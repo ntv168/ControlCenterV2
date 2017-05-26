@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    tools:context="center.control.system.vash.controlcenter.ControlPanel">
+
+    <LinearLayout
+        android:layout_width="804dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/lstAreaName"
+            android:layout_width="726dp"
+            android:layout_height="53dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/lstAreaAttribute"
+            android:layout_width="726dp"
+            android:layout_height="53dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_weight="0.20" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btnHouseMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nhà tôi" />
+
+        <Button
+            android:id="@+id/btnHousePanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chế độ" />
+
+        <Button
+            android:id="@+id/btnConfig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cài đặt" />
+
+        <Button
+            android:id="@+id/btnVoice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gọi quản gia" />
+    </LinearLayout>
+</LinearLayout>
