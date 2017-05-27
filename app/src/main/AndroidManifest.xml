@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="center.control.system.vash.controlcenter">
-    <uses-feature android:name="android.hardware.camera"
+
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
+
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,9 +16,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service
-        android:name=".service.ReadSensorService"
-        android:enabled="true" />
-        <activity android:name=".MainActivity"
+            android:name=".service.ReadSensorService"
+            android:enabled="true" />
+
+        <activity
+            android:name=".MainActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,8 +28,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ControlPanel"
-            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".panel.ControlPanel"
+            android:screenOrientation="landscape" />
+        <activity android:name=".panel.ModePanel" />
+        <activity android:name=".panel.SettingPanel" />
+        <activity android:name=".panel.VAPanel"></activity>
     </application>
 
 </manifest>

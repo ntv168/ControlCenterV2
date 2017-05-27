@@ -9,8 +9,8 @@
 
     <TextView
         android:id="@+id/txtAreaName"
-        android:layout_width="209dp"
-        android:layout_height="60dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Phòng"
         android:textColor="@color/colorPrimary"

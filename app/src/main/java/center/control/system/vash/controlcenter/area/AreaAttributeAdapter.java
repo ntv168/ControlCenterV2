@@ -29,6 +29,16 @@ public class AreaAttributeAdapter extends RecyclerView.Adapter<AreaAttributeHold
         }
     }
 
+
+    @Override
+    public int getItemCount() {
+        return areaAttributes.size();
+    }
+
+    public long getItemId(int position) {
+        return position;
+    }
+
     @Override
     public AreaAttributeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -42,12 +52,4 @@ public class AreaAttributeAdapter extends RecyclerView.Adapter<AreaAttributeHold
         holder.name.setText(areaAttributes.get(position).getName());
     }
 
-    @Override
-    public int getItemCount() {
-        return areaAttributes.size();
-    }
-
-    public long getItemId(int position) {
-        return position;
-    }
 }

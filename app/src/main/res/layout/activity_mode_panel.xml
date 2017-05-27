@@ -5,31 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="right"
-    tools:context="center.control.system.vash.controlcenter.panel.ControlPanel"
-    android:weightSum="1">
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:weightSum="1">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/lstAreaName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/lstAreaAttribute"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
-            android:layout_weight="0.20" />
-    </LinearLayout>
+    tools:context="center.control.system.vash.controlcenter.panel.ModePanel">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -41,12 +17,12 @@
             android:onClick="clicktoControlPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorActive"
             android:text="Nhà tôi" />
 
         <Button
             android:id="@+id/btnHousePanel"
             android:onClick="clicktoModePanel"
+            android:background="@color/colorActive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Chế độ" />
@@ -65,4 +41,5 @@
             android:layout_height="wrap_content"
             android:text="Gọi quản gia" />
     </LinearLayout>
+
 </LinearLayout>

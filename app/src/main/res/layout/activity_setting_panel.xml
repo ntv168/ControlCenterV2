@@ -5,43 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="right"
-    tools:context="center.control.system.vash.controlcenter.panel.ControlPanel"
-    android:weightSum="1">
+    tools:context="center.control.system.vash.controlcenter.panel.SettingPanel">
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
+        android:layout_height="495dp"
         android:orientation="vertical"
-        android:weightSum="1">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/lstAreaName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/lstAreaAttribute"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
-            android:layout_weight="0.20" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        tools:layout_editor_absoluteY="8dp"
+        tools:layout_editor_absoluteX="0dp">
 
         <Button
             android:id="@+id/btnHouseMode"
             android:onClick="clicktoControlPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorActive"
             android:text="Nhà tôi" />
 
         <Button
@@ -56,6 +33,7 @@
             android:onClick="clicktoSettingPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorActive"
             android:text="Cài đặt" />
 
         <Button
@@ -65,4 +43,6 @@
             android:layout_height="wrap_content"
             android:text="Gọi quản gia" />
     </LinearLayout>
+
+
 </LinearLayout>

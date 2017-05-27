@@ -3,7 +3,6 @@ package center.control.system.vash.controlcenter;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,11 +13,11 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONObject;
 
 import center.control.system.vash.controlcenter.constant.SharedPrefConstant;
+import center.control.system.vash.controlcenter.panel.ControlPanel;
 import center.control.system.vash.controlcenter.utils.VolleySingleton;
 
 public class MainActivity extends Activity {
@@ -34,7 +33,9 @@ public class MainActivity extends Activity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginSmartHouse();
+//                loginSmartHouse();
+                Intent i = new Intent(MainActivity.this, ControlPanel.class);
+                startActivity(i);
             }
         });
     }
