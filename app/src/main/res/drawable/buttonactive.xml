@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    //border color
     <item>
-        <shape android:shape="rectangle">
-            <size android:height="100dp"/>
-            <size android:width="100dp"/>
+        <shape>
+            <solid android:color="#f42176"/>
         </shape>
     </item>
-</selector>
+
+
+    //body and side border
+    <item android:bottom="5dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#FFFFFF"
+                android:endColor="#FFFFFF"
+                android:angle="90"
+                />
+        </shape>
+    </item>
+</layer-list>

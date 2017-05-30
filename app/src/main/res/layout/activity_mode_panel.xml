@@ -4,42 +4,65 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="right"
     tools:context="center.control.system.vash.controlcenter.panel.ModePanel">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_margin="30dp"
+        android:background="@color/colorSkin"
+        android:gravity="right">
 
-        <Button
-            android:id="@+id/btnHouseMode"
-            android:onClick="clicktoControlPanel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Nhà tôi" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btnHousePanel"
-            android:onClick="clicktoModePanel"
-            android:background="@color/colorActive"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Chế độ" />
+            <LinearLayout
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/colorActive"
+                android:orientation="vertical"
+                android:paddingRight="30dp"
+                android:weightSum="1">
 
-        <Button
-            android:id="@+id/btnConfig"
-            android:onClick="clicktoSettingPanel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Cài đặt" />
+                <ImageButton
+                    android:id="@+id/imageButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginLeft="30dp"
+                    android:background="@color/colorActive"
+                    android:onClick="clicktoControlPanel"
+                    android:src="@drawable/iconhome" />
 
-        <Button
-            android:id="@+id/btnVoice"
-            android:onClick="clicktoVAPanel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Gọi quản gia" />
+                <ImageButton
+                    android:id="@+id/imageButton1"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:background="@color/colorSkin"
+                    android:onClick="clicktoModePanel"
+                    android:paddingLeft="30dp"
+                    android:src="@drawable/iconhome" />
+
+                <ImageButton
+                    android:id="@+id/imageButton2"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginLeft="30dp"
+                    android:background="@drawable/buttonactive"
+                    android:onClick="clicktoSettingPanel"
+                    android:src="@drawable/iconhome" />
+
+                <ImageButton
+                    android:id="@+id/imageButton3"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginLeft="30dp"
+                    android:background="@drawable/buttonactive"
+                    android:onClick="clicktoVAPanel"
+                    android:src="@drawable/iconhome" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
-
 </LinearLayout>

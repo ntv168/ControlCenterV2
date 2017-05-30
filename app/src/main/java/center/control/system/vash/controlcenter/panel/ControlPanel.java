@@ -25,29 +25,29 @@ public class ControlPanel extends Activity {
         AreaEntity areaEntity = new AreaEntity();
         areaEntity.setName("Phòng khách");
 
-        areaEntities.add(areaEntity);
-        RecyclerView lstAreaName = (RecyclerView) findViewById(R.id.lstAreaName);
-        lstAreaName.setHasFixedSize(true);
-
-        LinearLayoutManager MyLayoutManager = new LinearLayoutManager(this);
-        MyLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-
-        lstAreaName.setLayoutManager(MyLayoutManager);
-
-        AreaAdapter areaAdapter = new AreaAdapter(areaEntities);
-        lstAreaName.setAdapter(areaAdapter);
-
-
-
-        LinearLayoutManager MyLayoutManager2 = new LinearLayoutManager(this);
-        MyLayoutManager2.setOrientation(LinearLayoutManager.HORIZONTAL);
-        RecyclerView lstAreaAttribute = (RecyclerView) findViewById(R.id.lstAreaAttribute);
-        lstAreaName.setHasFixedSize(true);
-
-        lstAreaAttribute.setLayoutManager(MyLayoutManager2);
-        AreaAttributeAdapter areaAttributeAdapter = new AreaAttributeAdapter();
-
-        lstAreaAttribute.setAdapter(areaAttributeAdapter);
+//        areaEntities.add(areaEntity);
+//        RecyclerView lstAreaName = (RecyclerView) findViewById(R.id.lstAreaName);
+//        lstAreaName.setHasFixedSize(true);
+//
+//        LinearLayoutManager MyLayoutManager = new LinearLayoutManager(this);
+//        MyLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+//
+//        lstAreaName.setLayoutManager(MyLayoutManager);
+//
+//        AreaAdapter areaAdapter = new AreaAdapter(areaEntities);
+//        lstAreaName.setAdapter(areaAdapter);
+//
+//
+//
+//        LinearLayoutManager MyLayoutManager2 = new LinearLayoutManager(this);
+//        MyLayoutManager2.setOrientation(LinearLayoutManager.HORIZONTAL);
+//        RecyclerView lstAreaAttribute = (RecyclerView) findViewById(R.id.lstAreaAttribute);
+//        lstAreaName.setHasFixedSize(true);
+//
+//        lstAreaAttribute.setLayoutManager(MyLayoutManager2);
+//        AreaAttributeAdapter areaAttributeAdapter = new AreaAttributeAdapter();
+//
+//        lstAreaAttribute.setAdapter(areaAttributeAdapter);
 
     }
 

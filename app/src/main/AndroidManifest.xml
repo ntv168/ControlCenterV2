@@ -9,8 +9,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -31,9 +32,12 @@
         <activity
             android:name=".panel.ControlPanel"
             android:screenOrientation="landscape" />
-        <activity android:name=".panel.ModePanel" />
-        <activity android:name=".panel.SettingPanel" />
-        <activity android:name=".panel.VAPanel"></activity>
+        <activity android:name=".panel.ModePanel"
+            android:screenOrientation="landscape"/>
+        <activity android:name=".panel.SettingPanel"
+            android:screenOrientation="landscape"/>
+        <activity android:name=".panel.VAPanel"
+            android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>
