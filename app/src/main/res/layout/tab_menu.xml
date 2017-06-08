@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/colorActive"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingRight="@dimen/tab_layout_margin"
+            android:weightSum="4" >
+
+            <ImageButton
+                android:id="@+id/tabBtnHome"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:onClick="clicktoControlPanel"
+                android:scaleType="fitCenter"
+
+                android:src="@drawable/tab_home" />
+
+            <ImageButton
+                android:id="@+id/tabBtnMode"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:onClick="clicktoModePanel"
+                android:scaleType="fitCenter"
+                android:src="@drawable/tab_mode" />
+
+            <ImageButton
+                android:id="@+id/tabBtnSetting"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:onClick="clicktoSettingPanel"
+                android:scaleType="fitCenter"
+                android:src="@drawable/tab_seting" />
+
+            <ImageButton
+                android:id="@+id/tabBtnVA"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:onClick="clicktoVAPanel"
+                android:scaleType="fitCenter"
+                android:src="@drawable/tab_voice" />
+        </LinearLayout>
+</LinearLayout>

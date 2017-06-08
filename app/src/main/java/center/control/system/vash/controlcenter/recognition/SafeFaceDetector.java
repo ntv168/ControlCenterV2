@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package center.control.system.vash.controlcenter.utils;
+package center.control.system.vash.controlcenter.recognition;
 
 import android.graphics.ImageFormat;
 import android.util.Log;

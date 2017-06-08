@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="center.control.system.vash.controlcenter.device.ManageDeviceActivity">
+
+    <LinearLayout
+        android:layout_width="@dimen/half_body_width"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listItemLeft"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/parent_list_height"></android.support.v7.widget.RecyclerView>
+
+        <Button
+            android:id="@+id/btnAddArea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Thêm không gian mới" />
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/listItemRight"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+    </android.support.v7.widget.RecyclerView>
+</LinearLayout>

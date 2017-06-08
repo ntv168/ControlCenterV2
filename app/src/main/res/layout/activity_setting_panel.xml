@@ -10,61 +10,66 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="30dp"
+        android:layout_margin="@dimen/main_layout_margin"
         android:background="@color/colorSkin"
         android:gravity="right">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/panel_body_width"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="200dp"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/half_body_height"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btnSetDevice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="30dp"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/network" />
+
+                <ImageButton
+                    android:id="@+id/btnSetConfig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="30dp"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/wrench" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
-                android:background="@color/colorActive"
-                android:orientation="vertical"
-                android:paddingRight="30dp"
-                android:weightSum="1">
+                android:orientation="horizontal">
 
                 <ImageButton
-                    android:id="@+id/imageButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:layout_marginLeft="30dp"
-                    android:background="@drawable/buttonactive"
-                    android:onClick="clicktoControlPanel"
-                    android:src="@drawable/iconhome" />
+                    android:id="@+id/btnSetReset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="30dp"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/refress" />
 
                 <ImageButton
-                    android:id="@+id/imageButton1"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:layout_marginLeft="30dp"
-                    android:background="@color/colorActive"
-                    android:onClick="clicktoModePanel"
-                    android:src="@drawable/iconhome" />
+                    android:id="@+id/btnSetLogout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="30dp"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/logout" />
 
-                <ImageButton
-                    android:id="@+id/imageButton2"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:background="@color/colorSkin"
-                    android:onClick="clicktoSettingPanel"
-                    android:paddingLeft="30dp"
-                    android:src="@drawable/iconhome" />
-
-                <ImageButton
-                    android:id="@+id/imageButton3"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:layout_marginLeft="30dp"
-                    android:background="@drawable/buttonactive"
-                    android:onClick="clicktoVAPanel"
-                    android:src="@drawable/iconhome" />
             </LinearLayout>
         </LinearLayout>
+
+        <include layout="@layout/tab_menu"/>
     </LinearLayout>
 
 </LinearLayout>

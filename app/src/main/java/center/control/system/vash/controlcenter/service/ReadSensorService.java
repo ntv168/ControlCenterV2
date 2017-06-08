@@ -9,9 +9,7 @@ import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
@@ -21,16 +19,13 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.face.Face;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.utils.Facedetect;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
-import center.control.system.vash.controlcenter.utils.VolleySingleton;
+import center.control.system.vash.controlcenter.server.VolleySingleton;
 
 /**
  * Created by Thuans on 5/26/2017.

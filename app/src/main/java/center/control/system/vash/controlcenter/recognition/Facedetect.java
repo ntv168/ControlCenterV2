@@ -1,4 +1,4 @@
-package center.control.system.vash.controlcenter.utils;
+package center.control.system.vash.controlcenter.recognition;
 
 import android.content.Context;
 import android.content.Intent;

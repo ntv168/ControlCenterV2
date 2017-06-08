@@ -9,19 +9,13 @@
 
     <TextView
         android:id="@+id/txtAttributeValue"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:background="@drawable/ovaltextview"
         android:gravity="center"
         android:text="Yếu"
         android:textColor="@color/colorPrimary"
         android:textSize="20sp" />
-
-    <!--<ImageView-->
-    <!--android:id="@+id/imageView"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:src="@drawable/ic_tv" />-->
 
     <TextView
         android:id="@+id/txtAttributeName"

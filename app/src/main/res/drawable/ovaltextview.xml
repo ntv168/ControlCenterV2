@@ -2,9 +2,9 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android" >
     <item>
         <shape android:shape="oval"  >
-            <corners android:radius="45dp" />
-            <gradient android:angle="270" android:startColor="@color/common_plus_signin_btn_text_dark_disabled"
-                android:endColor="@color/colorAccent"/>
+            <corners android:radius="55dp" />
+            <gradient android:angle="180" android:startColor="@color/coloreGreen"
+                android:endColor="@color/coloreGreen"/>
         </shape>
     </item>
 </selector>

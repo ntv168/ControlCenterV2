@@ -6,66 +6,40 @@
     android:layout_height="match_parent"
     android:gravity="right"
     tools:context="center.control.system.vash.controlcenter.panel.ControlPanel"
-    android:weightSum="1">
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="30dp"
+        android:layout_margin="@dimen/main_layout_margin"
         android:background="@color/colorSkin"
-        android:gravity="right">
+        android:weightSum="6"
+        android:gravity="left">
 
         <LinearLayout
-            android:layout_width="200dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_width="@dimen/panel_body_width"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"  >
 
-            <LinearLayout
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/lstAreaName"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
-                android:background="@color/colorActive"
-                android:orientation="vertical"
-                android:paddingRight="30dp"
-                android:weightSum="1">
+                android:layout_height="@dimen/title_height"
+                android:layout_weight="1" />
 
-                <ImageButton
-                    android:id="@+id/imageButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:background="@color/colorSkin"
-                    android:onClick="clicktoControlPanel"
-                    android:paddingLeft="30dp"
-                    android:src="@drawable/iconhome" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/lstAreaAttribute"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/detail_height"
+                android:layout_weight="1" />
 
-                <ImageButton
-                    android:id="@+id/imageButton1"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:layout_marginLeft="30dp"
-                    android:background="@drawable/buttonactive"
-                    android:onClick="clicktoModePanel"
-                    android:src="@drawable/iconhome" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/lstDevice"
+                android:layout_width="match_parent"
+                android:layout_height="182dp" />
 
-                <ImageButton
-                    android:id="@+id/imageButton2"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:layout_marginLeft="30dp"
-                    android:background="@drawable/buttonactive"
-                    android:onClick="clicktoSettingPanel"
-                    android:src="@drawable/iconhome" />
-
-                <ImageButton
-                    android:id="@+id/imageButton3"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:layout_marginLeft="30dp"
-                    android:background="@drawable/buttonactive"
-                    android:onClick="clicktoVAPanel"
-                    android:src="@drawable/iconhome" />
-            </LinearLayout>
         </LinearLayout>
 
+        <include layout="@layout/tab_menu" />
     </LinearLayout>
 </LinearLayout>

@@ -19,14 +19,19 @@ public class AreaAttributeAdapter extends RecyclerView.Adapter<AreaAttributeHold
     private static final String TAG = "AreaAdapter";
     private List<AreaAttribute> areaAttributes = new ArrayList<>();
 
-    public AreaAttributeAdapter() {
-        this.areaAttributes = new ArrayList<>();
-        for (String name : AreaEntity.attrivutes){
-            AreaAttribute attribute = new AreaAttribute();
-            attribute.setName(name);
-            attribute.setValue("cập nhật...");
-            this.areaAttributes.add(attribute);
+    public void updateAttribute(String[] value) {
+        for (int i = 0; i< AreaEntity.attrivutes.length; i++){
+            this.areaAttributes.get(i).setValue(value[i]);
         }
+        notifyDataSetChanged();
+    }
+    public void resetAttribute(){
+        this.areaAttributes = new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
+    public AreaAttributeAdapter(List<AreaAttribute> areaAttributes) {
+        this.areaAttributes = areaAttributes;
     }
 
 
@@ -50,6 +55,7 @@ public class AreaAttributeAdapter extends RecyclerView.Adapter<AreaAttributeHold
     @Override
     public void onBindViewHolder(AreaAttributeHolder holder, int position) {
         holder.name.setText(areaAttributes.get(position).getName());
+        holder.value.setText(areaAttributes.get(position).getValue());
     }
 
 }

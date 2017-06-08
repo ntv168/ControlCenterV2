@@ -1,9 +1,11 @@
 package center.control.system.vash.controlcenter.panel;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 
 import center.control.system.vash.controlcenter.R;
 
@@ -13,6 +15,8 @@ public class ModePanel extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mode_panel);
+        ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnMode);
+        currentTab.setBackgroundColor(Color.GREEN);
     }
 
     public void clicktoControlPanel(View view) {
