@@ -17,7 +17,7 @@ import center.control.system.vash.controlcenter.nlp.TermSQLite;
 
 public class SqLiteHelper extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
 
     private static final String DATABASE_NAME = "ControlCenter";
 
@@ -33,7 +33,8 @@ public class SqLiteHelper extends SQLiteOpenHelper {
                 //All necessary tables you like to create will create here
         db.execSQL(DeviceSQLite.createTable());
         db.execSQL(AreaSQLite.createTable());
-        db.execSQL(ScriptSQLite.createTable());
+        db.execSQL(ScriptSQLite.createScriptDeviceTable());
+        db.execSQL(ScriptSQLite.createScriptTable());
         db.execSQL(TermSQLite.createHumanTerm());
         db.execSQL(TermSQLite.createTargetTerm());
         db.execSQL(DetectIntentSQLite.createFunction());
@@ -48,10 +49,12 @@ public class SqLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + DeviceSQLite.TABLE_DEVICE);
         db.execSQL("DROP TABLE IF EXISTS " + AreaSQLite.TABLE_AREA);
         db.execSQL("DROP TABLE IF EXISTS " + ScriptSQLite.TABLE_SCRIPT);
+        db.execSQL("DROP TABLE IF EXISTS " + ScriptSQLite.TABLE_SCRIPT_DEVICE);
         db.execSQL("DROP TABLE IF EXISTS " + TermSQLite.TABLE_HUMAN_TERM);
         db.execSQL("DROP TABLE IF EXISTS " + TermSQLite.TABLE_TARGET_TERM);
         db.execSQL("DROP TABLE IF EXISTS " + DetectIntentSQLite.TABLE_FUNCTION_DETECT);
         db.execSQL("DROP TABLE IF EXISTS " + DetectIntentSQLite.TABLE_SOCIAL_DETECT);
         onCreate(db);
     }
+
 }

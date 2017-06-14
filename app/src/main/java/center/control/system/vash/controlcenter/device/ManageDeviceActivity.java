@@ -2,16 +2,20 @@ package center.control.system.vash.controlcenter.device;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
@@ -19,7 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Spinner; 
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -33,7 +37,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.area.AreaEntity;
@@ -82,7 +85,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
 
         deviceDialog = new Dialog(this);
         deviceDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        deviceDialog.setContentView(R.layout.edit_device_diaglog);
+        deviceDialog.setContentView(R.layout.add_device_diaglog);
 
         Button btnAddArea = (Button) findViewById(R.id.btnAddArea);
         btnAddArea.setOnClickListener(new View.OnClickListener() {
@@ -97,25 +100,33 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                 btnSave.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        final ProgressDialog progressDialog = new ProgressDialog(ManageDeviceActivity.this);
+                        progressDialog.setTitle("Kết nối gateway phòng");
+                        progressDialog.setMessage("Đợi tý nha");
                         currentArea = saveArea(areaName.getText().toString(),
                                 areaNickName.getText().toString(),
                                 ipArea.getText().toString());
+                        String url = "http://"+currentArea.getConnectAddress()+"/get";
+                        Log.d(TAG,url);
                         StringRequest connectAreaIP = new StringRequest(Request.Method.GET,
-                                "http://"+currentArea.getConnectAddress(), new Response.Listener<String>() {
+                                url,
+                                new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
                                 insertDeviceByPort(response, currentArea.getId());
-                                dialog.dismiss();
+                                progressDialog.dismiss();
                             }
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
                                 String response = "9,12,5,A2,A0";
                                 insertDeviceByPort(response, currentArea.getId());
-                                dialog.dismiss();
+                                progressDialog.dismiss();
                             }
                         });
                         VolleySingleton.getInstance(ManageDeviceActivity.this).addToRequestQueue(connectAreaIP);
+                        progressDialog.show();
+                        dialog.dismiss();
                     }
 
                     private AreaEntity saveArea(String name, String nickName, String addrress) {
@@ -127,7 +138,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                         int areaId = sqLite.insert(area);
                         area.setId(areaId);
                         house.getAreas().add(area);
-                        areaAdapter.addArea(area);
+                        areaAdapter.setAreas(house.getAreas());
 
                         return area;
                     }
@@ -143,7 +154,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                             device.setId(deviceId);
                             house.getDevices().add(device);
                         }
-                        devicesAdapter.setDevicesByAreaId(areaId, house.getDevices());
+                        devicesAdapter.setDevices(house.getDevicesByAreaId(areaId));
                     }
                 });
 
@@ -164,8 +175,90 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
     public void onAreaClick(AreaEntity areaEntity) {
         SmartHouse house = SmartHouse.getInstance();
         currentArea = areaEntity;
-        devicesAdapter.setDevicesByAreaId(areaEntity.getId(),house.getDevices());
+        devicesAdapter.setDevices(house.getDevicesByAreaId(areaEntity.getId()));
     }
+    @Override
+    public void onLongAreaClick(final AreaEntity areaEntity) {
+        currentArea = areaEntity;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Tùy chỉnh không gian "+areaEntity.getName());
+        View areaUpdateview = this.getLayoutInflater().inflate(R.layout.dialog_area_edit, null);
+        final EditText nickName = (EditText) areaUpdateview.findViewById(R.id.txtAreaNickname);
+        final EditText areaAddress = (EditText) areaUpdateview.findViewById(R.id.txtAreaAddress);
+        nickName.setText(currentArea.getNickName());
+        areaAddress.setText(currentArea.getConnectAddress());
+
+        builder.setView(areaUpdateview)
+                // Add action buttons
+                .setPositiveButton("Cập nhật", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        final ProgressDialog progressDialog = new ProgressDialog(ManageDeviceActivity.this);
+                        progressDialog.setTitle("Kết nối gateway phòng");
+                        progressDialog.setMessage("Đợi tý nha");
+                        updateArea(areaEntity,nickName.getText().toString(),
+                                areaAddress.getText().toString());
+                        String url = "http://"+areaAddress.getText().toString()+"/get";
+                        Log.d(TAG,url);
+                        StringRequest connectAreaIP = new StringRequest(Request.Method.GET,
+                                url,
+                                new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
+                                        renewDeviceByPort(response, currentArea.getId());
+                                        progressDialog.dismiss();
+                                    }
+                                }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.d(TAG,error.getMessage());
+                                progressDialog.dismiss();
+                            }
+                        });
+                        VolleySingleton.getInstance(ManageDeviceActivity.this).addToRequestQueue(connectAreaIP);
+                        progressDialog.show();
+                        dialog.dismiss();
+                    }
+
+                    private void renewDeviceByPort(String response, int id) {
+                        String[] ports = response.split(",");
+                        DeviceSQLite sqLite = new DeviceSQLite();
+                        sqLite.deleteByAreaId(currentArea.getId());
+                        SmartHouse house = SmartHouse.getInstance();
+                        house.removeDeviceByArea(currentArea.getId());
+                        for (String port : ports){
+                            DeviceEntity device = new DeviceEntity();
+                            device.setPort(port);
+                            device.setAreaId(currentArea.getId());
+                            int deviceId =sqLite.insert(device);
+                            device.setId(deviceId);
+                            house.getDevices().add(device);
+                        }
+                        devicesAdapter.setDevices(house.getDevicesByAreaId(currentArea.getId()));
+                    }
+
+                    private void updateArea(AreaEntity area, String nick, String addre) {
+                        area.setNickName(nick);
+                        area.setConnectAddress(addre);
+                        AreaSQLite sqLite = new AreaSQLite();
+                        sqLite.upAddressAndNickById(area.getId(),area);
+                        SmartHouse house = SmartHouse.getInstance();
+                        house.updateAreaById(area.getId(),area);
+                        areaAdapter.setAreas(house.getAreas());
+                    }
+                })
+                .setNegativeButton("Xóa", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        SmartHouse house = SmartHouse.getInstance();
+                        house.removeAreaAndItsDevice(currentArea.getId());
+                        currentArea = null;
+                        devicesAdapter.setDevices(new ArrayList<DeviceEntity>());
+                        areaAdapter.setAreas(house.getAreas());
+                    }
+                });
+        builder.show();
+    }
+
     public void pickImage() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
@@ -234,7 +327,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                         house.updateDeviceById(currentDevice.getId(),device);
                         DeviceSQLite sqLite = new DeviceSQLite();
                         sqLite.upById(device.getId(),device);
-                        devicesAdapter.setDevicesByAreaId(currentArea.getId(),house.getDevices());
+                        devicesAdapter.setDevices(house.getDevicesByAreaId(currentArea.getId()));
                         deviceDialog.dismiss();
                     }
                 });

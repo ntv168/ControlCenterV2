@@ -1,45 +1,49 @@
-package center.control.system.vash.controlcenter.area;
+package center.control.system.vash.controlcenter.script;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
-
-import center.control.system.vash.controlcenter.R;
 
 import java.util.List;
 
-public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHolder> {
+import center.control.system.vash.controlcenter.R;
 
-    private List<AreaEntity> areaEntities;
+public class ListScriptAdapter extends RecyclerView.Adapter<ListScriptAdapter.ViewHolder> {
+
+    private List<ScriptEntity> scriptEntities;
     private  OnAdapterItemClickListener mListener;
 
-    public ListAreaAdapter(List<AreaEntity> items, OnAdapterItemClickListener listener) {
-        areaEntities = items;
+    public void addScrip(ScriptEntity script) {
+        scriptEntities.add(script);
+        this.notifyDataSetChanged();
+    }
+
+    public ListScriptAdapter(List<ScriptEntity> items, OnAdapterItemClickListener listener) {
+        scriptEntities= items;
         mListener = listener;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.area_config_item, parent, false);
+                .inflate(R.layout.script_config_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.item = areaEntities.get(position);
-        holder.areaName.setText(holder.item.getName());
-        holder.areaAddress.setText(holder.item.getConnectAddress());
+        holder.item = scriptEntities.get(position);
+        holder.name.setText(holder.item.getName());
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    holder.areaName.setBackgroundColor(Color.GREEN);
-                   mListener.onAreaClick(holder.item);
+                    mListener.onScriptClick(holder.item);
                 }
             }
         });
@@ -47,7 +51,7 @@ public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHo
             @Override
             public boolean onLongClick(View v) {
                 if (mListener != null){
-                    mListener.onLongAreaClick(holder.item);
+                    mListener.onLongScriptClick(holder.item);
                 }
                 return true;
             }
@@ -61,31 +65,31 @@ public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return areaEntities.size();
+        return scriptEntities.size();
     }
 
-    public void setAreas(List<AreaEntity> areas) {
-        this.areaEntities = areas;
+    public void setScriptEntities(List<ScriptEntity> scriptEntities) {
+        this.scriptEntities = scriptEntities;
         this.notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
-        public final TextView areaName;
-        public final TextView areaAddress;
-        public AreaEntity item;
+        public final TextView name;
+        public final ImageButton btnActive;
+        public ScriptEntity item;
 
         public ViewHolder(View view) {
             super(view);
             this.view = view;
-            areaName = (TextView) view.findViewById(R.id.areaName);
-            areaAddress = (TextView) view.findViewById(R.id.areaAddress);
+            name = (TextView) view.findViewById(R.id.scriptName);
+            btnActive = (ImageButton) view.findViewById(R.id.btnActiveScript);
         }
 
     }
     public interface OnAdapterItemClickListener {
         // TODO: Update argument type and name
-        public void onAreaClick(AreaEntity areaEntity);
-        public void onLongAreaClick(AreaEntity areaEntity);
+        public void onScriptClick(ScriptEntity scriptEntity);
+        public void onLongScriptClick(ScriptEntity scriptEntity);
     }
 }

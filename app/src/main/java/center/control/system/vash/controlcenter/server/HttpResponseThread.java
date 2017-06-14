@@ -12,7 +12,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaEntity;
+import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 /**
@@ -21,7 +23,13 @@ import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 public class HttpResponseThread extends Thread {
     private static final String AREA_REQ = "area";
-    private static final String AREA_ATTRIBUTE_REQ = "areaAttribute";
+    private static final String AREA_ATTRIBUTE_REQ = "getAreaSensor";
+    private static final String AREA_DEVICE = "getAreaDevice";
+    private static final String MODE_REQ = "getMode";
+    private static final String ACTIVE_MODE = "activateMode";
+    private static final String MODE_DEVICE = "getModeDevice";
+    private static final String MODE_TODAY = "getModeToday";
+    private static final String RUN_MODE_TODAY = "modeToday";
     private final String TAG = "HttpResponseThread";
     Socket socket;
 
@@ -42,20 +50,48 @@ public class HttpResponseThread extends Thread {
             String response = "";
             os = socket.getOutputStream();
             if (request != null ) {
-
+                request = request.split(" ")[1];
+                Log.d(TAG,"req:  " +request);
+                SmartHouse house = SmartHouse.getInstance();
                 if (request.contains(AREA_REQ)){
-                    SmartHouse house = SmartHouse.getInstance();
                     for (AreaEntity area : house.getAreas()){
-                        response += '"'+area.getName()+"\",";
+                        response += area.getName()+"="+area.getId()+";";
                     }
-                    Log.d(TAG, request.substring(5,9));
                 } else if (request.contains(AREA_ATTRIBUTE_REQ)){
-                     String areaId = request.substring(20,request.length()-1);
-                    Log.d(TAG, areaId);
+                    String areaId = request.substring(AREA_ATTRIBUTE_REQ.length()+2);
+                    Log.d(TAG,areaId);
+//                    AreaEntity area = house.getAreaById(Integer.parseInt(areaId));
+//                    for (String attr: area.generateValueArr()){
+//                        response += '"'+attr+"\",";
+//                    }
                 }
-//                String content = "\"Phòng ăn\"=1,\"Phòng khách\"=2,\"Sân\"=3,";
-//                response = content;
+                else if (request.contains(AREA_DEVICE)){
+                    String[] param = request.split("/");
+                    Log.d(TAG,request);
+//                    "deviceName1=deviceId1=deviceType1=deviceStatus1=[security,temperature,light,sound,runningDevice];"
+//                    AreaEntity area = house.getAreaById(Integer.parseInt(areaId));
+//                    for (DeviceEntity device : house.getDevicesByAreaId(Integer.parseInt(areaId))){
+//                        response += '"'+device.getName()+"\"="+device.getId()+",";
+//                    }
+                } else if (request.contains(ACTIVE_MODE)){
+                    String areaId = request.substring(ACTIVE_MODE.length()+2);
+                    Log.d(TAG,areaId);
+//                    AreaEntity area = house.getAreaById(Integer.parseInt(areaId));
+//                    for (DeviceEntity device : house.getDevicesByAreaId(Integer.parseInt(areaId))){
+//                        response += '"'+device.getName()+"\"="+device.getId()+",";
+//                    }
+                } else if (request.contains(MODE_DEVICE)){
+                    String areaId = request.substring(MODE_DEVICE.length()+2);
+                    Log.d(TAG,areaId);
+//                    AreaEntity area = house.getAreaById(Integer.parseInt(areaId));
+//                    for (DeviceEntity device : house.getDevicesByAreaId(Integer.parseInt(areaId))){
+//                        response += '"'+device.getName()+"\"="+device.getId()+",";
+//                    }
+                }else if (request.contains(MODE_REQ)){
+                    response += "Thưa ông chủ ông có muốn bật đèn trước sân không ạ?";
+                }
             }
+            Log.d(TAG,response);
 
             os.write(("HTTP/1.0 200" + "\r\n").getBytes());
             os.write(("Content type: text/html" + "\r\n").getBytes());

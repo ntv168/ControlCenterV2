@@ -18,17 +18,17 @@ import center.control.system.vash.controlcenter.area.AreaAdapter;
 import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaAttributeAdapter;
 import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.utils.SharedPrefConstant;
+import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 public class ControlPanel extends Activity {
-    SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
+    private String systemId;
     @Override
     protected void onResume() {
         super.onResume();
-        sharedPreferences = getSharedPreferences(SharedPrefConstant.SMART_HOUSE_SHARED_PREF, MODE_PRIVATE);
-        String tokenSaved = sharedPreferences.getString(SharedPrefConstant.HOUSE_ID,"");
-
+        sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
+        systemId = sharedPreferences.getString(ConstManager.SYSTEM_ID,"");
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {

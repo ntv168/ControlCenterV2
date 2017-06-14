@@ -3,6 +3,12 @@ package center.control.system.vash.controlcenter.database;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import center.control.system.vash.controlcenter.area.AreaSQLite;
+import center.control.system.vash.controlcenter.device.DeviceSQLite;
+import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
+import center.control.system.vash.controlcenter.nlp.TermSQLite;
+import center.control.system.vash.controlcenter.script.ScriptSQLite;
+
 /**
  * Created by Thuans on 4/27/2017.
  */
@@ -44,5 +50,24 @@ public class SQLiteManager {
             mDatabase.close();
 
         }
+    }
+    public void clearAllData(){
+        SQLiteDatabase db = getInstance().openDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + DeviceSQLite.TABLE_DEVICE);
+        db.execSQL("DROP TABLE IF EXISTS " + AreaSQLite.TABLE_AREA);
+        db.execSQL("DROP TABLE IF EXISTS " + ScriptSQLite.TABLE_SCRIPT);
+        db.execSQL("DROP TABLE IF EXISTS " + TermSQLite.TABLE_HUMAN_TERM);
+        db.execSQL("DROP TABLE IF EXISTS " + TermSQLite.TABLE_TARGET_TERM);
+        db.execSQL("DROP TABLE IF EXISTS " + DetectIntentSQLite.TABLE_FUNCTION_DETECT);
+        db.execSQL("DROP TABLE IF EXISTS " + DetectIntentSQLite.TABLE_SOCIAL_DETECT);
+        db.execSQL(DeviceSQLite.createTable());
+        db.execSQL(AreaSQLite.createTable());
+        db.execSQL(ScriptSQLite.createScriptDeviceTable());
+        db.execSQL(ScriptSQLite.createScriptTable());
+        db.execSQL(TermSQLite.createHumanTerm());
+        db.execSQL(TermSQLite.createTargetTerm());
+        db.execSQL(DetectIntentSQLite.createFunction());
+        db.execSQL(DetectIntentSQLite.createSocial());
+        closeDatabase();
     }
 }

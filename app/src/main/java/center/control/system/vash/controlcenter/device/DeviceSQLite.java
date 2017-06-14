@@ -66,6 +66,7 @@ public class DeviceSQLite {
         if (cursor.moveToFirst()) {
             do {
                 DeviceEntity deviceEntity = getByCursor(cursor);
+                if (deviceEntity.getName() == null) deviceEntity.setName("...");
                 Log.d(TAG,deviceEntity.getName()+ " --- "+deviceEntity.getAreaId());
                 result.add(deviceEntity);
             } while (cursor.moveToNext());
@@ -129,6 +130,12 @@ public class DeviceSQLite {
     public void upById(int id, DeviceEntity device) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         db.update(TABLE_DEVICE, createContent(device), KEY_ID + " = "+id, null);
+        SQLiteManager.getInstance().closeDatabase();
+    }
+
+    public static void deleteByAreaId(int id) {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        db.delete(TABLE_DEVICE, KEY_AREA+"=?", new String[]{Integer.toString(id)});
         SQLiteManager.getInstance().closeDatabase();
     }
 }

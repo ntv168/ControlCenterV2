@@ -7,23 +7,43 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.face.Face;
+import com.microsoft.projectoxford.face.FaceServiceClient;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
+import center.control.system.vash.controlcenter.recognition.Facedetect;
+import center.control.system.vash.controlcenter.recognition.ImageHelper;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
 
@@ -39,24 +59,15 @@ public class ReadSensorService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        int cameraId = findFrontFacingCamera();
+        openBackCamera();
         final SurfaceView preview = new SurfaceView(this);
         final SurfaceHolder holder = preview.getHolder();
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        final WindowManager wm = (WindowManager)this
+        final WindowManager wm = (WindowManager) this
                 .getSystemService(Context.WINDOW_SERVICE);
 
+        Log.i(TAG, "Opened camera");
 
-        camera = Camera.open(cameraId);
-        Log.i(TAG,"Opened camera");
-        mCallBack =new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] data, Camera camera) {
-                Bitmap tmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                SmartHouse smartHouse = SmartHouse.getInstance();
-                smartHouse.updateCameraArea(smartHouse.getAreas().get(0).getId(),tmp);
-            }
-        };
         final Context context = this;
         repeatScheduler = new Timer();
         repeatScheduler.schedule(new TimerTask() {
@@ -67,15 +78,17 @@ public class ReadSensorService extends Service {
                 for (AreaEntity area: smartHouse.getAreas()){
                     final int currentAreaId = area.getId();
                     StringRequest readRoom = new StringRequest(Request.Method.GET, VolleySingleton.DEMO_ARDUINO_ADDRESS,
-                        new Response.Listener<String>(){
-                            @Override
-                            public void onResponse(String response) {
-                                response = "7:on,A0:25,A1:open";
-                                SmartHouse.getInstance().updateSensorArea(currentAreaId,response);
-                            }
-                        }, new Response.ErrorListener() {
+                            new Response.Listener<String>(){
+                                @Override
+                                public void onResponse(String response) {
+//                                    response = "7:on,A0:25,A1:open";
+//                                    SmartHouse.getInstance().updateSensorArea(currentAreaId,response);
+
+                                }
+                            }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
+
                             Log.e(TAG,error.getMessage());
                         }
                     });
@@ -83,8 +96,9 @@ public class ReadSensorService extends Service {
                 }
 
             }
-        }, 0, 3000);
+        }, 0, 4000);
     }
+
 
     @Nullable
     @Override
@@ -124,7 +138,7 @@ public class ReadSensorService extends Service {
                 0,PixelFormat.UNKNOWN);
         wm.addView(preview, params);
     }
-    private static int findFrontFacingCamera() {
+    private void openBackCamera() {
         int cameraId = -1;
         int numberOfCameras = Camera.getNumberOfCameras();
         for (int i = 0; i < numberOfCameras; i++) {
@@ -136,8 +150,9 @@ public class ReadSensorService extends Service {
                 break;
             }
         }
-        return cameraId;
+        camera = Camera.open(cameraId);
     }
+
     @Override
     public void onDestroy(){
         Toast.makeText(this, "Stop read sensor", Toast.LENGTH_SHORT).show();
@@ -150,4 +165,6 @@ public class ReadSensorService extends Service {
         }
         stopSelf();
     }
+
 }
+

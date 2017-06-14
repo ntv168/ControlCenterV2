@@ -1,7 +1,11 @@
 package center.control.system.vash.controlcenter.utils;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +14,9 @@ import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
+import center.control.system.vash.controlcenter.script.ScriptDeviceEntity;
+import center.control.system.vash.controlcenter.script.ScriptEntity;
+import center.control.system.vash.controlcenter.script.ScriptSQLite;
 
 /**
  * Created by Thuans on 5/27/2017.
@@ -21,6 +28,7 @@ public class SmartHouse {
 
     private List<AreaEntity> areas;
     private List<DeviceEntity> devices;
+    private List<ScriptEntity> scripts;
 
     private SmartHouse() { }
 
@@ -31,6 +39,7 @@ public class SmartHouse {
                     houseInstance= new SmartHouse();
                     houseInstance.setAreas(AreaSQLite.getAll());
                     houseInstance.setDevices(DeviceSQLite.getAll());
+                    houseInstance.setScripts(ScriptSQLite.getAll());
                 }
             }
 
@@ -44,6 +53,14 @@ public class SmartHouse {
 
     public List<AreaEntity> getAreas() {
         return areas;
+    }
+    public AreaEntity getAreaById(int areaId) {
+        for (AreaEntity area: this.getAreas()){
+            if (area.getId() == areaId){
+                return area;
+            }
+        }
+        return null;
     }
 
     public void updateSensorArea(int areaId, String response) {
@@ -66,6 +83,14 @@ public class SmartHouse {
         Log.d(TAG,areaId+ "   "+ areaId);
     }
 
+    public void setScripts(List<ScriptEntity> scripts) {
+        this.scripts = scripts;
+    }
+
+    public List<ScriptEntity> getScripts() {
+        return scripts;
+    }
+
     public List<DeviceEntity> getDevices() {
         return devices;
     }
@@ -78,6 +103,64 @@ public class SmartHouse {
         for (int i=0; i<this.getDevices().size();i++){
             if (this.getDevices().get(i).getId() == id){
                 this.getDevices().set(i,device);
+            }
+        }
+    }
+
+    public List<DeviceEntity> getDevicesByAreaId(int id) {
+        Log.d(TAG,"area: "+id);
+        List<DeviceEntity> result = new ArrayList<>();
+        for (DeviceEntity device : this.getDevices()){
+            if (device.getAreaId() == id){
+                result.add(device);
+            }
+        }
+        return result;
+    }
+
+    public void removeAreaAndItsDevice(int id) {
+        DeviceSQLite.deleteByAreaId(id);
+        AreaSQLite.deleteById(id);
+        for (AreaEntity areaEntity: this.getAreas()){
+            if (areaEntity.getId() == id){
+                this.getAreas().remove(areaEntity);
+            }
+        }
+    }
+    public ArrayAdapter<String> getAreaNameAdapter(Context ctx){
+        ArrayAdapter<String> areaNameAdapter = new ArrayAdapter<String>(ctx, android.R.layout.select_dialog_singlechoice);
+        for (AreaEntity areaEntity : areas){
+            areaNameAdapter.add(areaEntity.getName());
+        }
+        return areaNameAdapter;
+    }
+
+    public List<ScriptDeviceEntity> getDeviceScriptByAreaId(int areaId) {
+        List<ScriptDeviceEntity> areaNameAdapter = new ArrayList<>();
+        for (DeviceEntity deviceEntity: devices){
+            if (deviceEntity.getAreaId() == areaId) {
+                ScriptDeviceEntity sde = new ScriptDeviceEntity();
+                sde.setDeviceName(deviceEntity.getName());
+                sde.setGroupId(areaId);
+                sde.setDeviceId(deviceEntity.getId());
+                areaNameAdapter.add(sde);
+            }
+        }
+        return areaNameAdapter;
+    }
+
+    public void updateAreaById(int id, AreaEntity area) {
+        for (int i=0; i<this.getAreas().size();i++){
+            if (this.getAreas().get(i).getId() == id){
+                this.getAreas().set(i,area);
+            }
+        }
+    }
+
+    public void removeDeviceByArea(int id) {
+        for (int i=0; i<this.getDevices().size();i++){
+            if (this.getDevices().get(i).getAreaId() == id){
+                this.getDevices().remove(i);
             }
         }
     }

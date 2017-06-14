@@ -9,6 +9,10 @@ import android.util.Log;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.microsoft.projectoxford.face.FaceServiceClient;
+import com.microsoft.projectoxford.face.FaceServiceRestClient;
+
+import center.control.system.vash.controlcenter.R;
 
 /**
  * Created by Thuans on 4/18/2017.
@@ -17,11 +21,17 @@ import com.google.android.gms.vision.face.FaceDetector;
 public class Facedetect {
     private static Facedetect singleton;
     private static String TAG = "Vision api singleton";
-    private Bitmap imageBitmap;
     private Detector<Face> safeDetector;
     private Facedetect(){
 
     }
+
+    public static FaceServiceClient getFaceServiceClient() {
+        return sFaceServiceClient;
+    }
+
+    private static FaceServiceClient sFaceServiceClient;
+
     public static Facedetect getInstance(Context c){
         if (singleton == null){
             singleton = new Facedetect();
@@ -42,16 +52,11 @@ public class Facedetect {
             } else {
                 singleton.safeDetector  = faceDetector;
             }
+            sFaceServiceClient = new FaceServiceRestClient(c.getString(R.string.endpoint), c.getString(R.string.subscription_key));
+
+
         }
         return singleton;
-    }
-
-    public Bitmap getImageBitmap() {
-        return imageBitmap;
-    }
-
-    public void setImageBitmap(Bitmap imageBitmap) {
-        this.imageBitmap = imageBitmap;
     }
 
     public Detector<Face> getSafeDetector() {

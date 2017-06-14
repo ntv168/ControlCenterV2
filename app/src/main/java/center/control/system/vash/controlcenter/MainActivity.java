@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -16,7 +17,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import center.control.system.vash.controlcenter.utils.SharedPrefConstant;
+import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
 
@@ -33,29 +34,36 @@ public class MainActivity extends Activity {
     private String ownerAddress;
     private String ownerTel;
     private String ownerCmnd;
+    private String systemId;
     private String activeDay;
     private String pricePlan;
     private String virtualAssistantName;
     private String virtualAssistantType;
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button btnLogin = (Button) findViewById(R.id.btnLogin);
-        sharedPreferences =getSharedPreferences(SharedPrefConstant.SMART_HOUSE_SHARED_PREF, MODE_PRIVATE);
+        sharedPreferences =getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
+        String usename = sharedPreferences.getString(ConstManager.USERNAME,"");
+        ((EditText) findViewById(R.id.txtUsername)).setText(usename);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                loginSmartHouse();
-                Intent i = new Intent(MainActivity.this, ControlPanel.class);
-                startActivity(i);
+                loginSmartHouse();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        systemId = sharedPreferences.getString(ConstManager.SYSTEM_ID,"");
+        if (!systemId.equals("")){
+            Intent intent = new Intent(MainActivity.this, ControlPanel.class);
+            startActivity(intent);
+        }
     }
 
     private void loginSmartHouse() {
@@ -63,37 +71,32 @@ public class MainActivity extends Activity {
         EditText password = (EditText) findViewById(R.id.txtPassword);
 
         SharedPreferences.Editor edit = sharedPreferences.edit();
-        edit.putString(SharedPrefConstant.USERNAME,username.getText().toString());
+        edit.putString(ConstManager.USERNAME,username.getText().toString());
         edit.commit();
         Log.d(TAG,"Login :"+ username.getText()+ password.getText()+ " send "+VolleySingleton.LOGIN_HOUSE_API);
-        JsonObjectRequest loginJson = new JsonObjectRequest(Request.Method.GET,
+        final JsonObjectRequest loginJson = new JsonObjectRequest(Request.Method.GET,
                 VolleySingleton.LOGIN_HOUSE_API, null, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
-                Log.d(TAG, response.toString());
 
+                Log.d(TAG, response.toString());
+                SharedPreferences.Editor edit = sharedPreferences.edit();
+
+                edit.putString(ConstManager.SYSTEM_ID,houseId);
+                edit.commit();
             }
         }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(MainActivity.this,error.getMessage(),Toast.LENGTH_SHORT);
                 Intent i = new Intent(MainActivity.this, ControlPanel.class);
                 startActivity(i);
-                Log.d(TAG, "Error: " + error.getMessage());
             }
         });
         VolleySingleton.getInstance(this).addToRequestQueue(loginJson);
     }
 
-    @Override
-    protected void onPause() {
-        SharedPreferences preferences = getSharedPreferences(SharedPrefConstant.SMART_HOUSE_SHARED_PREF,MODE_PRIVATE);
-        SharedPreferences.Editor edit = preferences.edit();
-
-        edit.putString(SharedPrefConstant.HOUSE_ID,houseId);
-        edit.commit();
-        Log.d(TAG,"Saved contract info "+houseId);
-        super.onPause();
-    }
 }

@@ -45,7 +45,6 @@ public class AreaSQLite {
     public int insert(AreaEntity area) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, area.getId());
         values.put(KEY_NAME, area.getName());
         values.put(KEY_ADDRESS, area.getConnectAddress());
         values.put(KEY_TEMP, area.getTemperature());
@@ -83,6 +82,16 @@ public class AreaSQLite {
 
         return result;
     }
+
+    public void upAddressAndNickById(int id, AreaEntity area) {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(KEY_ADDRESS,area.getConnectAddress());
+        cv.put(KEY_NICKNAME,area.getNickName());
+        db.update(TABLE_AREA, cv, KEY_ID + " = "+id, null);
+        SQLiteManager.getInstance().closeDatabase();
+    }
+
     public AreaEntity findById(String id){
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
@@ -114,6 +123,11 @@ public class AreaSQLite {
     public void delete( ) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         db.delete(TABLE_AREA,null,null);
+        SQLiteManager.getInstance().closeDatabase();
+    }
+    public static void deleteById(int id){
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        db.delete(TABLE_AREA, KEY_ID+"=?", new String[]{Integer.toString(id)});
         SQLiteManager.getInstance().closeDatabase();
     }
     static AreaEntity cursorToEnt(Cursor cursor){

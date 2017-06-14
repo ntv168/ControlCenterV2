@@ -5,71 +5,79 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="right"
+    android:weightSum="7"
     tools:context="center.control.system.vash.controlcenter.panel.SettingPanel">
 
+
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/main_layout_margin"
-        android:background="@color/colorSkin"
-        android:gravity="right">
+        android:layout_weight="6"
+        android:weightSum="2"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="@dimen/panel_body_width"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:weightSum="2"
+            android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/half_body_height"
-                android:orientation="horizontal">
+            <ImageButton
+                android:id="@+id/btnSetDevice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="30dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/network" />
 
-                <ImageButton
-                    android:id="@+id/btnSetDevice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="30dp"
-                    android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/network" />
+            <ImageButton
+                android:id="@+id/btnSetConfig"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="30dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/wrench" />
 
-                <ImageButton
-                    android:id="@+id/btnSetConfig"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="30dp"
-                    android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/wrench" />
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/btnSetReset"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="30dp"
-                    android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/refress" />
-
-                <ImageButton
-                    android:id="@+id/btnSetLogout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="30dp"
-                    android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/logout" />
-
-            </LinearLayout>
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:weightSum="2"
+            android:orientation="horizontal">
 
-        <include layout="@layout/tab_menu"/>
+            <ImageButton
+                android:id="@+id/btnSetReset"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="30dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/refress" />
+
+            <ImageButton
+                android:id="@+id/btnSetLogout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="30dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/logout" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/colorSkin"
+        android:orientation="vertical">
+
+        <include layout="@layout/tab_menu" />
     </LinearLayout>
 
 </LinearLayout>

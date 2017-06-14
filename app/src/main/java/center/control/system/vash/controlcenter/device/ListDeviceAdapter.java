@@ -1,5 +1,6 @@
 package center.control.system.vash.controlcenter.device;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +40,7 @@ public class ListDeviceAdapter extends RecyclerView.Adapter<ListDeviceAdapter.Vi
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
+                    holder.deviceName.setBackgroundColor(Color.GREEN);
                    mListener.onDeviceClick(holder.item);
                 }
             }
@@ -51,13 +53,8 @@ public class ListDeviceAdapter extends RecyclerView.Adapter<ListDeviceAdapter.Vi
     }
 
 
-    public void setDevicesByAreaId(int id, List<DeviceEntity> allDevs) {
-        this.deviceEnts = new ArrayList<>();
-        for (DeviceEntity device : allDevs){
-            if (device.getAreaId() == id){
-                this.deviceEnts.add(device);
-            }
-        }
+    public void setDevices(List<DeviceEntity> devices) {
+        this.deviceEnts = devices;
         this.notifyDataSetChanged();
     }
 

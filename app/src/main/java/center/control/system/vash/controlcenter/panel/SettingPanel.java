@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -18,9 +20,12 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import center.control.system.vash.controlcenter.MainActivity;
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.database.SQLiteManager;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.service.WebServerService;
+import center.control.system.vash.controlcenter.utils.ConstManager;
 
 public class SettingPanel extends AppCompatActivity {
 
@@ -33,6 +38,9 @@ public class SettingPanel extends AppCompatActivity {
         super.onStart();
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
                 new IntentFilter(SETTING_FILTER_RECEIVER));
+        Intent webService = new Intent(SettingPanel.this, WebServerService.class);
+        startService(webService);
+
         Log.d(TAG,"start broadcast");
     }
 
@@ -89,6 +97,18 @@ public class SettingPanel extends AppCompatActivity {
             }
         };
 
+        ImageButton btnSetLogout = (ImageButton) findViewById(R.id.btnSetLogout);
+        btnSetLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
+                SharedPreferences.Editor edit = sharedPreferences.edit();
+                edit.putString(ConstManager.SYSTEM_ID,"");
+                edit.commit();
+                SQLiteManager.getInstance().clearAllData();
+                startActivity(new Intent(SettingPanel.this, MainActivity.class));
+            }
+        });
     }
 
     public void clicktoControlPanel(View view) {

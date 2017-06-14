@@ -17,33 +17,47 @@ import center.control.system.vash.controlcenter.database.SQLiteManager;
 public class ScriptSQLite {
 
     public static final String TABLE_SCRIPT = "script";
+    public static final String TABLE_SCRIPT_DEVICE = "script_device";
     // Contacts Table Columns names
     private static final String KEY_ID = "id";
     private static final String KEY_NAME = "name";
     private static final String KEY_NICKNAME = "nickName";
 
-    public static String createTable(){
+    private static final String KEY_GROUP_ID = "group_id";
+    private static final String KEY_DEVICE_ID = "device_id";
+    private static final String KEY_DEVICE_STATE = "device_state";
+
+    public static String createScriptTable(){
         return "CREATE TABLE " + TABLE_SCRIPT  + "("
                 + KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT    ,"
                 +  KEY_NAME+ "  TEXT ," +
                 KEY_NICKNAME + "  TEXT  "+ ")";
     }
-
-
-    public int insert(ScriptEntity script) {
+    public static String createScriptDeviceTable(){
+        return "CREATE TABLE " + TABLE_SCRIPT_DEVICE  + "("
+                + KEY_GROUP_ID  + " INTEGER ,"
+                +  KEY_DEVICE_ID+ "  INTEGER  ," +
+                KEY_DEVICE_STATE + "  TEXT  ,"+
+                "PRIMARY KEY ("+KEY_DEVICE_ID+","+ KEY_GROUP_ID+")" +
+                ")";
+    }
+    public static void insertScript(ScriptEntity script,List<ScriptDeviceEntity> command) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, script.getName());
         values.put(KEY_NICKNAME, script.getNickName());
-
         // Inserting Row
-        int newId  = (int) db.insert(TABLE_SCRIPT, null, values);
+        int scriptId  = (int) db.insert(TABLE_SCRIPT, null, values);
+        for (ScriptDeviceEntity device : command){
+            values = new ContentValues();
+            values.put(KEY_DEVICE_ID, device.getDeviceId());
+            values.put(KEY_GROUP_ID, scriptId);
+            values.put(KEY_DEVICE_STATE, device.getDeviceState());
+            db.insert(TABLE_SCRIPT_DEVICE, null, values);
+        }
         SQLiteManager.getInstance().closeDatabase();
-
-        return newId;
     }
-
-    public List<ScriptEntity> getAll(){
+    public static List<ScriptEntity> getAll(){
         List<ScriptEntity> result = new ArrayList<>();
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();

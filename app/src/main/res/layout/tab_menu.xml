@@ -21,8 +21,9 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:onClick="clicktoControlPanel"
-                android:scaleType="fitCenter"
+                android:padding="30dp"
 
+                android:scaleType="fitCenter"
                 android:src="@drawable/tab_home" />
 
             <ImageButton
@@ -31,6 +32,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:onClick="clicktoModePanel"
+                android:padding="30dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/tab_mode" />
 
@@ -40,6 +42,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:onClick="clicktoSettingPanel"
+                android:padding="30dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/tab_seting" />
 
@@ -49,6 +52,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:onClick="clicktoVAPanel"
+                android:padding="30dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/tab_voice" />
         </LinearLayout>
