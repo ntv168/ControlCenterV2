@@ -4,12 +4,17 @@ import android.graphics.Bitmap;
 
 import com.google.gson.annotations.SerializedName;
 
+import center.control.system.vash.controlcenter.R;
+
 /**
  * Created by Thuans on 5/26/2017.
  */
 
 public class AreaEntity {
     public  static final String[] attrivutes = {"An ninh","Ánh sáng","Nhiệt độ","Âm thanh", "Thiết bị sử dụng điện"};
+    public  static final String[] attrivutesValues = {"security","light","temperature","sound","runningDevice"};
+    public  static final int[] attributeIcon = {R.drawable.shield,R.drawable.light,
+            R.drawable.temp,R.drawable.music,R.drawable.electric};
     @SerializedName("id")
     private int id;
     @SerializedName("temperature")
@@ -124,4 +129,14 @@ public class AreaEntity {
         };
         return result;
     }
+    public String generateAttributeForApi(){
+        String result = new String(
+                this.getSafety()+";"+
+                this.getTemperature()+";"+
+                this.getLight()+";"+
+                this.getSound()+";"+
+                this.getElectricUsing());
+        return result;
+    }
+
 }

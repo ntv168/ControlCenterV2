@@ -17,14 +17,14 @@ import center.control.system.vash.controlcenter.R;
  * Created by Thuans on 4/7/2017.
  */
 
-public class AreaAdapter extends RecyclerView.Adapter<AreaHolder> {
+public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaHolder> {
     private static final String TAG = "AreaAdapter";
     private List<AreaEntity> areaEntities = new ArrayList<AreaEntity>();
-    private  AreaAttributeAdapter areaAttributeAdapter;
+    private AreaClickListener listener;
 
-    public AreaAdapter(List<AreaEntity> areaEntities, AreaAttributeAdapter areaAttributeAdapter) {
+    public AreaAdapter(List<AreaEntity> areaEntities, AreaClickListener listener) {
         this.areaEntities = areaEntities;
-        this.areaAttributeAdapter = areaAttributeAdapter;
+        this.listener = listener;
     }
 
     @Override
@@ -38,11 +38,10 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaHolder> {
     @Override
     public void onBindViewHolder(AreaHolder holder, final int position) {
         holder.name.setText(areaEntities.get(position).getName());
-        holder.name.setOnClickListener(new View.OnClickListener() {
+        holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                areaAttributeAdapter.updateAttribute(areaEntities.get(position).generateValueArr());
-//                Log.d(TAG," click ip");
+                listener.onAreaClick(areaEntities.get(position));
             }
         });
     }
@@ -55,4 +54,19 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaHolder> {
     public long getItemId(int position) {
         return position;
     }
+
+    public interface AreaClickListener{
+        public void onAreaClick(AreaEntity area);
+    }
+    public class AreaHolder extends RecyclerView.ViewHolder{
+        public TextView name;
+        public View view;
+
+        public AreaHolder(View rowView) {
+            super(rowView);
+            view = rowView;
+            name = (TextView) rowView.findViewById(R.id.txtAreaName);
+        }
+    }
 }
+

@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import center.control.system.vash.controlcenter.MainActivity;
 import center.control.system.vash.controlcenter.R;
@@ -29,19 +30,11 @@ import center.control.system.vash.controlcenter.utils.ConstManager;
 
 public class SettingPanel extends AppCompatActivity {
 
-    public static final String SETTING_FILTER_RECEIVER = "central.start.localbroadcast.APPLICATION_MOBILE";
     private static final String TAG = "Setting Panel";
-    private BroadcastReceiver receiver;
-
     @Override
     protected void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
-                new IntentFilter(SETTING_FILTER_RECEIVER));
-        Intent webService = new Intent(SettingPanel.this, WebServerService.class);
-        startService(webService);
 
-        Log.d(TAG,"start broadcast");
     }
 
     @Override
@@ -49,7 +42,7 @@ public class SettingPanel extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_panel);
         ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnSetting);
-        currentTab.setBackgroundColor(Color.GREEN);
+        currentTab.setBackgroundColor(Color.WHITE);
         final Dialog dialog = new Dialog(SettingPanel.this);
         dialog.setContentView(R.layout.activate_diaglog);
 
@@ -62,10 +55,7 @@ public class SettingPanel extends AppCompatActivity {
                 btnStartServ.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent webService = new Intent(SettingPanel.this, WebServerService.class);
-                        TextView text = (TextView) dialog.findViewById(R.id.txtServerResult);
-                        text.setText("starting server ...");
-                        startService(webService);
+
                     }
                 });
 
@@ -88,14 +78,6 @@ public class SettingPanel extends AppCompatActivity {
                 startActivity(new Intent(SettingPanel.this, ManageDeviceActivity.class));
             }
         });
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String messageSource = intent.getStringExtra(WebServerService.RESULT);
-                TextView text = (TextView) dialog.findViewById(R.id.txtServerResult);
-                text.setText(messageSource);
-            }
-        };
 
         ImageButton btnSetLogout = (ImageButton) findViewById(R.id.btnSetLogout);
         btnSetLogout.setOnClickListener(new View.OnClickListener() {

@@ -42,8 +42,10 @@ import java.util.TimerTask;
 import java.util.UUID;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
+import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.recognition.Facedetect;
 import center.control.system.vash.controlcenter.recognition.ImageHelper;
+import center.control.system.vash.controlcenter.script.ScriptDeviceEntity;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
 
@@ -59,47 +61,65 @@ public class ReadSensorService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        openBackCamera();
-        final SurfaceView preview = new SurfaceView(this);
-        final SurfaceHolder holder = preview.getHolder();
-        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        final WindowManager wm = (WindowManager) this
-                .getSystemService(Context.WINDOW_SERVICE);
-
-        Log.i(TAG, "Opened camera");
+//        openBackCamera();
+//        final SurfaceView preview = new SurfaceView(this);
+//        final SurfaceHolder holder = preview.getHolder();
+//        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+//        final WindowManager wm = (WindowManager) this
+//                .getSystemService(Context.WINDOW_SERVICE);
+//
+//        Log.i(TAG, "Opened camera");
 
         final Context context = this;
         repeatScheduler = new Timer();
         repeatScheduler.schedule(new TimerTask() {
             @Override
             public void run() {
-                takePhoto(context, holder,wm,preview);
+//                takePhoto(context, holder,wm,preview);
                 SmartHouse smartHouse = SmartHouse.getInstance();
-                for (AreaEntity area: smartHouse.getAreas()){
-                    final int currentAreaId = area.getId();
-                    StringRequest readRoom = new StringRequest(Request.Method.GET, VolleySingleton.DEMO_ARDUINO_ADDRESS,
-                            new Response.Listener<String>(){
-                                @Override
-                                public void onResponse(String response) {
-//                                    response = "7:on,A0:25,A1:open";
-//                                    SmartHouse.getInstance().updateSensorArea(currentAreaId,response);
-
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-
-                            Log.e(TAG,error.getMessage());
+                try {
+                    ScriptDeviceEntity command = smartHouse.getOwnerCommand().take();
+                    if (command == null){
+                        checkAttributeAllAreas(smartHouse.getAreas());
+                    } else {
+                        DeviceEntity device = smartHouse.getDeviceById(command.getDeviceId());
+                        if (device != null) {
+                            Toast.makeText(context, device.getName() + " lệnh: " + command.getDeviceState(), Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, "Không tìm thấy thiết bị với lệnh: " + command.getDeviceState(), Toast.LENGTH_SHORT).show();
                         }
-                    });
-                    VolleySingleton.getInstance(context).addToRequestQueue(readRoom);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+
 
             }
         }, 0, 4000);
     }
 
+    private  void checkAttributeAllAreas(List<AreaEntity> areas){
+        for (AreaEntity area: areas){
+            final int currentAreaId = area.getId();
+            Log.d(TAG,area.getConnectAddress());
+            StringRequest readRoom = new StringRequest(Request.Method.GET, area.getConnectAddress(),
+                    new Response.Listener<String>(){
+                        @Override
+                        public void onResponse(String response) {
+//                                    response = "7:on,A0:25,A1:open";
+//                                    SmartHouse.getInstance().updateSensorArea(currentAreaId,response);
 
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    Log.e(TAG,error.getMessage());
+                }
+            });
+            VolleySingleton.getInstance(null).addToRequestQueue(readRoom);
+        }
+    }
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -150,7 +170,7 @@ public class ReadSensorService extends Service {
                 break;
             }
         }
-        camera = Camera.open(cameraId);
+//        camera = Camera.open(cameraId);
     }
 
     @Override

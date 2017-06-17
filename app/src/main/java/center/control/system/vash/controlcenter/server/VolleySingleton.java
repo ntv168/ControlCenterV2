@@ -11,8 +11,8 @@ import com.android.volley.toolbox.Volley;
  */
 
 public class VolleySingleton {
-    public static final String LOGIN_HOUSE_API = "http://google.com.vn";
-    public static final String DEMO_ARDUINO_ADDRESS = "http://google.com.vn" ;
+
+    public static  String SERVER_HOST = "https://6c57aed5.ngrok.io";
     private static VolleySingleton mInstance;
     private RequestQueue mRequestQueue;
     private static Context context;

@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
+import center.control.system.vash.controlcenter.script.ScriptDeviceEntity;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 /**
@@ -28,8 +29,11 @@ public class HttpResponseThread extends Thread {
     private static final String MODE_REQ = "getMode";
     private static final String ACTIVE_MODE = "activateMode";
     private static final String MODE_DEVICE = "getModeDevice";
+    private static final String ON_DEVICE = "deviceOn";
     private static final String MODE_TODAY = "getModeToday";
     private static final String RUN_MODE_TODAY = "modeToday";
+    private static final String RESPONSE_SUCCESS = "sucess";
+    private static final String RESPONSE_FAIL = "fail";
     private final String TAG = "HttpResponseThread";
     Socket socket;
 
@@ -58,37 +62,28 @@ public class HttpResponseThread extends Thread {
                         response += area.getName()+"="+area.getId()+";";
                     }
                 } else if (request.contains(AREA_ATTRIBUTE_REQ)){
-                    String areaId = request.substring(AREA_ATTRIBUTE_REQ.length()+2);
-                    Log.d(TAG,areaId);
-//                    AreaEntity area = house.getAreaById(Integer.parseInt(areaId));
-//                    for (String attr: area.generateValueArr()){
-//                        response += '"'+attr+"\",";
-//                    }
+                    String[] reqElement  = request.split("/");
+                    Log.d(TAG,"area id:  "+reqElement[2]);
+                    AreaEntity area = house.getAreaById(Integer.parseInt(reqElement[2]));
+                    response +=  area.generateAttributeForApi();
                 }
                 else if (request.contains(AREA_DEVICE)){
-                    String[] param = request.split("/");
-                    Log.d(TAG,request);
-//                    "deviceName1=deviceId1=deviceType1=deviceStatus1=[security,temperature,light,sound,runningDevice];"
-//                    AreaEntity area = house.getAreaById(Integer.parseInt(areaId));
-//                    for (DeviceEntity device : house.getDevicesByAreaId(Integer.parseInt(areaId))){
-//                        response += '"'+device.getName()+"\"="+device.getId()+",";
-//                    }
-                } else if (request.contains(ACTIVE_MODE)){
-                    String areaId = request.substring(ACTIVE_MODE.length()+2);
-                    Log.d(TAG,areaId);
-//                    AreaEntity area = house.getAreaById(Integer.parseInt(areaId));
-//                    for (DeviceEntity device : house.getDevicesByAreaId(Integer.parseInt(areaId))){
-//                        response += '"'+device.getName()+"\"="+device.getId()+",";
-//                    }
+                    String[] reqElement  = request.split("/");
+                    Log.d(TAG,"area id:  "+reqElement[2]);
+                    response += house.generateDeviceByAreaForApi(Integer.parseInt(reqElement[2]));
+                } else if (request.contains(ON_DEVICE)){
+                    String[] reqElement  = request.split("/");
+                    Log.d(TAG,"device id:  "+reqElement[2]);
+                    house.addCommand(new ScriptDeviceEntity(Integer.parseInt(reqElement[2]),"on"));
+                    response += RESPONSE_SUCCESS;
                 } else if (request.contains(MODE_DEVICE)){
-                    String areaId = request.substring(MODE_DEVICE.length()+2);
-                    Log.d(TAG,areaId);
-//                    AreaEntity area = house.getAreaById(Integer.parseInt(areaId));
-//                    for (DeviceEntity device : house.getDevicesByAreaId(Integer.parseInt(areaId))){
-//                        response += '"'+device.getName()+"\"="+device.getId()+",";
-//                    }
+                    String[] reqElement  = request.split("/");
+                    Log.d(TAG,"mode id:  "+ reqElement[2]);
+                    response += "";
                 }else if (request.contains(MODE_REQ)){
-                    response += "Thưa ông chủ ông có muốn bật đèn trước sân không ạ?";
+                    String[] reqElement  = request.split("/");
+                    Log.d(TAG,"mode request:  "+ reqElement[2]);
+                    response += "";
                 }
             }
             Log.d(TAG,response);

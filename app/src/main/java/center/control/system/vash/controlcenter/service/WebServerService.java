@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import center.control.system.vash.controlcenter.panel.ControlPanel;
 import center.control.system.vash.controlcenter.panel.SettingPanel;
 import center.control.system.vash.controlcenter.server.WebServer;
 
@@ -26,7 +27,7 @@ public class WebServerService extends Service {
         return null;
     }
     private void sendMessageToActivity(String msg) {
-        Intent intent = new Intent(SettingPanel.SETTING_FILTER_RECEIVER);
+        Intent intent = new Intent(ControlPanel.CONTROL_FILTER_RECEIVER);
 
         intent.putExtra(RESULT, msg);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);

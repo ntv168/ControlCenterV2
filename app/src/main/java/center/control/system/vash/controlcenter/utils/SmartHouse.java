@@ -9,6 +9,10 @@ import android.widget.ListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
@@ -25,7 +29,7 @@ import center.control.system.vash.controlcenter.script.ScriptSQLite;
 public class SmartHouse {
     private static final String TAG = "Smart house singleton";
     private static volatile SmartHouse houseInstance = null;
-
+    private BlockingQueue<ScriptDeviceEntity> ownerCommand;
     private List<AreaEntity> areas;
     private List<DeviceEntity> devices;
     private List<ScriptEntity> scripts;
@@ -37,6 +41,7 @@ public class SmartHouse {
             synchronized(SmartHouse.class) {
                 if(houseInstance == null) {
                     houseInstance= new SmartHouse();
+                    houseInstance.ownerCommand = new LinkedBlockingDeque<>();
                     houseInstance.setAreas(AreaSQLite.getAll());
                     houseInstance.setDevices(DeviceSQLite.getAll());
                     houseInstance.setScripts(ScriptSQLite.getAll());
@@ -45,6 +50,17 @@ public class SmartHouse {
 
         }
         return houseInstance;
+    }
+    public void addCommand(ScriptDeviceEntity command){
+        try {
+            this.ownerCommand.put(command);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public BlockingQueue<ScriptDeviceEntity> getOwnerCommand() {
+        return ownerCommand;
     }
 
     public void setAreas(List<AreaEntity> areas) {
@@ -108,7 +124,6 @@ public class SmartHouse {
     }
 
     public List<DeviceEntity> getDevicesByAreaId(int id) {
-        Log.d(TAG,"area: "+id);
         List<DeviceEntity> result = new ArrayList<>();
         for (DeviceEntity device : this.getDevices()){
             if (device.getAreaId() == id){
@@ -118,12 +133,26 @@ public class SmartHouse {
         return result;
     }
 
+    public String generateDeviceByAreaForApi(int areaId){
+        List<DeviceEntity> devices=  getDevicesByAreaId(areaId);
+        String result = "";
+        for (DeviceEntity deviceEntity: devices){
+            result += deviceEntity.getName()+"="+
+                    deviceEntity.getId()+"="+
+                    deviceEntity.getType()+"="+
+                    deviceEntity.getState()+"=["+
+                    deviceEntity.getAttributeType()+"];";
+        }
+
+        return result;
+    }
+
     public void removeAreaAndItsDevice(int id) {
         DeviceSQLite.deleteByAreaId(id);
         AreaSQLite.deleteById(id);
-        for (AreaEntity areaEntity: this.getAreas()){
-            if (areaEntity.getId() == id){
-                this.getAreas().remove(areaEntity);
+        for (int i = 0; i<this.getAreas().size(); i++) {
+            if (this.getAreas().get(i).getId() == id){
+                this.getAreas().remove(i);
             }
         }
     }
@@ -163,5 +192,27 @@ public class SmartHouse {
                 this.getDevices().remove(i);
             }
         }
+    }
+
+    public DeviceEntity getDeviceById(int deviceId) {
+        for (DeviceEntity device: this.getDevices()){
+            if (device.getId() == deviceId){
+                return  device;
+            }
+        }
+        return null;
+    }
+
+    public List<DeviceEntity> getDevicesInAreaAttribute(int areaId, String attrbute) {
+        List<DeviceEntity> result = new ArrayList<>();
+        for (DeviceEntity device : this.getDevices()){
+            Log.d(TAG,device.getAttributeType()+" -- "+device.getName()+" --- "+ device.getAreaId());
+            if (device.getAreaId() == areaId
+                    && device.getAttributeType()!=null
+                    && device.getAttributeType().contains(attrbute)){
+                result.add(device);
+            }
+        }
+        return result;
     }
 }

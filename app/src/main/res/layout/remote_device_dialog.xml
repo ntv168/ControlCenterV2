@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/dialog_width"
+    android:layout_height="@dimen/dialog_height"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/txtRemoteName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Remote dieu khien"
+        android:textAlignment="center"
+        android:textColor="@color/colorText"
+        android:textSize="24sp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        android:paddingBottom="100dp"
+        android:paddingTop="70dp"
+        android:weightSum="4">
+
+    <ImageButton
+        android:id="@+id/btnRemoteOn"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_weight="1"
+        android:background="@drawable/buttonactive"
+        android:text="ImageButton"
+        app:srcCompat="@android:drawable/ic_lock_power_off" />
+    <ImageButton
+        android:id="@+id/btnRemoteOff"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_weight="1"
+        android:background="@drawable/button_shadow"
+        android:text="Bật"
+        app:srcCompat="@android:drawable/ic_lock_power_off" />
+
+
+    <ImageButton
+        android:id="@+id/btnRemoteInc"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_weight="1"
+        android:background="@drawable/button_shadow"
+        android:text="ImageButton"
+        app:srcCompat="@drawable/less" />
+
+    <ImageButton
+        android:id="@+id/btnRemoteDec"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_weight="1"
+        android:background="@drawable/button_shadow"
+        android:text="ImageButton"
+        app:srcCompat="@drawable/more" />
+    </LinearLayout>
+</LinearLayout>

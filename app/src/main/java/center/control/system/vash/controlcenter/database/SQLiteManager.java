@@ -56,6 +56,7 @@ public class SQLiteManager {
         db.execSQL("DROP TABLE IF EXISTS " + DeviceSQLite.TABLE_DEVICE);
         db.execSQL("DROP TABLE IF EXISTS " + AreaSQLite.TABLE_AREA);
         db.execSQL("DROP TABLE IF EXISTS " + ScriptSQLite.TABLE_SCRIPT);
+        db.execSQL("DROP TABLE IF EXISTS " + ScriptSQLite.TABLE_SCRIPT_DEVICE);
         db.execSQL("DROP TABLE IF EXISTS " + TermSQLite.TABLE_HUMAN_TERM);
         db.execSQL("DROP TABLE IF EXISTS " + TermSQLite.TABLE_TARGET_TERM);
         db.execSQL("DROP TABLE IF EXISTS " + DetectIntentSQLite.TABLE_FUNCTION_DETECT);

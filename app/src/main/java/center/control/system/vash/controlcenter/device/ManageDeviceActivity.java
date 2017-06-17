@@ -3,6 +3,7 @@ package center.control.system.vash.controlcenter.device;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -230,6 +231,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                             DeviceEntity device = new DeviceEntity();
                             device.setPort(port);
                             device.setAreaId(currentArea.getId());
+                            device.setState("off");
                             int deviceId =sqLite.insert(device);
                             device.setId(deviceId);
                             house.getDevices().add(device);
@@ -277,14 +279,15 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                 try {
                     InputStream is  = this.getContentResolver().openInputStream(data.getData());
                     Bitmap tmp = BitmapFactory.decodeStream(is);
-                    File myDir = new File(Environment.getExternalStorageDirectory() + ConstManager.ICON_FOLDER);
-                    myDir.mkdirs();
-                    File file = new File(myDir, currentDevice.getId() +".png");
-                    FileOutputStream fos = new FileOutputStream(file);
+                    FileOutputStream fos = ManageDeviceActivity.this.openFileOutput(currentDevice.getId() +".png", Context.MODE_PRIVATE);
                     deviceIcon = Bitmap.createScaledBitmap(tmp,100,100,true);
                     deviceIcon.compress(Bitmap.CompressFormat.PNG, 90, fos);
                     fos.close();
-                    Log.d(TAG,"Saved icon"+file.getCanonicalPath());
+//                    FileInputStream fis = context.openFileInput("file_name"+".txt");
+//                    BufferedReader r = new BufferedReader(new InputStreamReader(fis));
+//                    String line= r.readLine();
+//                    r.close();
+                    Log.d(TAG,"Saved icon"+ManageDeviceActivity.this.getFilesDir().getAbsolutePath());
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -305,28 +308,37 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                 Button btnSave = (Button) deviceDialog.findViewById(R.id.btnSave);
                 final EditText txtName = (EditText) deviceDialog.findViewById(R.id.txtDeviceName);
                 final EditText txtNickName = (EditText) deviceDialog.findViewById(R.id.txtDeviceNickname);
+                txtName.setText(currentDevice.getName()+"");
+                txtNickName.setText(currentDevice.getNickName()+"");
                 ((ImageView) deviceDialog.findViewById(R.id.imgDeviceIcon)).setImageBitmap(deviceIcon);
                 btnSave.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         SparseBooleanArray checkedType = attCheckList.getCheckedItemPositions();
                         String attributeType = "";
+                        boolean oneTimeCheck = true;
                         for (int i=0; i< checkedType.size(); i++){
                             if (checkedType.get(i)){
-                                attributeType += AreaEntity.attrivutes[checkedType.keyAt(i)]+',';
+                                oneTimeCheck = false;
                             }
                         }
-                        DeviceEntity device = currentDevice;
-                        device.setName(txtName.getText().toString());
-                        device.setNickName(txtNickName.getText().toString());
-                        device.setAttributeType(attributeType);
-                        device.setType(DeviceEntity.types[spnDeviceType.getSelectedItemPosition()]);
-                        device.setAreaId(currentArea.getId());
-                        device.setIconId(currentDevice.getId() +".png");
+                        for (int i=0; i< checkedType.size(); i++){
+                            if (checkedType.get(i) || oneTimeCheck){
+                                attributeType += AreaEntity.attrivutesValues[checkedType.keyAt(i)]+',';
+                            }
+                        }
+                        Log.d(TAG,attributeType);
+                        currentDevice.setName(txtName.getText().toString());
+                        currentDevice.setNickName(txtNickName.getText().toString());
+                        currentDevice.setAttributeType(attributeType);
+                        currentDevice.setType(DeviceEntity.types[spnDeviceType.getSelectedItemPosition()]);
+                        currentDevice.setAreaId(currentArea.getId());
+                        currentDevice.setState("off");
+                        currentDevice.setIconId(currentDevice.getId() +".png");
                         SmartHouse house = SmartHouse.getInstance();
-                        house.updateDeviceById(currentDevice.getId(),device);
+                        house.updateDeviceById(currentDevice.getId(),currentDevice);
                         DeviceSQLite sqLite = new DeviceSQLite();
-                        sqLite.upById(device.getId(),device);
+                        sqLite.upById(currentDevice.getId(),currentDevice);
                         devicesAdapter.setDevices(house.getDevicesByAreaId(currentArea.getId()));
                         deviceDialog.dismiss();
                     }
@@ -346,6 +358,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
     @Override
     public void onDeviceClick(DeviceEntity device) {
         currentDevice = device;
+
         pickImage();
     }
 }

@@ -13,7 +13,11 @@ public class ScriptDeviceEntity {
     private int groupId;
     @SerializedName("deviceState")
     private String deviceState;
-
+    public ScriptDeviceEntity(int deviceId, String deviceState){
+        this.deviceId = deviceId;
+        this.deviceState = deviceState;
+    }
+    public ScriptDeviceEntity(){}
     private String deviceName;
 
     public int getDeviceId() {

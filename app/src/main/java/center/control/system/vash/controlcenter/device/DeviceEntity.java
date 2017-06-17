@@ -13,6 +13,8 @@ import java.util.Set;
 public class DeviceEntity {
     public static final String [] types = new  String[]{"light","bell","door","fan","camera","tivi","airCondition","cooker","curtain"};
     public static final String [] typeNames = new  String[]{"đèn","chuông","cửa","quạt","camera","ti-vi","máy lạnh","nồi cơm","rèm cửa"};
+    public static final String remoteTypes = new  String("tivi,airCondition,curtain");
+
     @SerializedName("id")
     private int id;
     @SerializedName("port")

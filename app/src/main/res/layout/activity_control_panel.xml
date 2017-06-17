@@ -13,24 +13,26 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="6"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="7">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lstAreaName"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/title_height"
+            android:layout_height="0dp"
             android:layout_weight="1" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lstAreaAttribute"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/detail_height"
-            android:layout_weight="1" />
+            android:layout_height="0dp"
+            android:layout_weight="2" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lstDevice"
             android:layout_width="match_parent"
-            android:layout_height="182dp" />
+            android:layout_height="0dp"
+            android:layout_weight="4"/>
 
     </LinearLayout>
 

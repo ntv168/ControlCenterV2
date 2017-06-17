@@ -9,5 +9,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-
+    <style name="AreaSelect" >
+        <item name="android:background">@drawable/rectang_selected</item>
+    </style>
 </resources>
