@@ -17,6 +17,12 @@ public class ScriptDeviceEntity {
         this.deviceId = deviceId;
         this.deviceState = deviceState;
     }
+
+    public ScriptDeviceEntity(int deviceId, String deviceState, int groupId){
+        this.deviceId = deviceId;
+        this.deviceState = deviceState;
+        this.groupId = groupId;
+    }
     public ScriptDeviceEntity(){}
     private String deviceName;
 

@@ -19,7 +19,7 @@ import center.control.system.vash.controlcenter.server.WebServer;
 public class WebServerService extends Service {
 
     private static final String TAG = "Web socket service --- ";
-    public static final String RESULT = "web.server.result";
+    public static final String SERVER_SUCCESS = "Server start success";
     private WebServer server;
     @Nullable
     @Override
@@ -28,8 +28,7 @@ public class WebServerService extends Service {
     }
     private void sendMessageToActivity(String msg) {
         Intent intent = new Intent(ControlPanel.CONTROL_FILTER_RECEIVER);
-
-        intent.putExtra(RESULT, msg);
+        intent.putExtra(ControlPanel.ACTION_TYPE, msg);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
     @Override
@@ -41,7 +40,7 @@ public class WebServerService extends Service {
         server = new WebServer(port);
 
         (new Thread(server)).start();
-        sendMessageToActivity("Server start  success");
+        sendMessageToActivity(SERVER_SUCCESS);
     }
 
     @Override

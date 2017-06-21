@@ -15,10 +15,12 @@ public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHo
 
     private List<AreaEntity> areaEntities;
     private  OnAdapterItemClickListener mListener;
+    private int focusedItem = 0;
 
     public ListAreaAdapter(List<AreaEntity> items, OnAdapterItemClickListener listener) {
         areaEntities = items;
         mListener = listener;
+        focusedItem = -1;
     }
 
     @Override
@@ -29,8 +31,13 @@ public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.item = areaEntities.get(position);
+        if (position == focusedItem){
+            holder.view.setBackgroundColor(Color.GRAY);
+        } else {
+            holder.view.setBackgroundColor(Color.WHITE);
+        }
         holder.areaName.setText(holder.item.getName());
         holder.areaAddress.setText(holder.item.getConnectAddress());
 
@@ -38,9 +45,10 @@ public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHo
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    holder.areaName.setBackgroundColor(Color.GREEN);
                    mListener.onAreaClick(holder.item);
                 }
+                focusedItem = position;
+                notifyDataSetChanged();
             }
         });
         holder.view.setOnLongClickListener(new View.OnLongClickListener() {
@@ -49,6 +57,8 @@ public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHo
                 if (mListener != null){
                     mListener.onLongAreaClick(holder.item);
                 }
+                focusedItem = position;
+                notifyDataSetChanged();
                 return true;
             }
         });

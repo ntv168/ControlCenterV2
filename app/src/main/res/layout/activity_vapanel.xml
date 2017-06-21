@@ -5,17 +5,60 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="right"
+    android:background="@drawable/background"
+    android:weightSum="7"
     tools:context="center.control.system.vash.controlcenter.panel.VAPanel">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/main_layout_margin"
-        android:background="@color/colorSkin"
-        android:gravity="right">
+        android:layout_weight="6"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:padding="15dp"
+        android:weightSum="7">
 
-    <include layout="@layout/tab_menu"/>
+        <ListView
+            android:id="@+id/lstMsgChat"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="6"
+            android:divider="@null"
+            android:stackFromBottom="true"
+            android:transcriptMode="alwaysScroll" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:weightSum="6">
+
+            <EditText
+                android:id="@+id/txtHumanChat"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="5" />
+
+            <Button
+                android:id="@+id/btnChatSend"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="Gửi" />
+        </LinearLayout>
+
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/colorSkin"
+        android:orientation="vertical">
+
+        <include layout="@layout/tab_menu" />
+    </LinearLayout>
 
 </LinearLayout>

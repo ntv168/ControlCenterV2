@@ -17,10 +17,12 @@ public class ListDeviceAdapter extends RecyclerView.Adapter<ListDeviceAdapter.Vi
 
     private List<DeviceEntity> deviceEnts;
     private  OnAdapterItemClickListener mListener;
+    private int focused;
 
     public ListDeviceAdapter(List<DeviceEntity> items, OnAdapterItemClickListener listener) {
         deviceEnts = items;
         mListener = listener;
+        focused = -1;
     }
 
     @Override
@@ -31,18 +33,23 @@ public class ListDeviceAdapter extends RecyclerView.Adapter<ListDeviceAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.item = deviceEnts.get(position);
         holder.deviceName.setText(holder.item.getName());
         holder.devicePort.setText(holder.item.getPort());
-
+        if (position == focused){
+            holder.view.setBackgroundColor(Color.GRAY);
+        } else {
+            holder.view.setBackgroundColor(Color.WHITE);
+        }
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    holder.deviceName.setBackgroundColor(Color.GREEN);
                    mListener.onDeviceClick(holder.item);
                 }
+                focused = position;
+                notifyDataSetChanged();
             }
         });
     }

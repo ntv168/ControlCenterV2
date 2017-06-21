@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 public class ListDeviceInScriptAdapter extends RecyclerView.Adapter<ListDeviceInScriptAdapter.ViewHolder> {
 
@@ -36,30 +38,33 @@ public class ListDeviceInScriptAdapter extends RecyclerView.Adapter<ListDeviceIn
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.item = scriptDeviceEntities.get(position);
-        holder.name.setText(holder.item.getDeviceName());
+        SmartHouse house = SmartHouse.getInstance();
+        holder.name.setText(house.getDeviceById(scriptDeviceEntities.get(position).getDeviceId()).getName());
         if (holder.item.getDeviceState().equals("on") || holder.item.getDeviceState().equals("open")) {
             holder.state.setChecked(true);
-        } else
-        if (holder.item.getDeviceState().equals("off") || holder.item.getDeviceState().equals("close")) {
+        } else {
             holder.state.setChecked(false);
         }
+        holder.state.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    holder.item.setDeviceState("on");
+                } else {
+                    holder.item.setDeviceState("off");
+                }
+            }
+        });
 
         holder.btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                removeDevice(holder.item.getDeviceId());
+                scriptDeviceEntities.remove(position);
+                notifyDataSetChanged();
             }
         });
     }
 
-    private void removeDevice(int deviceId) {
-        for (ScriptDeviceEntity device : scriptDeviceEntities){
-            if (device.getDeviceId() == deviceId){
-                scriptDeviceEntities.remove(device);
-            }
-        }
-        this.notifyDataSetChanged();
-    }
     public void addScripDev(ScriptDeviceEntity scriptDeviceEntity) {
         scriptDeviceEntities.add(scriptDeviceEntity);
         this.notifyDataSetChanged();

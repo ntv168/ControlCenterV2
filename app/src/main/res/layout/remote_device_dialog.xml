@@ -21,48 +21,48 @@
         android:paddingTop="70dp"
         android:weightSum="4">
 
-    <ImageButton
-        android:id="@+id/btnRemoteOn"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_weight="1"
-        android:background="@drawable/buttonactive"
-        android:text="ImageButton"
-        app:srcCompat="@android:drawable/ic_lock_power_off" />
-    <ImageButton
-        android:id="@+id/btnRemoteOff"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_weight="1"
-        android:background="@drawable/button_shadow"
-        android:text="Bật"
-        app:srcCompat="@android:drawable/ic_lock_power_off" />
+        <ImageButton
+            android:id="@+id/btnRemoteOn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonactive"
+            android:text="ImageButton"
+            android:src="@drawable/on" />
+
+        <ImageButton
+            android:id="@+id/btnRemoteOff"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:text="Bật"
+            android:src="@drawable/on" />
 
 
-    <ImageButton
-        android:id="@+id/btnRemoteInc"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_weight="1"
-        android:background="@drawable/button_shadow"
-        android:text="ImageButton"
-        app:srcCompat="@drawable/less" />
+        <ImageButton
+            android:id="@+id/btnRemoteInc"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_shadow"
+            android:text="ImageButton"
+            android:src="@drawable/up" />
 
-    <ImageButton
-        android:id="@+id/btnRemoteDec"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_weight="1"
-        android:background="@drawable/button_shadow"
-        android:text="ImageButton"
-        app:srcCompat="@drawable/more" />
+        <ImageButton
+            android:id="@+id/btnRemoteDec"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_shadow"
+            android:text="ImageButton"
+            android:src="@drawable/down" />
     </LinearLayout>
 </LinearLayout>

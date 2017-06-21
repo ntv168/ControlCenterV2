@@ -2,28 +2,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/title_height"
     android:weightSum="7">
 
     <TextView
         android:id="@+id/deviceName"
         android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="5"
-        android:layout_height="wrap_content"
+        android:padding="5dp"
         android:text="@string/app_name"
         android:textAppearance="?attr/textAppearanceListItem"
-        android:textStyle="bold" />
+        android:textSize="25dp" />
+
     <Switch
         android:id="@+id/deviceState"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
     <ImageButton
         android:id="@+id/btnRemoveDevice"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@drawable/close"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitXY" />
 </LinearLayout>

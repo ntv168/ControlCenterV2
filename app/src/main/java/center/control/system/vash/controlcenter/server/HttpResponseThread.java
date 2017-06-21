@@ -32,8 +32,8 @@ public class HttpResponseThread extends Thread {
     private static final String ON_DEVICE = "deviceOn";
     private static final String MODE_TODAY = "getModeToday";
     private static final String RUN_MODE_TODAY = "modeToday";
-    private static final String RESPONSE_SUCCESS = "sucess";
-    private static final String RESPONSE_FAIL = "fail";
+    private static final String RESPONSE_SUCCESS = "tung=success";
+    private static final String RESPONSE_FAIL = "tung=fail";
     private final String TAG = "HttpResponseThread";
     Socket socket;
 
@@ -64,7 +64,7 @@ public class HttpResponseThread extends Thread {
                 } else if (request.contains(AREA_ATTRIBUTE_REQ)){
                     String[] reqElement  = request.split("/");
                     Log.d(TAG,"area id:  "+reqElement[2]);
-                    AreaEntity area = house.getAreaById(Integer.parseInt(reqElement[2]));
+                    AreaEntity area = SmartHouse.getAreaById(Integer.parseInt(reqElement[2]));
                     response +=  area.generateAttributeForApi();
                 }
                 else if (request.contains(AREA_DEVICE)){

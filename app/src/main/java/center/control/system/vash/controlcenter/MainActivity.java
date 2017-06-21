@@ -2,9 +2,11 @@ package center.control.system.vash.controlcenter;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,10 +17,18 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
+import center.control.system.vash.controlcenter.area.AreaEntity;
+import center.control.system.vash.controlcenter.area.AreaSQLite;
+import center.control.system.vash.controlcenter.device.DeviceEntity;
+import center.control.system.vash.controlcenter.device.DeviceSQLite;
+import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.HouseKeyDTO;
 import center.control.system.vash.controlcenter.server.LoginSmarthouseDTO;
@@ -26,6 +36,7 @@ import center.control.system.vash.controlcenter.server.RetroFitSingleton;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
+import center.control.system.vash.controlcenter.utils.SmartHouse;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -71,6 +82,28 @@ public class MainActivity extends Activity {
                 loginSmartHouse();
             }
         });
+
+        final AlertDialog.Builder modHost = new AlertDialog.Builder(this);
+        modHost.setTitle("Nhâp địa chỉ server");
+        View diaView = this.getLayoutInflater().inflate(R.layout.dialog_host_edit, null);
+        final EditText hostAddress = (EditText) diaView.findViewById(R.id.txtServerHost);
+        hostAddress.setText(VolleySingleton.SERVER_HOST);
+
+        modHost.setView(diaView)
+                // Add action buttons
+                .setPositiveButton("Cập nhật", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        VolleySingleton.SERVER_HOST = hostAddress.getText().toString();
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("Xóa", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+        modHost.show();
     }
 
     @Override
@@ -93,8 +126,8 @@ public class MainActivity extends Activity {
         loginApi.mobileLogin(key).enqueue(new Callback<LoginSmarthouseDTO>() {
             @Override
             public void onResponse(Call<LoginSmarthouseDTO> call, retrofit2.Response<LoginSmarthouseDTO> response) {
-                Log.d(TAG,call.request().url()+" --- "+response.body().getHouseId());
                 if (response.body().getHouseId()!= null) {
+                    Log.d(TAG,call.request().url()+" --- "+response.body().getHouseId());
                     username = key.getUsername();
                     password = key.getPassword();
                     houseId = response.body().getHouseId();

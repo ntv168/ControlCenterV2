@@ -70,8 +70,8 @@ public class SmartHouse {
     public List<AreaEntity> getAreas() {
         return areas;
     }
-    public AreaEntity getAreaById(int areaId) {
-        for (AreaEntity area: this.getAreas()){
+    public static AreaEntity getAreaById(int areaId) {
+        for (AreaEntity area: houseInstance.getAreas()){
             if (area.getId() == areaId){
                 return area;
             }
@@ -82,8 +82,6 @@ public class SmartHouse {
     public void updateSensorArea(int areaId, String response) {
         for (AreaEntity area: this.getAreas()){
             if (area.getId() == areaId){
-
-                Log.d(TAG,areaId+ "   "+ response);
                 break;
             }
         }
@@ -96,7 +94,6 @@ public class SmartHouse {
                 break;
             }
         }
-        Log.d(TAG,areaId+ "   "+ areaId);
     }
 
     public void setScripts(List<ScriptEntity> scripts) {
@@ -206,7 +203,6 @@ public class SmartHouse {
     public List<DeviceEntity> getDevicesInAreaAttribute(int areaId, String attrbute) {
         List<DeviceEntity> result = new ArrayList<>();
         for (DeviceEntity device : this.getDevices()){
-            Log.d(TAG,device.getAttributeType()+" -- "+device.getName()+" --- "+ device.getAreaId());
             if (device.getAreaId() == areaId
                     && device.getAttributeType()!=null
                     && device.getAttributeType().contains(attrbute)){
@@ -214,5 +210,13 @@ public class SmartHouse {
             }
         }
         return result;
+    }
+
+    public void updateDeviceStateById(int id, String status) {
+       for (DeviceEntity dev : this.getDevices()){
+           if (dev.getId() == id){
+               dev.setState(status);
+           }
+       }
     }
 }

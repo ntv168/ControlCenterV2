@@ -2,6 +2,7 @@ package center.control.system.vash.controlcenter.panel;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +20,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +35,11 @@ import center.control.system.vash.controlcenter.area.AreaAttributeAdapter;
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.device.DeviceAdapter;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
-import center.control.system.vash.controlcenter.service.ReadSensorService;
+import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
+import center.control.system.vash.controlcenter.script.ScriptDeviceEntity;
+import center.control.system.vash.controlcenter.server.VolleySingleton;
+import center.control.system.vash.controlcenter.server.WebServer;
+import center.control.system.vash.controlcenter.service.ControlMonitorService;
 import center.control.system.vash.controlcenter.service.WebServerService;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
@@ -38,6 +48,8 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         AreaAdapter.AreaClickListener,DeviceAdapter.DeviceItemClickListener{
     private static final String TAG = "Control Panel";
     public static final String CONTROL_FILTER_RECEIVER = "control filter receiver";
+    public static final String ACTION_TYPE = "control action type receiver";
+
     private SharedPreferences sharedPreferences;
     private String systemId;
     RecyclerView lstDevice;
@@ -48,26 +60,45 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
 
     AreaAttributeAdapter areaAttributeAdapter;
     DeviceAdapter deviceAdapter;
+    private DeviceEntity currentDevice;
+    private String currentAttrib;
 
     @Override
     protected void onResume() {
         super.onResume();
         sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
         systemId = sharedPreferences.getString(ConstManager.SYSTEM_ID,"");
-        startService(new Intent(this, ReadSensorService.class));
+        SmartHouse house = SmartHouse.getInstance();
+        if (house.getAreas().size()>0) {
+            currentArea = house.getAreas().get(0);
+            currentAttrib = AreaEntity.attrivutesValues[0];
+        } else {
+            startActivity(new Intent(this,ManageDeviceActivity.class));
+        }
+        startService(new Intent(this, ControlMonitorService.class));
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control_panel);
-        ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnHome);
+        final ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnHome);
         currentTab.setBackgroundColor(Color.WHITE);
         Intent webService = new Intent(ControlPanel.this, WebServerService.class);
         startService(webService);
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Toast.makeText(ControlPanel.this,intent.getStringExtra(WebServerService.RESULT),Toast.LENGTH_SHORT).show();
+                String resultType = intent.getStringExtra(ACTION_TYPE);
+                Toast.makeText(ControlPanel.this, resultType, Toast.LENGTH_SHORT).show();
+                if (resultType.equals(WebServerService.SERVER_SUCCESS)) {
+                    Toast.makeText(ControlPanel.this, intent.getStringExtra(resultType), Toast.LENGTH_SHORT).show();
+                }  else if (resultType.equals(ControlMonitorService.CONTROL)){
+                        SmartHouse house = SmartHouse.getInstance();
+                        deviceAdapter.updateHouseDevice(house.getDevicesInAreaAttribute(currentArea.getId(),currentAttrib));
+                } else if (resultType.equals(ControlMonitorService.MONITOR)){
+
+                }
+
             }
         };
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
@@ -91,6 +122,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         lstAreaName.setHasFixedSize(true);
         lstAreaAttribute.setLayoutManager(horizonLayout2);
 
+        deviceAdapter = new DeviceAdapter(new ArrayList<DeviceEntity>(),this);
 
         lstDevice = (RecyclerView) findViewById(R.id.lstDevice);
         lstDevice.setHasFixedSize(true);
@@ -129,7 +161,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     @Override
     protected void onPause() {
         super.onPause();
-        stopService(new Intent(this,ReadSensorService.class));
+        stopService(new Intent(this,ControlMonitorService.class));
     }
 
     @Override
@@ -138,22 +170,54 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         areaAttributeAdapter.updateAttribute(area.generateValueArr(),area.getId());
         Log.d(TAG," click ip");
     }
-
     @Override
     public void onAttributeClick(AreaAttribute areaAttribute, int areaId) {
         SmartHouse house = SmartHouse.getInstance();
-        Log.d(TAG,areaAttribute.getName()+" --- "+ areaId);
-        deviceAdapter = new DeviceAdapter(house.getDevicesInAreaAttribute(areaId,areaAttribute.getName()),this);
+        currentAttrib = areaAttribute.getName();
+        deviceAdapter.updateHouseDevice(house.getDevicesInAreaAttribute(areaId,areaAttribute.getName()));
         lstDevice.setAdapter(deviceAdapter);
     }
 
     @Override
-    public void onDeviceClick(DeviceEntity device) {
-        ((TextView) remoteDialog.findViewById(R.id.txtRemoteName)).setText("http://"+currentArea.getConnectAddress()+"/"+device.getPort());
+    public void onDeviceClick(final DeviceEntity device) {
+        currentDevice = device;
+        ((TextView) remoteDialog.findViewById(R.id.txtRemoteName)).setText(device.getName());
         if (DeviceEntity.remoteTypes.contains(device.getType())){
+            ImageButton btnOn = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteOn);
+            btnOn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"on"));
+                }
+            });
+            ImageButton btnOff = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteOff);
+            btnOff.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"off"));
+                }
+            });
+            ImageButton btnInc = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteInc);
+            btnInc.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"inc"));
+                }
+            });
+            ImageButton btnDec = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteDec);
+            btnDec.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"dec"));
+                }
+            });
             remoteDialog.show();
         } else {
-            Log.d(TAG, "http://"+currentArea.getConnectAddress()+"/"+device.getPort());
+            if (device.getState().equals("on")){
+                SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"off"));
+            } else {
+                SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"on"));
+            }
         }
     }
 }

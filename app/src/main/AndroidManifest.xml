@@ -24,7 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service
-            android:name=".service.ReadSensorService"
+            android:name=".service.ControlMonitorService"
             android:enabled="true" />
         <service
             android:name=".service.WebServerService"

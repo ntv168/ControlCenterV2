@@ -24,7 +24,6 @@ public class DeviceSQLite {
     private static final String KEY_ATTR_TYPE = "attributeType";
     private static final String KEY_STATE = "state";
     private static final String KEY_TYPE = "type";
-    private static final String KEY_ICON = "icon";
     private static final String KEY_AREA = "areaId";
     private static final String KEY_NICKNAME = "nickName";
     private static final String TAG = "Device sql lite";
@@ -37,11 +36,9 @@ public class DeviceSQLite {
                 KEY_ATTR_TYPE + "  TEXT  ,"+
                 KEY_STATE + "  TEXT  ,"+
                 KEY_TYPE + "  TEXT  ,"+
-                KEY_ICON + "  TEXT  ,"+
                 KEY_NICKNAME + "  TEXT  ,"+
                 KEY_AREA+ "  INTEGER  "+ ")";
     }
-
 
     public int insert(DeviceEntity device) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
@@ -108,7 +105,6 @@ public class DeviceSQLite {
         values.put(KEY_TYPE, device.getType());
         values.put(KEY_ATTR_TYPE, device.getAttributeType());
         values.put(KEY_STATE, device.getState());
-        values.put(KEY_ICON, device.getIconId());
         values.put(KEY_AREA, device.getAreaId());
         values.put(KEY_NICKNAME, device.getNickName());
         return values;
@@ -121,7 +117,6 @@ public class DeviceSQLite {
         deviceEntity.setType(cursor.getString(cursor.getColumnIndex(KEY_TYPE)));
         deviceEntity.setAttributeType(cursor.getString(cursor.getColumnIndex(KEY_ATTR_TYPE)));
         deviceEntity.setAreaId(cursor.getInt(cursor.getColumnIndex(KEY_AREA)));
-        deviceEntity.setIconId(cursor.getString(cursor.getColumnIndex(KEY_ICON)));
         deviceEntity.setState(cursor.getString(cursor.getColumnIndex(KEY_STATE)));
         deviceEntity.setNickName(cursor.getString(cursor.getColumnIndex(KEY_NICKNAME)));
         return deviceEntity;

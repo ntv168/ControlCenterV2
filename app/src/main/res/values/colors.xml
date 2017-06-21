@@ -7,4 +7,6 @@
     <color name="colorText">#000000</color>
     <color name="colorSkin">#fbf8f1</color>
     <color name="coloreGreen">#7dbe3b</color>
+    <color name="nGreen2">#42A99A</color>
+    <color name="nGreen1">#61C79A</color>
 </resources>

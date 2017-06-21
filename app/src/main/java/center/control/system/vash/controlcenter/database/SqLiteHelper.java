@@ -17,7 +17,7 @@ import center.control.system.vash.controlcenter.nlp.TermSQLite;
 
 public class SqLiteHelper extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
 
     private static final String DATABASE_NAME = "ControlCenter";
 

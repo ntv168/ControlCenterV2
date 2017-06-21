@@ -20,9 +20,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:onClick="clicktoControlPanel"
-                android:padding="30dp"
+                android:background="@android:color/transparent"
 
+                android:elevation="0dp"
+                android:onClick="clicktoControlPanel"
+                android:padding="50dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/tab_home" />
 
@@ -31,8 +33,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:background="@android:color/transparent"
                 android:onClick="clicktoModePanel"
-                android:padding="30dp"
+                android:padding="50dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/tab_mode" />
 
@@ -41,8 +44,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:background="@android:color/transparent"
                 android:onClick="clicktoSettingPanel"
-                android:padding="30dp"
+                android:padding="50dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/tab_seting" />
 
@@ -51,8 +55,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:background="@android:color/transparent"
                 android:onClick="clicktoVAPanel"
-                android:padding="30dp"
+                android:padding="50dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/tab_voice" />
         </LinearLayout>

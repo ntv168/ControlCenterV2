@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="@dimen/dialog_width"
-    android:layout_height="@dimen/dialog_height"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:gravity="center"
-    android:padding="3dp">
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:paddingBottom="@dimen/title_height"
+    android:weightSum="5">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="3">
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -33,8 +36,8 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
+            android:layout_weight="2"
             android:orientation="vertical">
 
             <TextView
@@ -50,32 +53,44 @@
 
         </LinearLayout>
     </LinearLayout>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnAddDeviceScript"
-        android:text="them thiet bi vao che do"/>
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Danh sách thiết bị" />
 
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/lstDeviceScript"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_marginLeft="10dp" />
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:orientation="vertical"
+        android:padding="10dp">
 
-    <View
+        <Button
+            android:id="@+id/btnAddDeviceScript"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="them thiet bi vao che do" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Danh sách thiết bị" />
+
+        <View
+            android:id="@+id/view"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@android:color/black" />
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/lstDeviceScript"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp" />
+    </LinearLayout>
+
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:gravity="right"
         android:orientation="horizontal">
 
@@ -83,6 +98,7 @@
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@color/common_google_signin_btn_text_dark_pressed"
             android:text="Hủy" />
 
         <Button

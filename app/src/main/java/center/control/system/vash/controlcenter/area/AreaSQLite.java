@@ -92,7 +92,7 @@ public class AreaSQLite {
         SQLiteManager.getInstance().closeDatabase();
     }
 
-    public AreaEntity findById(String id){
+    public AreaEntity findById(int id){
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "

@@ -9,7 +9,7 @@
     android:gravity="center"
     android:orientation="vertical"
     android:padding="5dp"
-    android:weightSum="4">
+    android:weightSum="6">
 
     <TextView
         android:id="@+id/txtAttributeName"
@@ -25,7 +25,7 @@
         android:id="@+id/imgAttribute"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
+        android:layout_weight="3"
         android:padding="30dp"
         android:scaleType="fitCenter"
         app:srcCompat="@drawable/bell" />
@@ -34,7 +34,7 @@
         android:id="@+id/txtAttributeValue"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:gravity="center"
         android:text="Yếu"
         android:textColor="@android:color/black"

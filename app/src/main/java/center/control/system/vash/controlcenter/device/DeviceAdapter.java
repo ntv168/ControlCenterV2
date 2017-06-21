@@ -1,5 +1,6 @@
 package center.control.system.vash.controlcenter.device;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,76 +38,44 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(DeviceAdapter.ViewHolder holder, final int position) {
-        holder.deviceName.setText(deviceEntities.get(position).getName());
-        holder.deviceStatus.setText(deviceEntities.get(position).getState());
-
-
-        if (deviceEntities.get(position).getState().equals("Bật") ||
-                deviceEntities.get(position).getState().equals("Mở")) {
-
-            switch (deviceEntities.get(position).getType()) {
-                case "light":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_light_active);
-                    break;
-                case "bell":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_bell_active);
-                    break;
-                case "door":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_door_active);
-                    break;
-                case "fan":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_fan_active);
-                    break;
-                case "camera":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_camera_active);
-                    break;
-                case "tivi":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_tivi_active);
-                    break;
-                case "airCondition":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_air_condition_active);
-                    break;
-                case "cooker":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_cooker_active);
-                    break;
-                case "curtain":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_curtain_active);
-                    break;
-                default:
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_default_active);
-            }
+        holder.item = deviceEntities.get(position);
+        holder.deviceName.setText(holder.item.getName());
+        holder.deviceStatus.setText(holder.item.getState());
+        if (holder.item.getState().equals("on")){
+            holder.view.setBackgroundColor(Color.WHITE);
         } else {
-            switch (deviceEntities.get(position).getType()) {
-                case "light":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_light);
-                    break;
-                case "bell":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_bell);
-                    break;
-                case "door":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_door);
-                    break;
-                case "fan":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_fan);
-                    break;
-                case "camera":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_camera);
-                    break;
-                case "tivi":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_tivi);
-                    break;
-                case "airCondition":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_air_condition);
-                    break;
-                case "cooker":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_cooker);
-                    break;
-                case "curtain":
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_curtain);
-                    break;
-                default:
-                    holder.deviceIcon.setImageResource(R.drawable.ic_device_default);
-            }
+            holder.view.setBackgroundColor(Color.GRAY);
+        }
+        switch (deviceEntities.get(position).getType()) {
+            case "light":
+                holder.deviceIcon.setImageResource(R.drawable.ic_device_light_active);
+                break;
+            case "bell":
+                holder.deviceIcon.setImageResource(R.drawable.ic_device_bell_active);
+                break;
+            case "door":
+                holder.deviceIcon.setImageResource(R.drawable.ic_device_door_active);
+                break;
+            case "fan":
+                holder.deviceIcon.setImageResource(R.drawable.ic_device_fan_active);
+                break;
+            case "camera":
+                holder.deviceIcon.setImageResource(R.drawable.ic_device_camera_active);
+                break;
+            case "tivi":
+                holder.deviceIcon.setImageResource(R.drawable.ic_device_tivi_active);
+                break;
+            case "airCondition":
+                holder.deviceIcon.setImageResource(R.drawable.ic_device_air_condition_active);
+                break;
+            case "cooker":
+                holder.deviceIcon.setImageResource(R.drawable.ic_device_cooker_active);
+                break;
+            case "curtain":
+                holder.deviceIcon.setImageResource(R.drawable.ic_device_curtain_active);
+                break;
+            default:
+                holder.deviceIcon.setImageResource(R.drawable.ic_device_default_active);
         }
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,6 +83,10 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
                 listener.onDeviceClick(deviceEntities.get(position));
             }
         });
+    }
+    public void updateHouseDevice(List<DeviceEntity> deviceEntities){
+        this.deviceEntities = deviceEntities;
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
