@@ -165,7 +165,7 @@ public class ControlMonitorService extends Service {
         readRoom.setRetryPolicy(new DefaultRetryPolicy(2000,0,1f));
         VolleySingleton.getInstance(this).addToRequestQueue(readRoom);
     }
-    private  void checkCamera(final AreaEntity area){
+    private void checkCamera(final AreaEntity area){
 
         String url ="http://"+ area.getConnectAddress()+"/camera";
         Log.d(TAG,url);StringRequest readRoom = new StringRequest(Request.Method.GET,

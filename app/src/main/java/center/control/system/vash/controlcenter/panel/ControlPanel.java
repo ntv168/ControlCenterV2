@@ -13,7 +13,10 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,17 +29,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.face.Face;
+import com.microsoft.projectoxford.face.FaceServiceClient;
+import com.microsoft.projectoxford.face.contract.IdentifyResult;
+import com.microsoft.projectoxford.face.contract.TrainingStatus;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.area.AreaAdapter;
@@ -46,10 +54,12 @@ import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.device.DeviceAdapter;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
+import center.control.system.vash.controlcenter.helper.StorageHelper;
+import center.control.system.vash.controlcenter.nlp.VoiceUtils;
 import center.control.system.vash.controlcenter.recognition.Facedetect;
+import center.control.system.vash.controlcenter.recognition.ImageHelper;
 import center.control.system.vash.controlcenter.script.ScriptDeviceEntity;
-import center.control.system.vash.controlcenter.server.VolleySingleton;
-import center.control.system.vash.controlcenter.server.WebServer;
+
 import center.control.system.vash.controlcenter.service.ControlMonitorService;
 import center.control.system.vash.controlcenter.service.WebServerService;
 import center.control.system.vash.controlcenter.utils.ConstManager;
@@ -75,6 +85,9 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     private DeviceAdapter deviceAdapter;
     private DeviceEntity currentDevice;
     private String currentAttrib;
+    FaceServiceClient fsClient;
+    boolean detecting;
+    String mPersonGroupId;
 
     @Override
     protected void onResume() {
@@ -98,6 +111,24 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         currentTab.setBackgroundColor(Color.WHITE);
         Intent webService = new Intent(ControlPanel.this, WebServerService.class);
         startService(webService);
+
+        fsClient = Facedetect.getInstance(ControlPanel.this);
+
+
+        mPersonGroupId = "29f1ccf6-16a3-4e09-95c7-24e5e31a2acf";
+        detecting= false;
+
+        if (StorageHelper.getAllPersonIds(mPersonGroupId, ControlPanel.this).isEmpty()) {
+            StorageHelper.setPersonName("4f50dd8f-0af7-4831-bf7a-9e94b8625950","Thuận", mPersonGroupId, ControlPanel.this);
+            StorageHelper.setPersonName("8fbd8bcc-f90f-4dde-9e76-8cbd9032a962","Tùng", mPersonGroupId, ControlPanel.this);
+            StorageHelper.setPersonName("cf784479-a176-4868-af86-7447715357f7","Mỹ", mPersonGroupId, ControlPanel.this);
+            StorageHelper.setPersonName("6d639f61-0df1-44b6-b0a3-1c2d1024edf2","Văn", mPersonGroupId, ControlPanel.this);
+
+        }
+
+
+
+
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -132,14 +163,36 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                         });
                         if (bmImg!=null){
                             imgFace.setImageBitmap(bmImg);
-                            Facedetect singleFace = Facedetect.getInstance(context);
 
-                            Frame frame = new Frame.Builder().setBitmap(bmImg).build();
-                            SparseArray<Face> faces = singleFace.getSafeDetector().detect(frame);
-                            if (faces.size() == 0){
-                                txtResult.setText("Không có khách đến");
-                            } else
-                            txtResult.setText("Có "+ faces.size()+" khách đến");
+                            ByteArrayOutputStream os = new ByteArrayOutputStream();
+                            bmImg.compress(Bitmap.CompressFormat.JPEG, 100, os);
+
+                            String root = Environment.getExternalStorageDirectory().toString();
+                            File myDir = new File(root + "/saved_images");
+                            myDir.mkdirs();
+                            String nameFile = "testSelf.jpg";
+                            File file = new File(myDir, nameFile);
+                            if (file.exists ()) file.delete();
+                            try {
+                                FileOutputStream out = new FileOutputStream(file);
+                                bmImg.compress(Bitmap.CompressFormat.JPEG, 100, out);
+//
+                                out.close();
+                            } catch (IOException e){
+                                Log.d("CAMERA file", e.getMessage());
+                            }
+
+
+
+//                detecting = false;
+                            // If image is selected successfully, set the image URI and bitmap.
+                            Uri uri = Uri.fromFile(file);
+
+                            Bitmap mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
+                                    uri, getContentResolver());
+
+                            detect(mBitmap);
+
                         } else {
                             imgFace.setImageResource(R.drawable.close);
                         }
@@ -293,5 +346,204 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             }
         }, delayInMillis);
     }
+
+
+
+    private void detect(Bitmap bitmap) {
+        // Put the image into an input stream for detection.
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(output.toByteArray());
+
+
+        // Start a background task to detect faces in the image.
+        new DetectionTask().execute(inputStream);
+    }
+
+    private class DetectionTask extends AsyncTask<InputStream, String, com.microsoft.projectoxford.face.contract.Face[]> {
+        long startdetect = System.currentTimeMillis();
+        @Override
+        protected com.microsoft.projectoxford.face.contract.Face[] doInBackground(InputStream... params) {
+            // Get an instance of face service client to detect faces in image.
+
+            try{
+                publishProgress("Detecting...");
+
+                // Start detection.
+                return fsClient.detect(
+                        params[0],  /* Input stream of image to detect */
+                        true,       /* Whether to return face ID */
+                        false,       /* Whether to return face landmarks */
+                        /* Which face attributes to analyze, currently we support:
+                           age,gender,headPose,smile,facialHair */
+                        null);
+            }  catch (Exception e) {
+                publishProgress(e.getMessage());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            // Show the status of background detection task on screen.
+
+        }
+
+        @Override
+        protected void onPostExecute(com.microsoft.projectoxford.face.contract.Face[] result) {
+            long enddetect= System.currentTimeMillis();
+            Log.d("--------------", "time detect --------------- " + (enddetect - startdetect));
+
+            if (result != null) {
+                // Set the adapter of the ListView which contains the details of detectingfaces.
+                List<com.microsoft.projectoxford.face.contract.Face> faces = Arrays.asList(result);
+
+
+                if (result.length == 0) {
+                    detecting= false;
+                    setInfo("No faces detected!");
+                } else {
+                    detecting= true;
+
+                    // Called identify after detection.
+                    if (detecting&& mPersonGroupId != null) {
+                        // Start a background task to identify faces in the image.
+                        List<UUID> faceIds = new ArrayList<>();
+                        for (com.microsoft.projectoxford.face.contract.Face face:  faces) {
+                            faceIds.add(face.faceId);
+
+                            Log.d(TAG, "------------------------: " + face.faceId.toString());
+                        }
+
+
+                        new IdentificationTask(mPersonGroupId).execute(
+                                faceIds.toArray(new UUID[faceIds.size()]));
+                        Log.d("-------", "identify: facezise" + faceIds.size());
+                    } else {
+                        // Not detectingor person group exists.
+                        setInfo("Please select an image and create a person group first.");
+                    }
+                }
+            } else {
+                detecting= false;
+            }
+
+        }
+
+    }
+
+    private class IdentificationTask extends AsyncTask<UUID, String, IdentifyResult[]> {
+        String mPersonGroupId;
+        long startidentify = System.currentTimeMillis();
+        IdentificationTask(String personGroupId) {
+            this.mPersonGroupId = personGroupId;
+            Log.d("--------", "IdentificationTask: " + personGroupId);
+        }
+
+        @Override
+        protected IdentifyResult[] doInBackground(UUID... params) {
+            String logString = "Request: Identifying faces ";
+            for (UUID faceId: params) {
+                logString += faceId.toString() + ", ";
+            }
+            logString += " in group " + mPersonGroupId;
+            Log.d("--------", "IdentificationTask: " + mPersonGroupId);
+            // Get an instance of face service client to detect faces in image.
+
+            try{
+                publishProgress("Getting person group status...");
+
+                TrainingStatus trainingStatus = fsClient.getPersonGroupTrainingStatus(
+                        this.mPersonGroupId);     /* personGroupId */
+
+                Log.d("--------", "trainingStatus: " + trainingStatus);
+
+                if (trainingStatus.status != TrainingStatus.Status.Succeeded) {
+                    publishProgress("Person group training status is " + trainingStatus.status);
+                    return null;
+                }
+
+                publishProgress("Identifying...");
+
+                // Start identification.
+                return fsClient.identity(
+                        this.mPersonGroupId,   /* personGroupId */
+                        params,                  /* faceIds */
+                        1);  /* maxNumOfCandidatesReturned */
+            }  catch (Exception e) {
+
+                publishProgress(e.getMessage());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+//
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            // Show the status of background detection task on screen.a
+
+        }
+
+        @Override
+        protected void onPostExecute(IdentifyResult[] result) {
+            long endidentify= System.currentTimeMillis();
+            Log.d("----------------", "time identity: ------------- " + (endidentify - startidentify));
+            // Show the result on screen when detection is done.
+            // Set the information about the detection result.
+            if (result != null) {
+
+                String message = "";
+                Boolean hasAqua = false;
+                int stranger = 0;
+
+                for (IdentifyResult identifyResult: result) {
+                    if (identifyResult.candidates.size() > 0) {
+                        if (identifyResult.candidates.get(0).confidence > 0.65) {
+                            String personId = identifyResult.candidates.get(0).personId.toString();
+                            String personName = StorageHelper.getPersonName(
+                                    personId, mPersonGroupId, ControlPanel.this);
+
+                            message += personName;
+                            hasAqua = true;
+                        } else {
+                            stranger++;
+                        }
+                    } else {
+                        stranger++;
+                    }
+                }
+                if (stranger > 0 && hasAqua) {
+                    message += " và " + stranger + "người lạ";
+                } if (stranger > 0 && !hasAqua) {
+                    message += "Có" + stranger + "người lạ";
+                }
+
+                showReply(message);
+
+            }
+        }
+
+    }
+
+
+    private void setInfo(String info) {
+        TextView textView = (TextView) findViewById(R.id.info);
+        textView.setText(info);
+    }
+
+    private  void showReply(String sentenceReply){
+        VoiceUtils.speak(sentenceReply);
+
+    }
+
 
 }

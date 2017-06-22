@@ -4,5 +4,5 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="endpoint">https://westcentralus.api.cognitive.microsoft.com/face/v1.0</string>
-    <string name="subscription_key">ba72b32dc6d44aa6a0fff5c5dfe1404e</string>
+    <string name="subscription_key">dfc1da8fbe6e4379aab362ebb8c35737</string>
 </resources>
