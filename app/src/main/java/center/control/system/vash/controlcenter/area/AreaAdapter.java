@@ -55,21 +55,11 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaHolder> {
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                resetBackgroundAllArea(holder);
-//                holder.linArea.setBackgroundResource(R.drawable.background_area_active);
-//                holder.name.setTextColor(Color.WHITE);
-                listener.onAreaClick(areaEntities.get(position));
-                focusedItem = position;
-                notifyDataSetChanged();
+            listener.onAreaClick(areaEntities.get(position));
+            focusedItem = position;
+            notifyDataSetChanged();
             }
         });
-    }
-
-    public void resetBackgroundAllArea(AreaHolder holder) {
-        for(AreaEntity areaEntity : areaEntities) {
-            holder.linArea.setBackgroundResource(R.drawable.background_none);
-            holder.name.setTextColor(view.getResources().getColor(R.color.nGreen1));
-        }
     }
 
     @Override
