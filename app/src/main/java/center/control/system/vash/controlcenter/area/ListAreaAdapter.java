@@ -33,7 +33,7 @@ public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.item = areaEntities.get(position);
-        if (position == focusedItem){
+            if (position == focusedItem){
             holder.view.setBackgroundColor(Color.GRAY);
         } else {
             holder.view.setBackgroundColor(Color.WHITE);
