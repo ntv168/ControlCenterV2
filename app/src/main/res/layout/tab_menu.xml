@@ -5,60 +5,61 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:background="@color/colorActive"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingRight="@dimen/tab_layout_margin"
-            android:weightSum="4" >
+    <LinearLayout
+        android:layout_width="120dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/background_menu"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:weightSum="4">
 
-            <ImageButton
-                android:id="@+id/tabBtnHome"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
+        <ImageButton
+            android:id="@+id/tabBtnHome"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
 
-                android:elevation="0dp"
-                android:onClick="clicktoControlPanel"
-                android:padding="50dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/tab_home" />
+            android:elevation="0dp"
+            android:onClick="clicktoControlPanel"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/tab_home" />
 
-            <ImageButton
-                android:id="@+id/tabBtnMode"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:onClick="clicktoModePanel"
-                android:padding="50dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/tab_mode" />
+        <ImageButton
+            android:id="@+id/tabBtnMode"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:onClick="clicktoModePanel"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/tab_mode" />
 
-            <ImageButton
-                android:id="@+id/tabBtnSetting"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:onClick="clicktoSettingPanel"
-                android:padding="50dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/tab_seting" />
+        <ImageButton
+            android:id="@+id/tabBtnSetting"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:onClick="clicktoSettingPanel"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/tab_setting" />
 
-            <ImageButton
-                android:id="@+id/tabBtnVA"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:onClick="clicktoVAPanel"
-                android:padding="50dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/tab_voice" />
-        </LinearLayout>
+        <ImageButton
+            android:id="@+id/tabBtnVA"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:onClick="clicktoVAPanel"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/tab_voice" />
+    </LinearLayout>
 </LinearLayout>

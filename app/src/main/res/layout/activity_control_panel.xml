@@ -4,44 +4,49 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     android:gravity="right"
-    android:weightSum="7"
-    tools:context="center.control.system.vash.controlcenter.panel.ControlPanel"
-    >
+    android:weightSum="8"
+    tools:context="center.control.system.vash.controlcenter.panel.ControlPanel">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="6"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_weight="8"
+        android:background="@drawable/background_content"
         android:orientation="vertical"
-        android:weightSum="7">
+        android:weightSum="10">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lstAreaName"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:background="@drawable/background_home_area" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lstAreaAttribute"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2" />
+            android:layout_weight="3" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lstDevice"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="4"/>
+            android:layout_weight="6" />
 
     </LinearLayout>
 
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@color/colorSkin"
+        android:gravity="right"
         android:orientation="vertical">
 
         <include layout="@layout/tab_menu" />
