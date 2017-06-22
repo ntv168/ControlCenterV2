@@ -160,14 +160,16 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                         String[] pairs = response.split(",");
                         DeviceSQLite sqLite = new DeviceSQLite();
                         for (String pair : pairs){
-                            String[] ele = pair.split("=");
-                            DeviceEntity device = new DeviceEntity();
-                            device.setPort(ele[1]);
-                            device.setName(ele[0]);
-                            device.setAreaId(areaId);
-                            int deviceId =sqLite.insert(device);
-                            device.setId(deviceId);
-                            house.getDevices().add(device);
+                            if (pair.length()>1) {
+                                String[] ele = pair.split("=");
+                                DeviceEntity device = new DeviceEntity();
+                                device.setPort(ele[1]);
+                                device.setName(ele[0]);
+                                device.setAreaId(areaId);
+                                int deviceId = sqLite.insert(device);
+                                device.setId(deviceId);
+                                house.getDevices().add(device);
+                            }
                         }
                         devicesAdapter.setDevices(house.getDevicesByAreaId(areaId));
                     }
@@ -215,21 +217,21 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                         String url = "http://"+areaAddress.getText().toString()+"/get";
                         Log.d(TAG,url);
                         StringRequest connectAreaIP = new StringRequest(Request.Method.GET,
-                                url,
-                                new Response.Listener<String>() {
-                                    @Override
-                                    public void onResponse(String response) {
-                                        updateArea(areaEntity,nickName.getText().toString(),
-                                                areaAddress.getText().toString());
-                                        renewDeviceByPort(response, currentArea.getId());
-                                        progressDialog.dismiss();
-                                        dialog.dismiss();
-                                    }
-                                }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.d(TAG,error.getMessage());
+                            url,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                updateArea(areaEntity,nickName.getText().toString(),
+                                        areaAddress.getText().toString());
+                                renewDeviceByPort(response, currentArea.getId());
                                 progressDialog.dismiss();
+                                dialog.dismiss();
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG,error.getMessage());
+                            progressDialog.dismiss();
                             }
                         });
                         VolleySingleton.getInstance(ManageDeviceActivity.this).addToRequestQueue(connectAreaIP);

@@ -82,11 +82,11 @@ public class SmartHouse {
     public void updateSensorArea(int areaId, String response) {
         for (AreaEntity area: this.getAreas()){
             if (area.getId() == areaId){
-                String[] ele = response.split(response);
+                String[] ele = response.split(",");
                 for (int i = 0; i< ele.length; i++){
-                    if (ele[i].length()>1){
+                     if (ele[i].length()>1){
                         String[] val = ele[i].split(":");
-                        if (val[0].equals(AreaEntity.attrivutesValues[0])){
+                         if (val[0].equals(AreaEntity.attrivutesValues[0])){
                             area.setSafety(val[1]);
                         } else if (val[0].equals(AreaEntity.attrivutesValues[1])){
                             area.setLight(val[1]);

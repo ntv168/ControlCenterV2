@@ -34,6 +34,15 @@ public class AreaEntity {
     @SerializedName("name")
     private String name;
     private Bitmap imageBitmap;
+    private boolean hasCamera = true;
+
+    public boolean isHasCamera() {
+        return hasCamera;
+    }
+
+    public void setHasCamera(boolean hasCamera) {
+        this.hasCamera = hasCamera;
+    }
 
     public static String[] getAttrivutes() {
         return attrivutes;

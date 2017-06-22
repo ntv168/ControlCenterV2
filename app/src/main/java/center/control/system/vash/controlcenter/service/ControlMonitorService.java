@@ -120,8 +120,10 @@ public class ControlMonitorService extends Service {
                     if (smartHouse.getOwnerCommand().size() == 0){
                         for (AreaEntity area: smartHouse.getAreas()){
                             Log.d(TAG,"check hang " +area.getName() + " "+area.getConnectAddress().trim()+"/check");
+                            if (area.isHasCamera()) {
+                                checkCamera(area);
+                            }
                             checkArea(area);
-                            checkCamera(area);
                         }
                     } else {
                         ScriptDeviceEntity command = smartHouse.getOwnerCommand().take();
@@ -138,7 +140,7 @@ public class ControlMonitorService extends Service {
 
 
             }
-        }, 0, 3000);
+        }, 5000, 8000);
     }
 
     private  void checkArea(final AreaEntity area){
@@ -149,6 +151,8 @@ public class ControlMonitorService extends Service {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+
+                        response = VolleySingleton.fixEncodingUnicode(response);
                         Log.d(TAG,response);
                         SmartHouse.getInstance().updateSensorArea(area.getId(),response);
                         sendResult(MONITOR,area.getId());
@@ -164,16 +168,11 @@ public class ControlMonitorService extends Service {
     private  void checkCamera(final AreaEntity area){
 
         String url ="http://"+ area.getConnectAddress()+"/camera";
-        Log.d(TAG,url);
-//        readRoom.setRetryPolicy(new DefaultRetryPolicy(2000,0,1f));
-        RequestFuture<String> future = RequestFuture.newFuture();
-        StringRequest readRoom = new StringRequest(Request.Method.GET, url, future, future);
-        try {
-            String response = null;
-            while (response == null) {
-                try {
-                    response = future.get(8, TimeUnit.SECONDS);
-                    if (response != null) {
+        Log.d(TAG,url);StringRequest readRoom = new StringRequest(Request.Method.GET,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
                         Log.d(TAG, response);
                         if (response.contains(NOBODY)) {
                             SmartHouse.getInstance().updateSensorArea(area.getId(), "security:Không thấy ai cả");
@@ -187,15 +186,12 @@ public class ControlMonitorService extends Service {
                             return;
                         }
                     }
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
             }
-        } catch (ExecutionException e) {
-            Log.d(TAG,"Exec camera"+ e.getMessage());
-        } catch (TimeoutException           e) {
-            Log.d(TAG,"Timeout camera "+ e.getMessage());
-        }
+        });
+        readRoom.setRetryPolicy(new DefaultRetryPolicy(8000,0,1f));
         VolleySingleton.getInstance(this).addToRequestQueue(readRoom);
 
     }

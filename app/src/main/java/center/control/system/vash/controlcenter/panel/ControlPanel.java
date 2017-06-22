@@ -136,6 +136,9 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
 
                             Frame frame = new Frame.Builder().setBitmap(bmImg).build();
                             SparseArray<Face> faces = singleFace.getSafeDetector().detect(frame);
+                            if (faces.size() == 0){
+                                txtResult.setText("Không có khách đến");
+                            } else
                             txtResult.setText("Có "+ faces.size()+" khách đến");
                         } else {
                             imgFace.setImageResource(R.drawable.close);
