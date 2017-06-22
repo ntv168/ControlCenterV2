@@ -359,4 +359,10 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
         deviceDialog.show();
 //        pickImage();
     }
+
+    @Override
+    public void onDeviceLongClick(DeviceEntity deviceEntity) {
+        DeviceSQLite.deleteByDevId(deviceEntity.getId());
+        devicesAdapter.remove(deviceEntity);
+    }
 }

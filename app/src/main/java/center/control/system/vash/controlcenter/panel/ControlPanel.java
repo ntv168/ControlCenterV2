@@ -2,12 +2,16 @@ package center.control.system.vash.controlcenter.panel;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -15,8 +19,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,9 +30,13 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.face.Face;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.area.AreaAdapter;
@@ -36,6 +46,7 @@ import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.device.DeviceAdapter;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
+import center.control.system.vash.controlcenter.recognition.Facedetect;
 import center.control.system.vash.controlcenter.script.ScriptDeviceEntity;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
 import center.control.system.vash.controlcenter.server.WebServer;
@@ -49,17 +60,19 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     private static final String TAG = "Control Panel";
     public static final String CONTROL_FILTER_RECEIVER = "control filter receiver";
     public static final String ACTION_TYPE = "control action type receiver";
+    public static final String AREA_ID = "service.area.check.id";
 
     private SharedPreferences sharedPreferences;
     private String systemId;
-    RecyclerView lstDevice;
-    RecyclerView lstAreaAttribute;
+    private RecyclerView lstDevice;
+    private RecyclerView lstAreaAttribute;
     private Dialog remoteDialog;
+    private Dialog cameraDialog;
     private BroadcastReceiver receiver;
     private AreaEntity currentArea;
-
-    AreaAttributeAdapter areaAttributeAdapter;
-    DeviceAdapter deviceAdapter;
+    private Notification.Builder noticBuilder;
+    private AreaAttributeAdapter areaAttributeAdapter;
+    private DeviceAdapter deviceAdapter;
     private DeviceEntity currentDevice;
     private String currentAttrib;
 
@@ -91,12 +104,44 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                 String resultType = intent.getStringExtra(ACTION_TYPE);
                 Toast.makeText(ControlPanel.this, resultType, Toast.LENGTH_SHORT).show();
                 if (resultType.equals(WebServerService.SERVER_SUCCESS)) {
-                    Toast.makeText(ControlPanel.this, intent.getStringExtra(resultType), Toast.LENGTH_SHORT).show();
+                    noticBuilder.setContentText(resultType);
+                    noticBuilder.setContentTitle("Server stated port "+8080);
+                    NotificationManager man = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                    man.notify(0,noticBuilder.build());
+
                 }  else if (resultType.equals(ControlMonitorService.CONTROL)){
                         SmartHouse house = SmartHouse.getInstance();
                         deviceAdapter.updateHouseDevice(house.getDevicesInAreaAttribute(currentArea.getId(),currentAttrib));
-                } else if (resultType.equals(ControlMonitorService.MONITOR)){
+                } else if (resultType.equals(ControlMonitorService.MONITOR)) {
+                    int areaId = intent.getIntExtra(AREA_ID, -1);
+                    if ( currentArea!=null && areaId == currentArea.getId()) {
+                        areaAttributeAdapter.updateAttribute(SmartHouse.getAreaById(areaId).generateValueArr(),areaId);
+                    }
+                } else if (resultType.equals(ControlMonitorService.CAMERA)){
+                    int areaId = intent.getIntExtra(AREA_ID,-1);
+                    if ( currentArea!=null && areaId == currentArea.getId()) {
+                        SmartHouse house = SmartHouse.getInstance();
+                        Bitmap bmImg = house.getBitmapByAreaId(areaId);
+                        ImageView imgFace = (ImageView) cameraDialog.findViewById(R.id.imgFace);
+                        TextView txtResult = (TextView) cameraDialog.findViewById(R.id.txtFaceResult);
+                        txtResult.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                cameraDialog.dismiss();
+                            }
+                        });
+                        if (bmImg!=null){
+                            imgFace.setImageBitmap(bmImg);
+                            Facedetect singleFace = Facedetect.getInstance(context);
 
+                            Frame frame = new Frame.Builder().setBitmap(bmImg).build();
+                            SparseArray<Face> faces = singleFace.getSafeDetector().detect(frame);
+                            txtResult.setText("Có "+ faces.size()+" khách đến");
+                        } else {
+                            imgFace.setImageResource(R.drawable.close);
+                        }
+                        cameraDialog.show();
+                    }
                 }
 
             }
@@ -104,11 +149,16 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
                 new IntentFilter(CONTROL_FILTER_RECEIVER));
 
-        Log.d(TAG,"start broadcast");
+        noticBuilder = new Notification.Builder(this);
+        noticBuilder.setSmallIcon(R.drawable.icon);
 
         remoteDialog = new Dialog(this);
         remoteDialog.setTitle("Điều khiển");
         remoteDialog.setContentView(R.layout.remote_device_dialog);
+
+        cameraDialog = new Dialog(this);
+        cameraDialog.setTitle("Hình ảnh từ camera");
+        cameraDialog.setContentView(R.layout.camera_dialog);
 
         RecyclerView lstAreaName = (RecyclerView) findViewById(R.id.lstAreaName);
         lstAreaName.setHasFixedSize(true);
@@ -181,13 +231,14 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     @Override
     public void onDeviceClick(final DeviceEntity device) {
         currentDevice = device;
-        ((TextView) remoteDialog.findViewById(R.id.txtRemoteName)).setText(device.getName());
+        ((TextView) remoteDialog.findViewById(R.id.txtRemoteName)).setText(device.getName()+" ở "+currentArea.getName()+ " ");
         if (DeviceEntity.remoteTypes.contains(device.getType())){
             ImageButton btnOn = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteOn);
             btnOn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"on"));
+                    waitDialog(2000);
                 }
             });
             ImageButton btnOff = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteOff);
@@ -195,6 +246,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                 @Override
                 public void onClick(View v) {
                     SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"off"));
+                    waitDialog(2000);
                 }
             });
             ImageButton btnInc = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteInc);
@@ -202,6 +254,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                 @Override
                 public void onClick(View v) {
                     SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"inc"));
+                    waitDialog(2000);
                 }
             });
             ImageButton btnDec = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteDec);
@@ -209,6 +262,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                 @Override
                 public void onClick(View v) {
                     SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"dec"));
+                    waitDialog(2000);
                 }
             });
             remoteDialog.show();
@@ -220,4 +274,21 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             }
         }
     }
+    private void waitDialog(int sec){
+        final ProgressDialog waitDialog = new ProgressDialog(this);
+        waitDialog.setTitle("Vui lòng đợi");
+        waitDialog.setIndeterminate(true);
+        waitDialog.setCancelable(false);
+        waitDialog.show();
+
+        long delayInMillis = sec;
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                waitDialog.dismiss();
+            }
+        }, delayInMillis);
+    }
+
 }

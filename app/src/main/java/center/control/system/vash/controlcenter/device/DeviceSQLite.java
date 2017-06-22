@@ -133,4 +133,10 @@ public class DeviceSQLite {
         db.delete(TABLE_DEVICE, KEY_AREA+"=?", new String[]{Integer.toString(id)});
         SQLiteManager.getInstance().closeDatabase();
     }
+
+    public static void deleteByDevId(int id) {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        db.delete(TABLE_DEVICE, KEY_ID+"=?", new String[]{Integer.toString(id)});
+        SQLiteManager.getInstance().closeDatabase();
+    }
 }

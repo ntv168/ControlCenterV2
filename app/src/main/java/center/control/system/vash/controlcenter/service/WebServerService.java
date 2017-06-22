@@ -1,5 +1,6 @@
 package center.control.system.vash.controlcenter.service;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
@@ -47,6 +48,9 @@ public class WebServerService extends Service {
     public void onDestroy() {
         super.onDestroy();
         server.stop();
+
+        NotificationManager man = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        man.cancel(0);
         Log.w(TAG, "stopped server.....");
     }
 }

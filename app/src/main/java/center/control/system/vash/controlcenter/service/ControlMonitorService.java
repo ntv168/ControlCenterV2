@@ -14,15 +14,18 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Base64;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Frame;
@@ -40,6 +43,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaEntity;
@@ -61,14 +67,15 @@ public class ControlMonitorService extends Service {
     private static final String TAG = "---Read Sensor---";
     public static final String CONTROL = "control.action";
     public static final String MONITOR = "monitor.action";
-    private static Camera camera= null;
-    private static Camera.PictureCallback mCallBack;
+    public static final String CAMERA = "camera.action";
+    public static final String NOBODY = "Nobody";
     private static Timer repeatScheduler;
     private LocalBroadcastManager broadcaster;
 
-    public void sendResult(String message) {
+    public void sendResult(String message, int areaId) {
         Intent intent = new Intent(ControlPanel.CONTROL_FILTER_RECEIVER);
         intent.putExtra(ControlPanel.ACTION_TYPE, message);
+        intent.putExtra(ControlPanel.AREA_ID, areaId);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
     public void sendControl(DeviceEntity deviceEntity, final String status){
@@ -87,12 +94,13 @@ public class ControlMonitorService extends Service {
                 public void onErrorResponse(VolleyError error) {
                 }
             });
+            control.setRetryPolicy(new DefaultRetryPolicy(1000,0,1f));
             if (status.equals("on") || status.equals("off")) {
                 SmartHouse house = SmartHouse.getInstance();
                 deviceEntity.setState(status);
                 house.updateDeviceStateById(deviceEntity.getId(),status);
                 Log.d(TAG,deviceEntity.getName()+ " với lệnh: " + status);
-                sendResult(CONTROL);
+                sendResult(CONTROL,-1);
             }
             VolleySingleton.getInstance(this).addToRequestQueue(control);
         }
@@ -100,31 +108,23 @@ public class ControlMonitorService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-//        openBackCamera();
-//        final SurfaceView preview = new SurfaceView(this);
-//        final SurfaceHolder holder = preview.getHolder();
-//        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-//        final WindowManager wm = (WindowManager) this
-//                .getSystemService(Context.WINDOW_SERVICE);
-//
-//        Log.i(TAG, "Opened camera");
-
         final Context context = this;
         broadcaster = LocalBroadcastManager.getInstance(context);
         repeatScheduler = new Timer();
+        Log.d(TAG,"Start service");
         repeatScheduler.schedule(new TimerTask() {
             @Override
             public void run() {
-//                takePhoto(context, holder,wm,preview);
                 SmartHouse smartHouse = SmartHouse.getInstance();
                 try {
-                    ScriptDeviceEntity command = smartHouse.getOwnerCommand().take();
-                    if (command == null){
+                    if (smartHouse.getOwnerCommand().size() == 0){
                         for (AreaEntity area: smartHouse.getAreas()){
                             Log.d(TAG,"check hang " +area.getName() + " "+area.getConnectAddress().trim()+"/check");
                             checkArea(area);
+                            checkCamera(area);
                         }
                     } else {
+                        ScriptDeviceEntity command = smartHouse.getOwnerCommand().take();
                         DeviceEntity device = smartHouse.getDeviceById(command.getDeviceId());
                         if (device != null) {
                             sendControl(device,command.getDeviceState());
@@ -141,26 +141,63 @@ public class ControlMonitorService extends Service {
         }, 0, 3000);
     }
 
-    private  void checkArea(AreaEntity area){
-
-        String url = area.getConnectAddress()+"/check";
+    private  void checkArea(final AreaEntity area){
+        String url ="http://"+ area.getConnectAddress()+"/check";
         Log.d(TAG,url);
-//            StringRequest readRoom = new StringRequest(Request.Method.GET, area.getConnectAddress(),
-//                    new Response.Listener<String>(){
-//                        @Override
-//                        public void onResponse(String response) {
-////                                    response = "7:on,A0:25,A1:open";
-////                                    SmartHouse.getInstance().updateSensorArea(currentAreaId,response);
-//
-//                        }
-//                    }, new Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//
-//                    Log.e(TAG,error.getMessage());
-//                }
-//            });
-//            VolleySingleton.getInstance(null).addToRequestQueue(readRoom);
+        StringRequest readRoom = new StringRequest(Request.Method.GET,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG,response);
+                        SmartHouse.getInstance().updateSensorArea(area.getId(),response);
+                        sendResult(MONITOR,area.getId());
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
+        readRoom.setRetryPolicy(new DefaultRetryPolicy(2000,0,1f));
+        VolleySingleton.getInstance(this).addToRequestQueue(readRoom);
+    }
+    private  void checkCamera(final AreaEntity area){
+
+        String url ="http://"+ area.getConnectAddress()+"/camera";
+        Log.d(TAG,url);
+//        readRoom.setRetryPolicy(new DefaultRetryPolicy(2000,0,1f));
+        RequestFuture<String> future = RequestFuture.newFuture();
+        StringRequest readRoom = new StringRequest(Request.Method.GET, url, future, future);
+        try {
+            String response = null;
+            while (response == null) {
+                try {
+                    response = future.get(8, TimeUnit.SECONDS);
+                    if (response != null) {
+                        Log.d(TAG, response);
+                        if (response.contains(NOBODY)) {
+                            SmartHouse.getInstance().updateSensorArea(area.getId(), "security:Không thấy ai cả");
+                            sendResult(MONITOR, area.getId());
+                            return;
+                        } else if (response.length() > 10) {
+                            byte[] decodedString = Base64.decode(response, Base64.NO_WRAP);
+                            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                            SmartHouse.getInstance().updatePictureArea(area.getId(), decodedByte);
+                            sendResult(CAMERA, area.getId());
+                            return;
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        } catch (ExecutionException e) {
+            Log.d(TAG,"Exec camera"+ e.getMessage());
+        } catch (TimeoutException           e) {
+            Log.d(TAG,"Timeout camera "+ e.getMessage());
+        }
+        VolleySingleton.getInstance(this).addToRequestQueue(readRoom);
+
     }
     @Nullable
     @Override
@@ -168,60 +205,10 @@ public class ControlMonitorService extends Service {
         return null;
     }
 
-    @SuppressWarnings("deprecation")
-    private static void takePhoto(final Context context,SurfaceHolder holder, WindowManager wm, SurfaceView preview) {
-        holder.addCallback(new SurfaceHolder.Callback() {
-            @Override
-            //The preview must happen at or after this point or takePicture fails
-            public void surfaceCreated(SurfaceHolder holder) {
-                Camera.Parameters parameters = camera.getParameters();
-                parameters.set("orientation", "portrait");
-                parameters.setRotation(90);
-                camera.setParameters(parameters);
-                try {
-                    camera.setPreviewDisplay(holder);
-                    camera.startPreview();
-                    camera.takePicture(null, null, mCallBack);
-                } catch (Exception e) {
-                    if (camera != null)
-                        camera.release();
-                    e.printStackTrace();
-                }
-            }
-
-            @Override public void surfaceDestroyed(SurfaceHolder holder) {}
-            @Override public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
-
-
-        });
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                1, 1, //Must be at least 1x1
-                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-                0,PixelFormat.UNKNOWN);
-        wm.addView(preview, params);
-    }
-    private void openBackCamera() {
-        int cameraId = -1;
-        int numberOfCameras = Camera.getNumberOfCameras();
-        for (int i = 0; i < numberOfCameras; i++) {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(i, info);
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                Log.i(TAG, "Camera found "+i);
-                cameraId = i;
-                break;
-            }
-        }
-//        camera = Camera.open(cameraId);
-    }
 
     @Override
     public void onDestroy(){
         Toast.makeText(this, "Stop read sensor", Toast.LENGTH_SHORT).show();
-        if (camera != null){
-            camera.release();
-            Log.i(TAG,"release CAMERA FOR PHONE");
-        }
         if (repeatScheduler !=null){
             repeatScheduler.cancel();
         }

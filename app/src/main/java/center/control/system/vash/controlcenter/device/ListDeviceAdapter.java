@@ -42,6 +42,16 @@ public class ListDeviceAdapter extends RecyclerView.Adapter<ListDeviceAdapter.Vi
         } else {
             holder.view.setBackgroundColor(Color.WHITE);
         }
+        holder.view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (null != mListener) {
+                    mListener.onDeviceLongClick(holder.item);
+                    deviceEnts.remove(holder.item);
+                }
+                return true;
+            }
+        });
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,6 +75,11 @@ public class ListDeviceAdapter extends RecyclerView.Adapter<ListDeviceAdapter.Vi
         this.notifyDataSetChanged();
     }
 
+    public void remove(DeviceEntity deviceEntity) {
+        this.deviceEnts.remove(deviceEntity);
+        this.notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public final TextView deviceName;
@@ -84,7 +99,7 @@ public class ListDeviceAdapter extends RecyclerView.Adapter<ListDeviceAdapter.Vi
     }
 
     public interface OnAdapterItemClickListener {
-        // TODO: Update argument type and name
         public void onDeviceClick(DeviceEntity areaEntity);
+        public void onDeviceLongClick(DeviceEntity deviceEntity);
     }
 }

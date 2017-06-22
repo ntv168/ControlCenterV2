@@ -82,6 +82,23 @@ public class SmartHouse {
     public void updateSensorArea(int areaId, String response) {
         for (AreaEntity area: this.getAreas()){
             if (area.getId() == areaId){
+                String[] ele = response.split(response);
+                for (int i = 0; i< ele.length; i++){
+                    if (ele[i].length()>1){
+                        String[] val = ele[i].split(":");
+                        if (val[0].equals(AreaEntity.attrivutesValues[0])){
+                            area.setSafety(val[1]);
+                        } else if (val[0].equals(AreaEntity.attrivutesValues[1])){
+                            area.setLight(val[1]);
+                        } else if (val[0].equals(AreaEntity.attrivutesValues[2])){
+                            area.setTemperature(val[1]);
+                        }else if (val[0].equals(AreaEntity.attrivutesValues[3])){
+                            area.setSound(val[1]);
+                        }else if (val[0].equals(AreaEntity.attrivutesValues[4])){
+                            area.setElectricUsing(val[1]);
+                        }
+                    }
+                }
                 break;
             }
         }
@@ -216,7 +233,27 @@ public class SmartHouse {
        for (DeviceEntity dev : this.getDevices()){
            if (dev.getId() == id){
                dev.setState(status);
+               return;
            }
        }
+    }
+
+    public void updatePictureArea(int id, Bitmap decodedByte) {
+        for (AreaEntity area: this.areas){
+            if (area.getId() == id){
+                area.setImageBitmap(decodedByte);
+                return;
+            }
+        }
+    }
+
+    public Bitmap getBitmapByAreaId(int areaId) {
+        for (AreaEntity area: this.areas){
+            if (area.getId() == areaId){
+
+                return area.getImageBitmap();
+            }
+        }
+        return null;
     }
 }
