@@ -25,7 +25,7 @@ public class App extends Application {
         VoiceUtils.initializeInstance(context);
         dbHelper = new SqLiteHelper();
         SQLiteManager.initializeInstance(dbHelper);
-        Facedetect singleFace = Facedetect.getInstance(context);
+
         Log.d("App context","initiating .....");
 
     }
