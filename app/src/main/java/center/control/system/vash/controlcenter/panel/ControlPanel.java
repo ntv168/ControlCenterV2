@@ -94,8 +94,11 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control_panel);
+
         final ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnHome);
-        currentTab.setBackgroundColor(Color.WHITE);
+        currentTab.setImageResource(R.drawable.tab_home_active);
+        currentTab.setBackgroundResource(R.drawable.background_tab_home_active);
+
         Intent webService = new Intent(ControlPanel.this, WebServerService.class);
         startService(webService);
         receiver = new BroadcastReceiver() {

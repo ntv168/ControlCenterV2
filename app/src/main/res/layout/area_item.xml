@@ -4,7 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_marginRight="10dp"
-    android:background="@color/colorPrimary"
+    android:background="@android:color/transparent"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="20dp"
@@ -16,8 +16,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Phòng"
-        android:textColor="@color/colorActive"
-        android:textSize="30dp" />
+        android:textColor="@color/nGreen1"
+        android:textSize="20dp" />
 
 
 </LinearLayout>

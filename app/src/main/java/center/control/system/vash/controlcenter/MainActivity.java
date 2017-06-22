@@ -84,7 +84,7 @@ public class MainActivity extends Activity {
         });
 
         final AlertDialog.Builder modHost = new AlertDialog.Builder(this);
-        modHost.setTitle("Nhâp địa chỉ server");
+        modHost.setTitle("Nhập địa chỉ server");
         View diaView = this.getLayoutInflater().inflate(R.layout.dialog_host_edit, null);
         final EditText hostAddress = (EditText) diaView.findViewById(R.id.txtServerHost);
         hostAddress.setText(VolleySingleton.SERVER_HOST);
