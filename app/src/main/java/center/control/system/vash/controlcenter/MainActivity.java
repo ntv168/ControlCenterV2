@@ -5,10 +5,13 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -61,6 +64,14 @@ public class MainActivity extends Activity {
     EditText txtpassword;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // Set transparent status bar Android
+        Window w = getWindow();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            w.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            w.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button btnLogin = (Button) findViewById(R.id.btnLogin);
