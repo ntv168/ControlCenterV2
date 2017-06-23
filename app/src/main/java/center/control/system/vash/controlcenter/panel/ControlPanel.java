@@ -120,6 +120,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
 
 
         mPersonGroupId = "29f1ccf6-16a3-4e09-95c7-24e5e31a2acf";
+        StorageHelper.setPersonGroupId(mPersonGroupId, "nguoinha", ControlPanel.this);
         detecting= false;
 
         if (StorageHelper.getAllPersonIds(mPersonGroupId, ControlPanel.this).isEmpty()) {
