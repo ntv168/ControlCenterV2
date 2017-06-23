@@ -23,6 +23,7 @@ public class VoiceUtils {
                         public void onInit(int status) {
                             if(status == TextToSpeech.SUCCESS) {
                                 singleton.tts.setLanguage(new Locale("vi","VN"));
+                                Log.d("VOICEUTILSSSS","ok");
                             }else {
                                 Log.d("VOICEUTILSSSS","Khong noi duoc roi");
                             }

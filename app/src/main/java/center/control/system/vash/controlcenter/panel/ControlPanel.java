@@ -46,6 +46,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
+import center.control.system.vash.controlcenter.App;
 import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.area.AreaAdapter;
 import center.control.system.vash.controlcenter.area.AreaAttribute;
@@ -107,7 +108,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control_panel);
-
+        showReply("Xin chào anh Đại, quán cà phê thông minh xin được phục vụ ạ");
         final ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnHome);
         currentTab.setImageResource(R.drawable.tab_home_active);
         currentTab.setBackgroundResource(R.drawable.background_tab_home_active);
@@ -128,10 +129,6 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             StorageHelper.setPersonName("6d639f61-0df1-44b6-b0a3-1c2d1024edf2","Văn", mPersonGroupId, ControlPanel.this);
 
         }
-
-
-
-
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -157,38 +154,26 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                         SmartHouse house = SmartHouse.getInstance();
                         Bitmap bmImg = house.getBitmapByAreaId(areaId);
                         ImageView imgFace = (ImageView) cameraDialog.findViewById(R.id.imgFace);
-                        TextView txtResult = (TextView) cameraDialog.findViewById(R.id.txtFaceResult);
-                        txtResult.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                cameraDialog.dismiss();
-                            }
-                        });
+
                         if (bmImg!=null){
                             imgFace.setImageBitmap(bmImg);
 
-                            ByteArrayOutputStream os = new ByteArrayOutputStream();
-                            bmImg.compress(Bitmap.CompressFormat.JPEG, 100, os);
-
                             String root = Environment.getExternalStorageDirectory().toString();
-                            File myDir = new File(root + "/saved_images");
+                            File myDir =  Environment.getExternalStoragePublicDirectory(
+                                    Environment.DIRECTORY_PICTURES);
                             myDir.mkdirs();
                             String nameFile = "testSelf.jpg";
                             File file = new File(myDir, nameFile);
                             if (file.exists ()) file.delete();
                             try {
                                 FileOutputStream out = new FileOutputStream(file);
+                                Log.d(TAG,file.getAbsolutePath());
                                 bmImg.compress(Bitmap.CompressFormat.JPEG, 100, out);
-//
                                 out.close();
                             } catch (IOException e){
-                                Log.d("CAMERA file", e.getMessage());
+                                Log.d(TAG, e.getMessage());
                             }
 
-
-
-//                detecting = false;
-                            // If image is selected successfully, set the image URI and bitmap.
                             Uri uri = Uri.fromFile(file);
 
                             Bitmap mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
@@ -369,11 +354,12 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         protected com.microsoft.projectoxford.face.contract.Face[] doInBackground(InputStream... params) {
             // Get an instance of face service client to detect faces in image.
 
+            FaceServiceClient faceServiceClient = App.getFaceServiceClient();
             try{
                 publishProgress("Detecting...");
 
                 // Start detection.
-                return fsClient.detect(
+                return faceServiceClient.detect(
                         params[0],  /* Input stream of image to detect */
                         true,       /* Whether to return face ID */
                         false,       /* Whether to return face landmarks */
@@ -400,7 +386,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         @Override
         protected void onPostExecute(com.microsoft.projectoxford.face.contract.Face[] result) {
             long enddetect= System.currentTimeMillis();
-            Log.d("--------------", "time detect --------------- " + (enddetect - startdetect));
+            Log.d("--------------", "time detect --------------- " + result.length);
 
             if (result != null) {
                 // Set the adapter of the ListView which contains the details of detectingfaces.
@@ -457,11 +443,11 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             logString += " in group " + mPersonGroupId;
             Log.d("--------", "IdentificationTask: " + mPersonGroupId);
             // Get an instance of face service client to detect faces in image.
-
+            FaceServiceClient faceServiceClient = App.getFaceServiceClient();
             try{
                 publishProgress("Getting person group status...");
 
-                TrainingStatus trainingStatus = fsClient.getPersonGroupTrainingStatus(
+                TrainingStatus trainingStatus = faceServiceClient.getPersonGroupTrainingStatus(
                         this.mPersonGroupId);     /* personGroupId */
 
                 Log.d("--------", "trainingStatus: " + trainingStatus);
@@ -474,7 +460,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                 publishProgress("Identifying...");
 
                 // Start identification.
-                return fsClient.identity(
+                return faceServiceClient.identity(
                         this.mPersonGroupId,   /* personGroupId */
                         params,                  /* faceIds */
                         1);  /* maxNumOfCandidatesReturned */
@@ -504,7 +490,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             // Set the information about the detection result.
             if (result != null) {
 
-                String message = "";
+                String message = "Dù Vàng xin chào ";
                 Boolean hasAqua = false;
                 int stranger = 0;
 
@@ -515,7 +501,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                             String personName = StorageHelper.getPersonName(
                                     personId, mPersonGroupId, ControlPanel.this);
 
-                            message += personName;
+                            message += personName+" ";
                             hasAqua = true;
                         } else {
                             stranger++;
@@ -524,13 +510,14 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                         stranger++;
                     }
                 }
-                if (stranger > 0 && hasAqua) {
-                    message += " và " + stranger + "người lạ";
-                } if (stranger > 0 && !hasAqua) {
-                    message += "Có" + stranger + "người lạ";
+                if (hasAqua) {
+                    message += " trở lại quán ạ";
+                } if (!hasAqua) {
+                    message = "Dù Vàng xin chào anh chị. Có " + stranger + " khách đến quán ạ";
                 }
 
                 showReply(message);
+                setInfo(message);
 
             }
         }
@@ -539,13 +526,19 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
 
 
     private void setInfo(String info) {
-        TextView textView = (TextView) findViewById(R.id.info);
-        textView.setText(info);
+        TextView txtResult = (TextView) cameraDialog.findViewById(R.id.txtFaceResult);
+        txtResult.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cameraDialog.dismiss();
+            }
+        });
+        txtResult.setText(info);
     }
 
     private  void showReply(String sentenceReply){
         VoiceUtils.speak(sentenceReply);
-
+        Log.d(TAG, "showReply: ----------------" + sentenceReply);
     }
 
 

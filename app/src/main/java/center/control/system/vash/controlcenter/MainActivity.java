@@ -32,6 +32,7 @@ import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
+import center.control.system.vash.controlcenter.nlp.VoiceUtils;
 import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.HouseKeyDTO;
 import center.control.system.vash.controlcenter.server.LoginSmarthouseDTO;
@@ -111,7 +112,10 @@ public class MainActivity extends Activity {
                 })
                 .setNegativeButton("Xóa", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+
+                        VoiceUtils.speak("Xin chào anh Đại, quán cà phê thông minh xin được phục vụ ạ");
                         dialog.dismiss();
+
                     }
                 });
         modHost.show();

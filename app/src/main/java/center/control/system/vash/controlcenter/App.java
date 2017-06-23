@@ -4,6 +4,9 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import com.microsoft.projectoxford.face.FaceServiceClient;
+import com.microsoft.projectoxford.face.FaceServiceRestClient;
+
 import center.control.system.vash.controlcenter.recognition.Facedetect;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
 import center.control.system.vash.controlcenter.database.SqLiteHelper;
@@ -26,9 +29,17 @@ public class App extends Application {
         dbHelper = new SqLiteHelper();
         SQLiteManager.initializeInstance(dbHelper);
 
+        sFaceServiceClient = new FaceServiceRestClient(context.getString(R.string.endpoint), context.getString(R.string.subscription_key));
+
         Log.d("App context","initiating .....");
 
     }
+
+    public static FaceServiceClient getFaceServiceClient(){
+        return sFaceServiceClient;
+    }
+
+    private static FaceServiceClient sFaceServiceClient;
 
     public static Context getContext(){
         return context;

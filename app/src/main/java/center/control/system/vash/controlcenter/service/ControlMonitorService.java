@@ -71,6 +71,7 @@ public class ControlMonitorService extends Service {
     public static final String NOBODY = "Nobody";
     private static Timer repeatScheduler;
     private LocalBroadcastManager broadcaster;
+    private boolean areaChecked = false;
 
     public void sendResult(String message, int areaId) {
         Intent intent = new Intent(ControlPanel.CONTROL_FILTER_RECEIVER);
@@ -120,11 +121,13 @@ public class ControlMonitorService extends Service {
                     if (smartHouse.getOwnerCommand().size() == 0){
                         for (AreaEntity area: smartHouse.getAreas()){
                             Log.d(TAG,"check hang " +area.getName() + " "+area.getConnectAddress().trim()+"/check");
-                            if (area.isHasCamera()) {
+                            if (area.isHasCamera() && areaChecked) {
                                 checkCamera(area);
+                            } else if (!areaChecked) {
+                                checkArea(area);
                             }
-                            checkArea(area);
                         }
+                        areaChecked = !areaChecked;
                     } else {
                         ScriptDeviceEntity command = smartHouse.getOwnerCommand().take();
                         DeviceEntity device = smartHouse.getDeviceById(command.getDeviceId());
@@ -140,7 +143,7 @@ public class ControlMonitorService extends Service {
 
 
             }
-        }, 5000, 8000);
+        }, 3000, 6000);
     }
 
     private  void checkArea(final AreaEntity area){
@@ -162,7 +165,7 @@ public class ControlMonitorService extends Service {
             public void onErrorResponse(VolleyError error) {
             }
         });
-        readRoom.setRetryPolicy(new DefaultRetryPolicy(2000,0,1f));
+        readRoom.setRetryPolicy(new DefaultRetryPolicy(VolleySingleton.CHECK_AREA_TIMEOUT,0,1f));
         VolleySingleton.getInstance(this).addToRequestQueue(readRoom);
     }
     private void checkCamera(final AreaEntity area){
@@ -173,8 +176,8 @@ public class ControlMonitorService extends Service {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d(TAG, response);
-                        if (response.contains(NOBODY)) {
+                        Log.d(TAG, response.length()+"");
+                        if (response.equals(NOBODY)) {
                             SmartHouse.getInstance().updateSensorArea(area.getId(), "security:Không thấy ai cả");
                             sendResult(MONITOR, area.getId());
                             return;
@@ -191,7 +194,7 @@ public class ControlMonitorService extends Service {
             public void onErrorResponse(VolleyError error) {
             }
         });
-        readRoom.setRetryPolicy(new DefaultRetryPolicy(8000,0,1f));
+        readRoom.setRetryPolicy(new DefaultRetryPolicy(VolleySingleton.CHECK_CAMERA_TIMEOUT,0,1f));
         VolleySingleton.getInstance(this).addToRequestQueue(readRoom);
 
     }
