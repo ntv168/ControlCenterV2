@@ -59,6 +59,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mode_panel);
         ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnMode);
+        currentTab.setImageResource(R.drawable.tab_mode_active);
         currentTab.setBackgroundColor(Color.WHITE);
         final SmartHouse house = SmartHouse.getInstance();
 

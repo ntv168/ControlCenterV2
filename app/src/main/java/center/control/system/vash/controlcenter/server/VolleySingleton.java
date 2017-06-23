@@ -15,7 +15,7 @@ import java.io.UnsupportedEncodingException;
 
 public class VolleySingleton {
 
-    public static  String SERVER_HOST = "https://6c57aed5.ngrok.io";
+    public static  String SERVER_HOST = "https://9882c02c.ngrok.io";
     private static VolleySingleton mInstance;
     private RequestQueue mRequestQueue;
     private static Context context;

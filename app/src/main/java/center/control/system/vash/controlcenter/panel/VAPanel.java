@@ -25,6 +25,7 @@ public class VAPanel extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vapanel);
         ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnVA);
+        currentTab.setImageResource(R.drawable.tab_voice_active);
         currentTab.setBackgroundColor(Color.WHITE);
 
         btnSend = (Button) findViewById(R.id.btnChatSend);

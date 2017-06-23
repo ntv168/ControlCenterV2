@@ -236,7 +236,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         currentDevice = device;
         ((TextView) remoteDialog.findViewById(R.id.txtRemoteName)).setText(device.getName()+" ở "+currentArea.getName()+ " ");
         if (DeviceEntity.remoteTypes.contains(device.getType())){
-            ImageButton btnOn = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteOn);
+            ImageButton btnOn = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteOnOff);
             btnOn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -244,7 +244,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                     waitDialog(2000);
                 }
             });
-            ImageButton btnOff = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteOff);
+            ImageButton btnOff = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteOnOff);
             btnOff.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

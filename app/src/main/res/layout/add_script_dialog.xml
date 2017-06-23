@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
+    android:layout_width="800dp"
+    android:layout_height="600dp"
+    android:gravity="top"
     android:orientation="vertical"
     android:padding="20dp"
-    android:paddingBottom="@dimen/title_height"
-    android:weightSum="5">
+    android:weightSum="10.1">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:orientation="horizontal"
-        android:weightSum="3">
+        android:weightSum="2">
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -25,26 +24,27 @@
                 android:id="@+id/textView4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tên chế độ" />
+                android:text="Tên chế độ"
+                android:textSize="18sp" />
 
             <EditText
                 android:id="@+id/txtScriptName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/textView5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tên phụ" />
+                android:text="Tên phụ"
+                android:textSize="18sp" />
 
             <EditText
                 android:id="@+id/txtScriptNickname"
@@ -57,34 +57,49 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:layout_weight="7"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btnAddDeviceScript"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="them thiet bi vao che do" />
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal"
+            android:weightSum="10">
 
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Danh sách thiết bị" />
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_weight="9"
+                android:text="Danh sách thiết bị"
+                android:textSize="18sp" />
 
-        <View
-            android:id="@+id/view"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/black" />
+            <Button
+                android:id="@+id/btnAddDeviceScript"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/login_button"
+                android:elevation="1dp"
+                android:text="+"
+                android:textColor="@android:color/white"
+                android:textSize="26sp" />
+
+        </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lstDeviceScript"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="10dp" />
+            android:paddingLeft="30dp" />
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#F1F1F1" />
 
 
     <LinearLayout
@@ -92,20 +107,26 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="right"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingTop="10dp">
 
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/common_google_signin_btn_text_dark_pressed"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
             android:text="Hủy" />
 
         <Button
             android:id="@+id/btnSave"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Lưu" />
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/login_button"
+            android:text="Lưu"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </LinearLayout>

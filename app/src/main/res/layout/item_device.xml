@@ -4,10 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="@dimen/half_body_height"
     android:layout_height="match_parent"
-    android:layout_marginBottom="20dp"
-    android:background="@drawable/paper_shadow"
-    android:layout_marginTop="15dp"
-    android:layout_marginLeft="15dp"
+    android:layout_margin="5dp"
+    android:background="@drawable/background_device"
     android:orientation="vertical"
     android:weightSum="4">
 
@@ -15,22 +13,30 @@
         android:id="@+id/deviceIcon"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="20dp"
+        android:layout_margin="10dp"
         android:layout_weight="2"
         android:padding="10dp"
-        android:src="@drawable/bell" />
+        android:src="@drawable/bell"
+        android:tint="@android:color/white" />
 
-    <TextView
-        android:id="@+id/deviceName"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center"
-        android:padding="5dp"
-        android:text="Đèn chính 1 phòng khách"
-        android:textAlignment="center"
-        android:textColor="@color/colorText"
-        android:textSize="15dp" />
+        android:background="@drawable/background_status_name"
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/deviceName"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Đèn chính 1 phòng khách"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/deviceStatus"
@@ -40,6 +46,6 @@
         android:gravity="center"
         android:text="Đang bật"
         android:textAlignment="center"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@android:color/white"
         android:textSize="14dp" />
 </LinearLayout>
