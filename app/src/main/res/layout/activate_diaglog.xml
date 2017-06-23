@@ -25,6 +25,12 @@
         android:text="Start server" />
 
     <Button
+        android:id="@+id/btnUpdatePersons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tải lại danh sách người thân" />
+
+    <Button
         android:id="@+id/btnCancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
