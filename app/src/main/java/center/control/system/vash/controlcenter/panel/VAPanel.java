@@ -43,6 +43,7 @@ public class VAPanel extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 chatAdapter.add(new ChatAdapter.ViewHolder(false, chatText.getText().toString()));
+                chatText.setText("");
             }
         });
 
