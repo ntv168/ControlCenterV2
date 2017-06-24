@@ -32,14 +32,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="90dp"
                 android:orientation="horizontal"
-                android:weightSum="10">
+                android:weightSum="1">
 
                 <TextView
                     android:id="@+id/textView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
-                    android:layout_weight="8.5"
+                    android:layout_weight="1"
                     android:text="Tất cả chế độ"
                     android:textAllCaps="true"
                     android:textColor="#FFFFFF"
@@ -48,14 +48,14 @@
 
                 <Button
                     android:id="@+id/btnAddMode"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1.5"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:background="@drawable/background_home_sensor"
                     android:elevation="1dp"
+                    android:gravity="center_vertical|center_horizontal|center"
                     android:text="+"
                     android:textColor="@color/nGreen1"
-                    android:textSize="26sp" />
+                    android:textSize="30sp" />
             </LinearLayout>
 
 

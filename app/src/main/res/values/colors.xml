@@ -12,4 +12,5 @@
     <color name="ntnTabMenu">#0affffff</color>
     <color name="nDarkGray">#333333</color>
     <color name="nYellow">#FFF96C</color>
+    <color name="nWhite">#FFFFFF</color>
 </resources>

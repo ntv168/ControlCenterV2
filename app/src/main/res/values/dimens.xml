@@ -11,10 +11,15 @@
     <dimen name="half_body_height">150dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="parent_list_height">200dp</dimen>
-    <dimen name="dialog_width">520dp</dimen>
-    <dimen name="dialog_height">350dp</dimen>
+    <!--<dimen name="dialog_width">520dp</dimen>-->
+    <!--<dimen name="dialog_height">350dp</dimen>    -->
+    <dimen name="dialog_width">640dp</dimen>
+    <dimen name="dialog_height">450dp</dimen>
+    <dimen name="dialog_small_width">640dp</dimen>
+    <dimen name="dialog_small_height">450dp</dimen>
     <dimen name="rec_item_width">150dp</dimen>
     <dimen name="title_font_size">25dp</dimen>
     <dimen name="dialog_tablet_height">500dp</dimen>
     <dimen name="dialog_tablet_width">700dp</dimen>
+    <dimen name="text_title_back">20dp</dimen>
 </resources>
