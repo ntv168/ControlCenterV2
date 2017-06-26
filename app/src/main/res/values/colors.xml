@@ -14,5 +14,6 @@
     <color name="nYellow">#FFF96C</color>
     <color name="nWhite">#FFFFFF</color>
     <color name="nLGray">#F1F1F1</color>
+    <color name="nMGray">#666666</color>
     <color name="nDGray">#333333</color>
 </resources>

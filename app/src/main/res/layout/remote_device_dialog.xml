@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="@dimen/dialog_width"
-    android:layout_height="@dimen/dialog_height"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
     android:orientation="vertical">
 
     <TextView
@@ -13,8 +14,8 @@
         android:padding="10dp"
         android:text="Điều khiển thiết bị"
         android:textAlignment="center"
-        android:textColor="@android:color/white"
         android:textAllCaps="true"
+        android:textColor="@android:color/white"
         android:textSize="24sp" />
 
     <LinearLayout
@@ -33,10 +34,11 @@
 
             <ImageButton
                 android:id="@+id/btnRemoteOnOff"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
                 android:src="@drawable/icn_power" />
 
             <TextView
@@ -51,18 +53,27 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <View
+            android:layout_width="1px"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="100dp"
+            android:layout_marginTop="100dp"
+            android:background="@color/nMGray" />
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:gravity="center"
             android:orientation="vertical"
-            android:padding="50dp"
+            android:paddingBottom="30dp"
+            android:paddingTop="30dp"
             android:weightSum="2">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="-4dp"
                 android:layout_weight="1"
                 android:background="@drawable/background_button_up"
@@ -72,156 +83,180 @@
                 <ImageButton
                     android:id="@+id/btnRemoteInc"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:background="@android:color/transparent"
-                    android:padding="10dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:scaleType="fitCenter"
                     android:src="@drawable/icn_up"
-                    android:tint="@color/nGreen1" />
+                    android:tint="@color/nMGray" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TĂNG"
+                    android:textAlignment="center"
+                    android:textAllCaps="true"
+                    android:textColor="@color/nMGray"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/background_button_down"
                 android:orientation="vertical"
                 android:padding="20dp">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="GIẢM"
+                    android:textAlignment="center"
+                    android:textAllCaps="true"
+                    android:textColor="@color/nMGray"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
                 <ImageButton
                     android:id="@+id/btnRemoteDec"
-                    android:layout_width="120dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:background="@android:color/transparent"
-                    android:padding="10dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:scaleType="fitCenter"
                     android:src="@drawable/icn_down"
-                    android:tint="@color/nGreen1" />
+                    android:tint="@color/nMGray" />
 
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
     <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="fill_parent"-->
-        <!--android:orientation="horizontal"-->
-        <!--android:paddingBottom="100dp"-->
-        <!--android:paddingTop="70dp"-->
-        <!--android:weightSum="4">-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="fill_parent"-->
+    <!--android:orientation="horizontal"-->
+    <!--android:paddingBottom="100dp"-->
+    <!--android:paddingTop="70dp"-->
+    <!--android:weightSum="4">-->
 
-        <!--<LinearLayout-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_weight="1"-->
-            <!--android:layout_marginLeft="20dp"-->
-            <!--android:layout_marginRight="20dp"-->
-            <!--android:weightSum="4"-->
-            <!--android:orientation="vertical">-->
+    <!--<LinearLayout-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_weight="1"-->
+    <!--android:layout_marginLeft="20dp"-->
+    <!--android:layout_marginRight="20dp"-->
+    <!--android:weightSum="4"-->
+    <!--android:orientation="vertical">-->
 
-            <!--<TextView-->
-                <!--android:id="@+id/textView"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="0dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:text="Bật"-->
-                <!--android:textAlignment="center"-->
-                <!--android:textSize="24sp"-->
-                <!--android:textStyle="bold" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/textView"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0dp"-->
+    <!--android:layout_weight="1"-->
+    <!--android:text="Bật"-->
+    <!--android:textAlignment="center"-->
+    <!--android:textSize="24sp"-->
+    <!--android:textStyle="bold" />-->
 
-            <!--<ImageButton-->
-                <!--android:id="@+id/btnRemoteOn"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="0dp"-->
-                <!--android:layout_weight="3"-->
-                <!--android:background="@drawable/buttonactive"-->
-                <!--android:src="@drawable/on"-->
-                <!--android:text="ImageButton" />-->
-        <!--</LinearLayout>-->
+    <!--<ImageButton-->
+    <!--android:id="@+id/btnRemoteOn"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0dp"-->
+    <!--android:layout_weight="3"-->
+    <!--android:background="@drawable/buttonactive"-->
+    <!--android:src="@drawable/on"-->
+    <!--android:text="ImageButton" />-->
+    <!--</LinearLayout>-->
 
-        <!--<LinearLayout-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_weight="1"-->
-            <!--android:layout_marginLeft="20dp"-->
-            <!--android:layout_marginRight="20dp"-->
-            <!--android:weightSum="4"-->
-            <!--android:orientation="vertical">-->
+    <!--<LinearLayout-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_weight="1"-->
+    <!--android:layout_marginLeft="20dp"-->
+    <!--android:layout_marginRight="20dp"-->
+    <!--android:weightSum="4"-->
+    <!--android:orientation="vertical">-->
 
-            <!--<TextView-->
-                <!--android:id="@+id/textView1"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="0dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:text="Tắt"-->
-                <!--android:textAlignment="center"-->
-                <!--android:textSize="24sp"-->
-                <!--android:textStyle="bold" />-->
-        <!--<ImageButton-->
-            <!--android:id="@+id/btnRemoteOff"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:layout_weight="3"-->
-            <!--android:text="Bật"-->
-            <!--android:src="@drawable/on" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/textView1"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0dp"-->
+    <!--android:layout_weight="1"-->
+    <!--android:text="Tắt"-->
+    <!--android:textAlignment="center"-->
+    <!--android:textSize="24sp"-->
+    <!--android:textStyle="bold" />-->
+    <!--<ImageButton-->
+    <!--android:id="@+id/btnRemoteOff"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0dp"-->
+    <!--android:layout_weight="3"-->
+    <!--android:text="Bật"-->
+    <!--android:src="@drawable/on" />-->
 
-        <!--</LinearLayout>-->
-        <!--<LinearLayout-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_weight="1"-->
-            <!--android:layout_marginLeft="20dp"-->
-            <!--android:layout_marginRight="20dp"-->
-            <!--android:weightSum="4"-->
-            <!--android:orientation="vertical">-->
+    <!--</LinearLayout>-->
+    <!--<LinearLayout-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_weight="1"-->
+    <!--android:layout_marginLeft="20dp"-->
+    <!--android:layout_marginRight="20dp"-->
+    <!--android:weightSum="4"-->
+    <!--android:orientation="vertical">-->
 
-            <!--<TextView-->
-                <!--android:id="@+id/textView12"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="0dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:text="Tăng"-->
-                <!--android:textAlignment="center"-->
-                <!--android:textSize="24sp"-->
-                <!--android:textStyle="bold" />-->
-            <!--<ImageButton-->
-                <!--android:id="@+id/btnRemoteInc"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="0dp"-->
-                <!--android:layout_weight="3"-->
-                <!--android:background="@drawable/button_shadow"-->
-                <!--android:text="ImageButton"-->
-                <!--android:src="@drawable/up" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/textView12"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0dp"-->
+    <!--android:layout_weight="1"-->
+    <!--android:text="Tăng"-->
+    <!--android:textAlignment="center"-->
+    <!--android:textSize="24sp"-->
+    <!--android:textStyle="bold" />-->
+    <!--<ImageButton-->
+    <!--android:id="@+id/btnRemoteInc"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0dp"-->
+    <!--android:layout_weight="3"-->
+    <!--android:background="@drawable/button_shadow"-->
+    <!--android:text="ImageButton"-->
+    <!--android:src="@drawable/up" />-->
 
-        <!--</LinearLayout>-->
-        <!--<LinearLayout-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_weight="1"-->
-            <!--android:layout_marginLeft="20dp"-->
-            <!--android:layout_marginRight="20dp"-->
-            <!--android:weightSum="4"-->
-            <!--android:orientation="vertical">-->
+    <!--</LinearLayout>-->
+    <!--<LinearLayout-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_weight="1"-->
+    <!--android:layout_marginLeft="20dp"-->
+    <!--android:layout_marginRight="20dp"-->
+    <!--android:weightSum="4"-->
+    <!--android:orientation="vertical">-->
 
-            <!--<TextView-->
-                <!--android:id="@+id/textView123"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="0dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:text="Giảm"-->
-                <!--android:textAlignment="center"-->
-                <!--android:textSize="24sp"-->
-                <!--android:textStyle="bold" />-->
-            <!--<ImageButton-->
-                <!--android:id="@+id/btnRemoteDec"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="0dp"-->
-                <!--android:layout_weight="3"-->
-                <!--android:background="@drawable/button_shadow"-->
-                <!--android:text="ImageButton"-->
-                <!--android:src="@drawable/down" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/textView123"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0dp"-->
+    <!--android:layout_weight="1"-->
+    <!--android:text="Giảm"-->
+    <!--android:textAlignment="center"-->
+    <!--android:textSize="24sp"-->
+    <!--android:textStyle="bold" />-->
+    <!--<ImageButton-->
+    <!--android:id="@+id/btnRemoteDec"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0dp"-->
+    <!--android:layout_weight="3"-->
+    <!--android:background="@drawable/button_shadow"-->
+    <!--android:text="ImageButton"-->
+    <!--android:src="@drawable/down" />-->
 
-        <!--</LinearLayout>-->
+    <!--</LinearLayout>-->
     <!--</LinearLayout>-->
 </LinearLayout>
