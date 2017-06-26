@@ -1,61 +1,30 @@
 package center.control.system.vash.controlcenter.service;
 
-import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.PixelFormat;
-import android.hardware.Camera;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Base64;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
-import com.google.android.gms.vision.CameraSource;
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.face.Face;
-import com.microsoft.projectoxford.face.FaceServiceClient;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.area.AreaSQLite;
-import center.control.system.vash.controlcenter.device.DeviceAdapter;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
-import center.control.system.vash.controlcenter.recognition.Facedetect;
-import center.control.system.vash.controlcenter.recognition.ImageHelper;
-import center.control.system.vash.controlcenter.script.ScriptDeviceEntity;
+import center.control.system.vash.controlcenter.script.CommandEntity;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
 
@@ -120,7 +89,6 @@ public class ControlMonitorService extends Service {
                 try {
                     if (smartHouse.getOwnerCommand().size() == 0){
                         for (AreaEntity area: smartHouse.getAreas()){
-                            Log.d(TAG,"check hang " +area.getName() + " "+area.getConnectAddress().trim()+"/check");
                             if (area.isHasCamera() && areaChecked) {
                                 checkCamera(area);
                             } else if (!areaChecked) {
@@ -129,7 +97,7 @@ public class ControlMonitorService extends Service {
                         }
                         areaChecked = !areaChecked;
                     } else {
-                        ScriptDeviceEntity command = smartHouse.getOwnerCommand().take();
+                        CommandEntity command = smartHouse.getOwnerCommand().take();
                         DeviceEntity device = smartHouse.getDeviceById(command.getDeviceId());
                         if (device != null) {
                             sendControl(device,command.getDeviceState());
@@ -143,7 +111,7 @@ public class ControlMonitorService extends Service {
 
 
             }
-        }, 3000, 6000);
+        }, 1500, 4000);
     }
 
     private  void checkArea(final AreaEntity area){
@@ -177,7 +145,7 @@ public class ControlMonitorService extends Service {
                     @Override
                     public void onResponse(String response) {
                         Log.d(TAG, response.length()+"");
-                        if (response.equals(NOBODY)) {
+                        if (response.contains(NOBODY)) {
                             SmartHouse.getInstance().updateSensorArea(area.getId(), "security:Không thấy ai cả");
                             sendResult(MONITOR, area.getId());
                             return;

@@ -141,7 +141,7 @@ public class MainActivity extends Activity {
         loginApi.mobileLogin(key).enqueue(new Callback<LoginSmarthouseDTO>() {
             @Override
             public void onResponse(Call<LoginSmarthouseDTO> call, retrofit2.Response<LoginSmarthouseDTO> response) {
-                if (response.body().getHouseId()!= null) {
+                if (response.body()!= null && response.body().getHouseId()!= null) {
                     Log.d(TAG,call.request().url()+" --- "+response.body().getHouseId());
                     username = key.getUsername();
                     password = key.getPassword();
@@ -159,6 +159,22 @@ public class MainActivity extends Activity {
                     Intent i = new Intent(MainActivity.this, ControlPanel.class);
                     startActivity(i);
                 } else {
+                    Log.d(TAG,call.request().url()+"sai ten");
+                    username = key.getUsername();
+                    password = key.getPassword();
+                    houseId = "21321321321";
+                    staticAddress = "21321321321";
+                    contractCode = "sads";
+                    ownerName = "fake account";
+                    ownerAddress = "21321321321";
+                    ownerTel = "21321321321";
+                    ownerCmnd = "21321321321";
+                    contractId = "21321321321";
+                    activeDay = "21321321321";
+                    virtualAssistantName = "Sen";
+                    virtualAssistantType = "21321321321";
+                    Intent i = new Intent(MainActivity.this, ControlPanel.class);
+                    startActivity(i);
                     Toast.makeText(MainActivity.this,"Sai tên đăng nhập mật khẩu",Toast.LENGTH_LONG);
                 }
                 loginDia.dismiss();

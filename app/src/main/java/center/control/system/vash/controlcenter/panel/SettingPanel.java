@@ -153,7 +153,7 @@ public class SettingPanel extends AppCompatActivity {
             try{
 
                 groupid = params[0];
-
+                Log.d(TAG,groupid);
                 return faceServiceClient.listPersons(params[0]);
 
             } catch (Exception e) {
@@ -174,18 +174,17 @@ public class SettingPanel extends AppCompatActivity {
         @Override
         protected void onPostExecute(Person[] result) {
             String message = "";
-
-            for (Person person : result) {
-                try {
-                    String name = URLDecoder.decode(person.name, "UTF-8");
-                    StorageHelper.setPersonName(person.personId.toString(),name, groupid, SettingPanel.this);
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+            Log.d(TAG,result.length+"");
+            if (result != null) {
+                for (Person person : result) {
+                    try {
+                        String name = URLDecoder.decode(person.name, "UTF-8");
+                        StorageHelper.setPersonName(person.personId.toString(), name, groupid, SettingPanel.this);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                 }
-
-
             }
-            Toast.makeText(SettingPanel.this, message + "", Toast.LENGTH_SHORT).show();
         }
     }
 }

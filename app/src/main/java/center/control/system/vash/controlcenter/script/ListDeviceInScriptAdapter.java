@@ -1,6 +1,5 @@
 package center.control.system.vash.controlcenter.script;
 
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
@@ -18,13 +16,13 @@ import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 public class ListDeviceInScriptAdapter extends RecyclerView.Adapter<ListDeviceInScriptAdapter.ViewHolder> {
 
-    private List<ScriptDeviceEntity> scriptDeviceEntities;
+    private List<CommandEntity> scriptDeviceEntities;
 
-    public List<ScriptDeviceEntity> getScriptDeviceEntities() {
+    public List<CommandEntity> getScriptDeviceEntities() {
         return scriptDeviceEntities;
     }
 
-    public ListDeviceInScriptAdapter(List<ScriptDeviceEntity> scriptDevices) {
+    public ListDeviceInScriptAdapter(List<CommandEntity> scriptDevices) {
         scriptDeviceEntities= scriptDevices;
     }
 
@@ -65,8 +63,8 @@ public class ListDeviceInScriptAdapter extends RecyclerView.Adapter<ListDeviceIn
         });
     }
 
-    public void addScripDev(ScriptDeviceEntity scriptDeviceEntity) {
-        scriptDeviceEntities.add(scriptDeviceEntity);
+    public void addScripDev(CommandEntity commandEntity) {
+        scriptDeviceEntities.add(commandEntity);
         this.notifyDataSetChanged();
     }
 
@@ -81,7 +79,7 @@ public class ListDeviceInScriptAdapter extends RecyclerView.Adapter<ListDeviceIn
         return scriptDeviceEntities.size();
     }
 
-    public void setScriptEntities(List<ScriptDeviceEntity> scriptEntities) {
+    public void setScriptEntities(List<CommandEntity> scriptEntities) {
         this.scriptDeviceEntities = scriptEntities;
         this.notifyDataSetChanged();
     }
@@ -91,7 +89,7 @@ public class ListDeviceInScriptAdapter extends RecyclerView.Adapter<ListDeviceIn
         public final TextView name;
         public final ImageButton btnRemove;
         public final Switch state;
-        public ScriptDeviceEntity item;
+        public CommandEntity item;
 
         public ViewHolder(View view) {
             super(view);

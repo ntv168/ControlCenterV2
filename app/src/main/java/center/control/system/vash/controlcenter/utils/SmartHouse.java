@@ -1,16 +1,11 @@
 package center.control.system.vash.controlcenter.utils;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -18,7 +13,7 @@ import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
-import center.control.system.vash.controlcenter.script.ScriptDeviceEntity;
+import center.control.system.vash.controlcenter.script.CommandEntity;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 
@@ -29,7 +24,7 @@ import center.control.system.vash.controlcenter.script.ScriptSQLite;
 public class SmartHouse {
     private static final String TAG = "Smart house singleton";
     private static volatile SmartHouse houseInstance = null;
-    private BlockingQueue<ScriptDeviceEntity> ownerCommand;
+    private BlockingQueue<CommandEntity> ownerCommand;
     private List<AreaEntity> areas;
     private List<DeviceEntity> devices;
     private List<ScriptEntity> scripts;
@@ -51,7 +46,7 @@ public class SmartHouse {
         }
         return houseInstance;
     }
-    public void addCommand(ScriptDeviceEntity command){
+    public void addCommand(CommandEntity command){
         try {
             this.ownerCommand.put(command);
         } catch (InterruptedException e) {
@@ -59,7 +54,7 @@ public class SmartHouse {
         }
     }
 
-    public BlockingQueue<ScriptDeviceEntity> getOwnerCommand() {
+    public BlockingQueue<CommandEntity> getOwnerCommand() {
         return ownerCommand;
     }
 
@@ -178,11 +173,11 @@ public class SmartHouse {
         return areaNameAdapter;
     }
 
-    public List<ScriptDeviceEntity> getDeviceScriptByAreaId(int areaId) {
-        List<ScriptDeviceEntity> areaNameAdapter = new ArrayList<>();
+    public List<CommandEntity> getDeviceScriptByAreaId(int areaId) {
+        List<CommandEntity> areaNameAdapter = new ArrayList<>();
         for (DeviceEntity deviceEntity: devices){
             if (deviceEntity.getAreaId() == areaId) {
-                ScriptDeviceEntity sde = new ScriptDeviceEntity();
+                CommandEntity sde = new CommandEntity();
                 sde.setDeviceName(deviceEntity.getName());
                 sde.setGroupId(areaId);
                 sde.setDeviceId(deviceEntity.getId());

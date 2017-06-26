@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,7 +11,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,7 +20,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -59,7 +56,7 @@ import center.control.system.vash.controlcenter.helper.StorageHelper;
 import center.control.system.vash.controlcenter.nlp.VoiceUtils;
 import center.control.system.vash.controlcenter.recognition.Facedetect;
 import center.control.system.vash.controlcenter.recognition.ImageHelper;
-import center.control.system.vash.controlcenter.script.ScriptDeviceEntity;
+import center.control.system.vash.controlcenter.script.CommandEntity;
 
 import center.control.system.vash.controlcenter.service.ControlMonitorService;
 import center.control.system.vash.controlcenter.service.WebServerService;
@@ -282,7 +279,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             btnOn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"on"));
+                    SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"on"));
                     waitDialog(2000);
                 }
             });
@@ -290,7 +287,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             btnOff.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"off"));
+                    SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"off"));
                     waitDialog(2000);
                 }
             });
@@ -298,7 +295,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             btnInc.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"inc"));
+                    SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"inc"));
                     waitDialog(2000);
                 }
             });
@@ -306,16 +303,16 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             btnDec.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"dec"));
+                    SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"dec"));
                     waitDialog(2000);
                 }
             });
             remoteDialog.show();
         } else {
             if (device.getState().equals("on")){
-                SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"off"));
+                SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"off"));
             } else {
-                SmartHouse.getInstance().addCommand(new ScriptDeviceEntity(device.getId(),"on"));
+                SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"on"));
             }
         }
     }

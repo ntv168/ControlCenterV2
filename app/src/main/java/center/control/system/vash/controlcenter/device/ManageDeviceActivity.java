@@ -212,7 +212,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                     public void onClick(final DialogInterface dialog, int id) {
 
                         final ProgressDialog progressDialog = new ProgressDialog(ManageDeviceActivity.this);
-                        progressDialog.setTitle("Dò tìm thiết bị khu vực "+ipArea.getText().toString());
+                        progressDialog.setTitle("Dò tìm thiết bị khu vực "+areaAddress.getText().toString());
                         progressDialog.setMessage("Đợi tý nha");
                         String url = "http://"+areaAddress.getText().toString()+"/get";
                         Log.d(TAG,url);

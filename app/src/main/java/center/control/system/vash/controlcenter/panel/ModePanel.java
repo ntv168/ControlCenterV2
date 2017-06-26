@@ -15,34 +15,26 @@ import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
-import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.script.ListDeviceInScriptAdapter;
 import center.control.system.vash.controlcenter.script.ListScriptAdapter;
-import center.control.system.vash.controlcenter.script.ScriptDeviceEntity;
+import center.control.system.vash.controlcenter.script.CommandEntity;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
-import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 public class ModePanel extends AppCompatActivity implements ListScriptAdapter.OnAdapterItemClickListener{
@@ -100,10 +92,10 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 int areaId = house.getAreas().get(which).getId();
-                final List<ScriptDeviceEntity> newScript = house.getDeviceScriptByAreaId(areaId);
+                final List<CommandEntity> newScript = house.getDeviceScriptByAreaId(areaId);
                 ArrayAdapter<String> devNames = new ArrayAdapter<String>(ModePanel.this,android.R.layout.select_dialog_singlechoice);
 
-                for (ScriptDeviceEntity sde : newScript){
+                for (CommandEntity sde : newScript){
                     if (sde.getDeviceName() != null)
                     devNames.add(sde.getDeviceName());
                 }
@@ -127,7 +119,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
             public void onClick(View v) {
                 final EditText scriptName = (EditText) dialog.findViewById(R.id.txtScriptName);
                 final EditText scriptNickName= (EditText) dialog.findViewById(R.id.txtScriptNickname);
-                List<ScriptDeviceEntity> scriptDeviceEntities = new ArrayList<ScriptDeviceEntity>();
+                List<CommandEntity> scriptDeviceEntities = new ArrayList<CommandEntity>();
 
                 lstScriptDevice = (RecyclerView) dialog.findViewById(R.id.lstDeviceScript);
                 lstScriptDevice.setHasFixedSize(true);
@@ -153,7 +145,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
                         script.setNickName(scriptNickName.getText().toString());
                         script.setHour(-1);
                         script.setMinute(-1);
-                        List<ScriptDeviceEntity> listCommmand = listDeviceInScriptAdapter.getScriptDeviceEntities();
+                        List<CommandEntity> listCommmand = listDeviceInScriptAdapter.getScriptDeviceEntities();
                         Log.d(TAG,listCommmand.size()+" ");
                         ScriptSQLite.insertScript(script,listCommmand);
                         scriptAdapter.addScrip(script);
@@ -230,7 +222,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
                 String time[] = txtTimeSch.getText().toString().split(":");
                 scriptEntity.setHour(Integer.parseInt(time[0]));
                 scriptEntity.setMinute(Integer.parseInt(time[1]));
-                List<ScriptDeviceEntity> listCommmand = listDeviceInScriptAdapter.getScriptDeviceEntities();
+                List<CommandEntity> listCommmand = listDeviceInScriptAdapter.getScriptDeviceEntities();
                 ScriptSQLite.upById(scriptEntity.getId(),scriptEntity,listCommmand);
                 scriptAdapter.setScriptEntities(ScriptSQLite.getAll());
                 dialog.dismiss();

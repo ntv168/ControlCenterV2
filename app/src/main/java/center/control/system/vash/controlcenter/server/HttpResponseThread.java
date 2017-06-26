@@ -1,21 +1,17 @@
 package center.control.system.vash.controlcenter.server;
 
-import android.util.Base64;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.device.DeviceEntity;
-import center.control.system.vash.controlcenter.script.ScriptDeviceEntity;
+import center.control.system.vash.controlcenter.script.CommandEntity;
+import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 /**
@@ -30,6 +26,7 @@ public class HttpResponseThread extends Thread {
     private static final String ACTIVE_MODE = "activateMode";
     private static final String MODE_DEVICE = "getModeDevice";
     private static final String ON_DEVICE = "deviceOn";
+    private static final String OFF_DEVICE = "deviceOff";
     private static final String MODE_TODAY = "getModeToday";
     private static final String RUN_MODE_TODAY = "modeToday";
     private static final String RESPONSE_SUCCESS = "tung=success";
@@ -74,7 +71,12 @@ public class HttpResponseThread extends Thread {
                 } else if (request.contains(ON_DEVICE)){
                     String[] reqElement  = request.split("/");
                     Log.d(TAG,"device id:  "+reqElement[2]);
-                    house.addCommand(new ScriptDeviceEntity(Integer.parseInt(reqElement[2]),"on"));
+                    house.addCommand(new CommandEntity(Integer.parseInt(reqElement[2]),"on"));
+                    response += RESPONSE_SUCCESS;
+                } else if (request.contains(OFF_DEVICE)){
+                    String[] reqElement  = request.split("/");
+                    Log.d(TAG,"device id:  "+reqElement[2]);
+                    house.addCommand(new CommandEntity(Integer.parseInt(reqElement[2]),"off"));
                     response += RESPONSE_SUCCESS;
                 } else if (request.contains(MODE_DEVICE)){
                     String[] reqElement  = request.split("/");
@@ -82,7 +84,9 @@ public class HttpResponseThread extends Thread {
                     response += "";
                 }else if (request.contains(MODE_REQ)){
                     String[] reqElement  = request.split("/");
-                    Log.d(TAG,"mode request:  "+ reqElement[2]);
+                    for (ScriptEntity script : house.getScripts()){
+                        response += script.getName()+"="+script.getId()+";";
+                    }
                     response += "";
                 }
             }

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.database.SQLiteManager;
-import center.control.system.vash.controlcenter.device.DeviceEntity;
 
 /**
  * Created by Thuans on 5/29/2017.
@@ -27,9 +26,10 @@ public class ScriptSQLite {
     private static final String KEY_MIN = "scheduler_min";
     private static final String KEY_WEEKSDAY = "week_days";
 
-    private static final String KEY_GROUP_ID = "group_id";
-    private static final String KEY_DEVICE_ID = "device_id";
-    private static final String KEY_DEVICE_STATE = "device_state";
+    public static final String KEY_GROUP_ID = "group_id";
+    public static final String KEY_CONFIG_ID = "configuration_id";
+    public static final String KEY_DEVICE_ID = "device_id";
+    public static final String KEY_DEVICE_STATE = "device_state";
 
     public static String createScriptTable(){
         return "CREATE TABLE " + TABLE_SCRIPT  + "("
@@ -43,28 +43,30 @@ public class ScriptSQLite {
     public static String createScriptDeviceTable(){
         return "CREATE TABLE " + TABLE_SCRIPT_DEVICE  + "("
                 + KEY_GROUP_ID  + " INTEGER ,"
+                + KEY_CONFIG_ID  + " INTEGER ,"
                 +  KEY_DEVICE_ID+ "  INTEGER  ," +
                 KEY_DEVICE_STATE + "  TEXT  ,"+
                 "PRIMARY KEY ("+KEY_DEVICE_ID+","+ KEY_GROUP_ID+")" +
                 ")";
     }
-    public static void insertScript(ScriptEntity script,List<ScriptDeviceEntity> command) {
+    public static void insertScript(ScriptEntity script,List<CommandEntity> command) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
 
         // Inserting Row
         int scriptId  = (int) db.insert(TABLE_SCRIPT, null, scriptToCV(script));
         script.setId(scriptId);
-        for (ScriptDeviceEntity device : command){
+        for (CommandEntity device : command){
             db.insert(TABLE_SCRIPT_DEVICE, null, scriptDeviceToCV(
-                    new ScriptDeviceEntity(device.getDeviceId(),device.getDeviceState(),scriptId)));
+                    new CommandEntity(device.getDeviceId(),device.getDeviceState(),scriptId)));
         }
         SQLiteManager.getInstance().closeDatabase();
     }
-    private static ContentValues scriptDeviceToCV(ScriptDeviceEntity sde){
+    private static ContentValues scriptDeviceToCV(CommandEntity sde){
         ContentValues values;
         values = new ContentValues();
         values.put(KEY_DEVICE_ID, sde.getDeviceId() );
         values.put(KEY_GROUP_ID, sde.getGroupId());
+        values.put(KEY_CONFIG_ID, sde.getConfigurationId());
         values.put(KEY_DEVICE_STATE, sde.getDeviceState());
         return values;
     }
@@ -126,7 +128,7 @@ public class ScriptSQLite {
             return script;
         } else return null;
     }
-    public List<ScriptDeviceEntity> getCommandByScriptId(int scriptId){
+    public List<CommandEntity> getCommandByScriptId(int scriptId){
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
                 + " FROM " + TABLE_SCRIPT_DEVICE
@@ -134,25 +136,26 @@ public class ScriptSQLite {
 
         Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(scriptId)});
         // looping through all rows and adding to list
-        List<ScriptDeviceEntity> commands = new ArrayList<>();
+        List<CommandEntity> commands = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
-                ScriptDeviceEntity cmd = new ScriptDeviceEntity();
+                CommandEntity cmd = new CommandEntity();
                 cmd.setDeviceId(cursor.getInt(cursor.getColumnIndex(KEY_DEVICE_ID)));
                 cmd.setGroupId(cursor.getInt(cursor.getColumnIndex(KEY_GROUP_ID)));
+                cmd.setConfigurationId(cursor.getInt(cursor.getColumnIndex(KEY_CONFIG_ID)));
                 cmd.setDeviceState(cursor.getString(cursor.getColumnIndex(KEY_DEVICE_STATE)));
                 commands.add(cmd);
             } while (cursor.moveToNext());
         }
         return commands;
     }
-    public static void upById(int id, ScriptEntity scriptEntity,List<ScriptDeviceEntity> command) {
+    public static void upById(int id, ScriptEntity scriptEntity,List<CommandEntity> command) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         db.update(TABLE_SCRIPT, scriptToCV(scriptEntity), KEY_ID + " = "+id, null);
         db.delete(TABLE_SCRIPT_DEVICE, KEY_GROUP_ID+"="+id, null);
-        for (ScriptDeviceEntity device : command){
+        for (CommandEntity device : command){
             db.insert(TABLE_SCRIPT_DEVICE, null, scriptDeviceToCV(
-                    new ScriptDeviceEntity(device.getDeviceId(),device.getDeviceState(),id)));
+                    new CommandEntity(device.getDeviceId(),device.getDeviceState(),id)));
         }
         SQLiteManager.getInstance().closeDatabase();
     }

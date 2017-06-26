@@ -6,24 +6,35 @@ import com.google.gson.annotations.SerializedName;
  * Created by Thuans on 6/8/2017.
  */
 
-public class ScriptDeviceEntity {
+public class CommandEntity {
     @SerializedName("deviceId")
     private int deviceId;
     @SerializedName("groupId")
     private int groupId;
+    @SerializedName("configurationId")
+    private int configurationId;
     @SerializedName("deviceState")
     private String deviceState;
-    public ScriptDeviceEntity(int deviceId, String deviceState){
+    public CommandEntity(int deviceId, String deviceState){
         this.deviceId = deviceId;
         this.deviceState = deviceState;
     }
 
-    public ScriptDeviceEntity(int deviceId, String deviceState, int groupId){
+    public CommandEntity(int deviceId, String deviceState, int groupId){
         this.deviceId = deviceId;
         this.deviceState = deviceState;
         this.groupId = groupId;
     }
-    public ScriptDeviceEntity(){}
+
+    public void setConfigurationId(int configurationId) {
+        this.configurationId = configurationId;
+    }
+
+    public int getConfigurationId() {
+        return configurationId;
+    }
+
+    public CommandEntity(){}
     private String deviceName;
 
     public int getDeviceId() {

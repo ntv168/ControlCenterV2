@@ -28,9 +28,7 @@ public class VAPanel extends AppCompatActivity {
         currentTab.setBackgroundColor(Color.WHITE);
 
         btnSend = (Button) findViewById(R.id.btnChatSend);
-
         chatList = (ListView) findViewById(R.id.lstMsgChat);
-
         chatAdapter = new ChatAdapter(this, R.layout.msg_right);
         chatList.setAdapter(chatAdapter);
 
@@ -57,8 +55,6 @@ public class VAPanel extends AppCompatActivity {
             }
         });
     }
-
-
     public void clicktoControlPanel(View view) {
         startActivity(new Intent(this, ControlPanel.class));
     }
