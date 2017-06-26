@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class AreaAttributeAdapter extends RecyclerView.Adapter<AreaAttributeAdap
     }
 
     @Override
-    public void onBindViewHolder(AreaAttributeHolder holder, final int position) {
+    public void onBindViewHolder(final AreaAttributeHolder holder, final int position) {
         for (int i = 0; i< AreaEntity.attrivutesValues.length; i++){
             if (AreaEntity.attrivutesValues[i].equals(areaAttributes.get(position).getName())){
                 holder.name.setText(AreaEntity.attrivutes[i]);
@@ -84,6 +85,7 @@ public class AreaAttributeAdapter extends RecyclerView.Adapter<AreaAttributeAdap
         public TextView value;
         public ImageView icon;
         public View view;
+        public LinearLayout lin;
 
         public AreaAttributeHolder(View rowView) {
             super(rowView);
@@ -91,6 +93,7 @@ public class AreaAttributeAdapter extends RecyclerView.Adapter<AreaAttributeAdap
             value = (TextView) rowView.findViewById(R.id.txtAttributeValue);
             name = (TextView) rowView.findViewById(R.id.txtAttributeName);
             icon = (ImageView) rowView.findViewById(R.id.imgAttribute);
+            lin = (LinearLayout) rowView.findViewById(R.id.linAreaAttribute);
         }
     }
 }

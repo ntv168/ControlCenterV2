@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import center.control.system.vash.controlcenter.R;
@@ -16,6 +17,7 @@ public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHo
     private List<AreaEntity> areaEntities;
     private  OnAdapterItemClickListener mListener;
     private int focusedItem = 0;
+    private View view;
 
     public ListAreaAdapter(List<AreaEntity> items, OnAdapterItemClickListener listener) {
         areaEntities = items;
@@ -25,7 +27,7 @@ public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+        view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.area_config_item, parent, false);
         return new ViewHolder(view);
     }
@@ -33,10 +35,14 @@ public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.item = areaEntities.get(position);
-            if (position == focusedItem){
-            holder.view.setBackgroundColor(Color.GRAY);
+        if (position == focusedItem){
+            holder.view.setBackgroundColor(view.getResources().getColor(R.color.nGreen2));
+            holder.areaName.setTextColor(view.getResources().getColor(R.color.nWhite));
+            holder.areaAddress.setTextColor(view.getResources().getColor(R.color.nWhite));
         } else {
             holder.view.setBackgroundColor(Color.WHITE);
+            holder.areaName.setTextColor(Color.BLACK);
+            holder.areaAddress.setTextColor(Color.parseColor("#80000000"));
         }
         holder.areaName.setText(holder.item.getName());
         holder.areaAddress.setText(holder.item.getConnectAddress());
@@ -45,7 +51,7 @@ public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHo
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                   mListener.onAreaClick(holder.item);
+                    mListener.onAreaClick(holder.item);
                 }
                 focusedItem = position;
                 notifyDataSetChanged();
@@ -84,12 +90,15 @@ public class ListAreaAdapter extends RecyclerView.Adapter<ListAreaAdapter.ViewHo
         public final TextView areaName;
         public final TextView areaAddress;
         public AreaEntity item;
+        LinearLayout lin;
+
 
         public ViewHolder(View view) {
             super(view);
             this.view = view;
             areaName = (TextView) view.findViewById(R.id.areaName);
             areaAddress = (TextView) view.findViewById(R.id.areaAddress);
+            lin = (LinearLayout) view.findViewById(R.id.lin_area_config_item);
         }
 
     }

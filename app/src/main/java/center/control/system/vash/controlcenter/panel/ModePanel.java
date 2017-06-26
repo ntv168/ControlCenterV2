@@ -19,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioGroup;
@@ -51,6 +52,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mode_panel);
         ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnMode);
+        currentTab.setImageResource(R.drawable.tab_mode_active);
         currentTab.setBackgroundColor(Color.WHITE);
         final SmartHouse house = SmartHouse.getInstance();
 
@@ -187,7 +189,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
         final Dialog dialog = new Dialog(this);
         dialog.setTitle("CHẾ ĐỘ "+scriptEntity.getName());
         dialog.setContentView(R.layout.diaglog_script_detail);
-        final ListView weekCheckList = (ListView)dialog.findViewById(R.id.lstWeekDay);
+        final GridView weekCheckList = (GridView)dialog.findViewById(R.id.lstWeekDay);
 
         ScriptSQLite sqLite = new ScriptSQLite();
 

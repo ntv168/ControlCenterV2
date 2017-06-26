@@ -52,6 +52,7 @@ public class SettingPanel extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_panel);
         ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnSetting);
+        currentTab.setImageResource(R.drawable.tab_setting_active);
         currentTab.setBackgroundColor(Color.WHITE);
         final Dialog dialog = new Dialog(SettingPanel.this);
         dialog.setContentView(R.layout.activate_diaglog);

@@ -22,7 +22,7 @@ public class HttpResponseThread extends Thread {
     private static final String AREA_REQ = "area";
     private static final String AREA_ATTRIBUTE_REQ = "getAreaSensor";
     private static final String AREA_DEVICE = "getAreaDevice";
-    private static final String MODE_REQ = "getMode";
+    private static final String MODE_REQ = "getAllMode";
     private static final String ACTIVE_MODE = "activateMode";
     private static final String MODE_DEVICE = "getModeDevice";
     private static final String ON_DEVICE = "deviceOn";
@@ -30,6 +30,7 @@ public class HttpResponseThread extends Thread {
     private static final String MODE_TODAY = "getModeToday";
     private static final String RUN_MODE_TODAY = "modeToday";
     private static final String RESPONSE_SUCCESS = "tung=success";
+    private static final String DATABASE_VERS = "databaseVersion";
     private static final String RESPONSE_FAIL = "tung=fail";
     private final String TAG = "HttpResponseThread";
     Socket socket;
@@ -88,6 +89,10 @@ public class HttpResponseThread extends Thread {
                         response += script.getName()+"="+script.getId()+";";
                     }
                     response += "";
+                } else if (request.contains(DATABASE_VERS)){
+                    response += "saf=3";
+                } else if (request.contains(MODE_TODAY)){
+                    response += "Thức dậy buổi sáng=1=on=06:30;Đi làm=2=on=12:35;Ăn tối với cả nhà=3=on=17:00";
                 }
             }
             Log.d(TAG,response);

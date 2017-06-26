@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class ListDeviceAdapter extends RecyclerView.Adapter<ListDeviceAdapter.Vi
     private List<DeviceEntity> deviceEnts;
     private  OnAdapterItemClickListener mListener;
     private int focused;
+    View view;
 
     public ListDeviceAdapter(List<DeviceEntity> items, OnAdapterItemClickListener listener) {
         deviceEnts = items;
@@ -27,7 +29,7 @@ public class ListDeviceAdapter extends RecyclerView.Adapter<ListDeviceAdapter.Vi
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+        view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.device_config_item, parent, false);
         return new ViewHolder(view);
     }
@@ -38,9 +40,10 @@ public class ListDeviceAdapter extends RecyclerView.Adapter<ListDeviceAdapter.Vi
         holder.deviceName.setText(holder.item.getName());
         holder.devicePort.setText(holder.item.getPort());
         if (position == focused){
-            holder.view.setBackgroundColor(Color.GRAY);
+            holder.view.setBackgroundResource(R.drawable.background_white);
+//            holder.view.setBackgroundColor(Color.LTGRAY);
         } else {
-            holder.view.setBackgroundColor(Color.WHITE);
+            holder.view.setBackgroundResource(R.drawable.background_gray);
         }
         holder.view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

@@ -42,23 +42,33 @@
                 android:layout_gravity="center"
                 android:layout_margin="0dp"
                 android:layout_weight="0.5"
-                android:padding="15dp"
-                android:src="@drawable/txt_TrangThai" />
+                android:padding="10dp"
+                android:src="@drawable/txt_trangthai" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/lstAreaAttribute"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="9.5" />
+                android:layout_weight="9.5"
+                android:padding="5dp" />
 
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="#80FFFFFF"
+            android:paddingBottom="5px"
+            android:paddingTop="5px" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="6"
-            android:weightSum="10"
-            android:orientation="horizontal">
+            android:layout_weight="5.8"
+            android:orientation="horizontal"
+            android:weightSum="10">
 
             <ImageView
                 android:layout_width="0dp"
@@ -66,25 +76,19 @@
                 android:layout_gravity="center"
                 android:layout_margin="0dp"
                 android:layout_weight="0.5"
-                android:padding="15dp"
-                android:src="@drawable/txt_ThietBiDieuKhien" />
+                android:padding="10dp"
+                android:src="@drawable/txt_thietbidieukhien" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/lstDevice"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="9.5" />
+                android:layout_weight="9.5"
+                android:padding="5dp" />
 
         </LinearLayout>
 
-        <!--<android.support.v7.widget.RecyclerView-->
-            <!--android:id="@+id/lstDevice"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:layout_weight="6" />-->
-
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="wrap_content"
