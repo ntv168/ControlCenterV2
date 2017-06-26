@@ -21,6 +21,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -196,7 +197,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
         final Dialog dialog = new Dialog(this);
         dialog.setTitle("CHẾ ĐỘ "+scriptEntity.getName());
         dialog.setContentView(R.layout.diaglog_script_detail);
-        final ListView weekCheckList = (ListView)dialog.findViewById(R.id.lstWeekDay);
+        final GridView weekCheckList = (GridView)dialog.findViewById(R.id.lstWeekDay);
 
         ScriptSQLite sqLite = new ScriptSQLite();
 

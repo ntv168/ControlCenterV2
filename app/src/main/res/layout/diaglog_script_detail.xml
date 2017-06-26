@@ -1,55 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="start"
     android:orientation="vertical"
-    android:padding="10dp"
-    android:weightSum="10">
+    android:weightSum="1">
+
+    <TextView
+        android:id="@+id/txtRemoteName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background"
+        android:padding="15dp"
+        android:text="Tên chế độ"
+        android:textAlignment="center"
+        android:textAllCaps="true"
+        android:textColor="@android:color/white"
+        android:textSize="20sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="horizontal"></LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="8"
         android:orientation="horizontal"
-        android:weightSum="5">
+        android:weightSum="4">
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="3"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical"
+            android:padding="20dp">
 
-            <Button
-                android:id="@+id/btnAddDeviceScript"
+            <!--<Button-->
+            <!--android:id="@+id/btnAddDeviceScript"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Thêm thiết bị" />-->
+
+            <!--<TextView-->
+            <!--android:id="@+id/textView10"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Danh sách thiết bị" />-->
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Thêm thiết bị" />
+                android:layout_marginBottom="20dp"
+                android:orientation="horizontal"
+                android:weightSum="1">
 
-            <TextView
-                android:id="@+id/textView10"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Danh sách thiết bị" />
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:text="Danh sách thiết bị"
+                    android:textColor="@color/nGreen1" />
+
+                <Button
+                    android:id="@+id/btnAddDeviceScript"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/login_button"
+                    android:elevation="1dp"
+                    android:text="+"
+                    android:textColor="@android:color/white"
+                    android:textSize="30sp" />
+
+            </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/lstDeviceScript"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="10dp" />
+                android:layout_height="match_parent" />
         </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/nGreen1" />
 
         <LinearLayout
             android:id="@+id/viewSchedule"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="20dp">
 
             <Switch
                 android:id="@+id/swtSetSchedule"
@@ -58,8 +101,17 @@
                 android:checked="false"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                android:text="Đặt hẹn giờ"
+                android:text="ĐẶT HẸN GIỜ"
+                android:textColor="@color/nGreen1"
+                android:textSize="18sp"
                 android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:background="#F1F1F1" />
 
             <TextView
                 android:id="@+id/txtSchedulerTime"
@@ -67,7 +119,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="00:00"
-                android:textSize="30dp"
+                android:textSize="60sp"
                 android:textStyle="bold" />
 
             <RadioGroup
@@ -79,48 +131,77 @@
                     android:id="@+id/rdoTomorrow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
                     android:layout_weight="1"
-                    android:text="Mai thôi nha" />
+                    android:text="Lặp lại chỉ ngày mai" />
 
                 <RadioButton
                     android:id="@+id/rdoRepeat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
                     android:layout_weight="1"
-                    android:text="Lặp lại trong tuần" />
+                    android:text="Chọn ngày lặp lại trong tuần" />
 
             </RadioGroup>
 
-            <ListView
+            <!--<ListView-->
+            <!--android:id="@+id/lstWeekDay"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_alignParentTop="true"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_margin="0dp"-->
+            <!--android:choiceMode="multipleChoice" />-->
+
+            <GridView
                 android:id="@+id/lstWeekDay"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_margin="0dp"
-                android:choiceMode="multipleChoice" />
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20sp"
+                android:choiceMode="multipleChoice"
+                android:columnWidth="90dp"
+                android:gravity="center"
+                android:horizontalSpacing="1dp"
+                android:numColumns="3"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="1dp" />
 
         </LinearLayout>
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#F1F1F1" />
+
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnSave"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Lưu" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="right"
+        android:orientation="horizontal"
+        android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="10dp">
 
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
             android:text="Hủy" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/login_button"
+            android:text="Lưu"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

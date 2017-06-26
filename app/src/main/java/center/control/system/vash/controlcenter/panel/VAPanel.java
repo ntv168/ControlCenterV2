@@ -17,7 +17,7 @@ import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.nlp.ChatAdapter;
 
 public class VAPanel extends AppCompatActivity {
-    private Button btnSend;
+    private ImageButton btnSend;
     private ChatAdapter chatAdapter;
     private ListView chatList;
     @Override
@@ -28,7 +28,7 @@ public class VAPanel extends AppCompatActivity {
         currentTab.setImageResource(R.drawable.tab_voice_active);
         currentTab.setBackgroundColor(Color.WHITE);
 
-        btnSend = (Button) findViewById(R.id.btnChatSend);
+        btnSend = (ImageButton) findViewById(R.id.btnChatSend);
 
         chatList = (ListView) findViewById(R.id.lstMsgChat);
 
