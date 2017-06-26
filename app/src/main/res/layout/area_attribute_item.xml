@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:layout_margin="5dp"
     android:layout_marginRight="10dp"
-    android:background="@drawable/rectang_bold"
+    android:background="@drawable/background_home_sensor"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="5dp"
@@ -16,10 +16,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@drawable/background_home_sensor_name"
         android:gravity="center"
         android:text="Ánh sáng"
         android:textAlignment="center"
-        android:textColor="@color/colorPrimaryDark" />
+        android:textColor="@color/nDarkGray" />
 
     <ImageView
         android:id="@+id/imgAttribute"
@@ -28,6 +29,7 @@
         android:layout_weight="3"
         android:padding="30dp"
         android:scaleType="fitCenter"
+        android:tint="@color/nGreen1"
         app:srcCompat="@drawable/bell" />
 
     <TextView
@@ -37,7 +39,8 @@
         android:layout_weight="2"
         android:gravity="center"
         android:text="Yếu"
-        android:textColor="@android:color/black"
+        android:textColor="@color/nGreen1"
+        android:textStyle="bold"
         android:textSize="20sp" />
 
 </LinearLayout>
