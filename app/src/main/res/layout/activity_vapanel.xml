@@ -33,7 +33,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1px"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="20dp"
             android:background="#80FFFFFF" />
 
         <LinearLayout
@@ -69,9 +69,16 @@
                 android:layout_width="70dp"
                 android:layout_height="50dp"
                 android:background="@android:color/transparent"
-                android:padding="5dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icn_send"
+                android:tint="@color/nWhite" />
+            <ImageButton
+                android:id="@+id/btnVoice"
+                android:layout_width="70dp"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icn_voice"
                 android:tint="@color/nWhite" />
         </LinearLayout>
 
