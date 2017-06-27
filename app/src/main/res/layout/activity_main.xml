@@ -4,70 +4,86 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     android:gravity="center"
     android:orientation="vertical"
-    android:background="@drawable/background"
     tools:context="center.control.system.vash.controlcenter.MainActivity">
 
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nha Tini"
-        android:textSize="100sp"/>
-
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="600dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:background="@drawable/background_white"
+        android:orientation="vertical"
+        android:padding="20dp">
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="200dp"
-            android:layout_height="match_parent"
-            android:src="@drawable/icon" />
+            android:id="@+id/img_logo"
+            android:layout_width="130dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="30dp"
+            android:maxHeight="100dp"
+            android:maxWidth="100dp"
+            android:src="@drawable/logo" />
 
         <LinearLayout
-            android:background="@color/colorActive"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/login_input"
+            android:orientation="horizontal"
+            android:padding="10dp">
 
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Tài khoản"
-                android:textColor="@color/colorText" />
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.1"
+                android:src="@drawable/ic_user" />
 
             <EditText
                 android:id="@+id/txtUsername"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPersonName"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.9"
+                android:background="@android:color/transparent"
                 android:hint="Tên đăng nhập"
-                />
+                android:inputType="textPersonName"
+                android:paddingLeft="10dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/login_input"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.1"
+                android:src="@drawable/ic_password" />
 
             <EditText
                 android:id="@+id/txtPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:hint="Mật khẩu" />
-
-            <Button
-                android:id="@+id/btnLogin"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="15"
-                android:text="ĐĂNG NHẬP" />
-
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.9"
+                android:background="@android:color/transparent"
+                android:hint="Mật khẩu"
+                android:inputType="textPassword"
+                android:paddingLeft="10dp" />
         </LinearLayout>
 
-
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/login_button"
+            android:text="ĐĂNG NHẬP"
+            android:textColor="@color/nWhite"
+            android:textSize="18sp" />
     </LinearLayout>
-
 </LinearLayout>
