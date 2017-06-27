@@ -23,6 +23,7 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -60,6 +61,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
 
     private Dialog deviceDialog;
     private EditText ipArea;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -310,7 +312,8 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
     @Override
     public void onDeviceClick(DeviceEntity device) {
         currentDevice = device;
-        final ListView attCheckList = (ListView)deviceDialog.findViewById(R.id.lstDeviceAttribute);
+//        final ListView attCheckList = (ListView)deviceDialog.findViewById(R.id.lstDeviceAttribute);
+        final GridView attCheckList = (GridView) deviceDialog.findViewById(R.id.lstDeviceAttribute);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>
                 (ManageDeviceActivity.this,
                         android.R.layout.simple_list_item_multiple_choice,

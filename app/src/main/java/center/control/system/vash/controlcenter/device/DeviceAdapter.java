@@ -42,9 +42,15 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         holder.deviceName.setText(holder.item.getName());
         holder.deviceStatus.setText(holder.item.getState());
         if (holder.item.getState().equals("on")){
-            holder.view.setBackgroundColor(Color.WHITE);
+            holder.view.setBackgroundResource(R.drawable.background_device_active);
+            holder.deviceName.setTextColor(holder.view.getResources().getColor(R.color.nGreen1));
+            holder.deviceStatus.setTextColor(holder.view.getResources().getColor(R.color.nGreen1));
+            holder.deviceIcon.setColorFilter(holder.view.getResources().getColor(R.color.nGreen1));
         } else {
-            holder.view.setBackgroundColor(Color.GRAY);
+            holder.view.setBackgroundResource(R.drawable.background_device);
+            holder.deviceName.setTextColor(Color.WHITE);
+            holder.deviceStatus.setTextColor(Color.WHITE);
+            holder.deviceIcon.setColorFilter(Color.WHITE);
         }
         switch (deviceEntities.get(position).getType()) {
             case "light":

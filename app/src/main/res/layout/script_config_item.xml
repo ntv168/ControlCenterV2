@@ -1,28 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="@dimen/title_height"-->
+    <!--android:layout_marginBottom="10dp"-->
+    <!--android:padding="10dp"-->
+    <!--android:weightSum="6">-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/scriptName"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="5"-->
+        <!--android:text="@string/app_name"-->
+        <!--android:textAppearance="?attr/textAppearanceListItem"-->
+        <!--android:textColor="#333333"-->
+        <!--android:textSize="18sp" />-->
+
+    <!--<ImageButton-->
+        <!--android:id="@+id/btnActiveScript"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_weight="1"-->
+        <!--android:scaleType="fitCenter"-->
+        <!--app:srcCompat="@drawable/play" />-->
+<!--</LinearLayout>-->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/title_height"
-    android:layout_marginBottom="10dp"
-    android:background="@drawable/paper_shadow"
-    android:padding="10dp"
-    android:weightSum="6">
+android:orientation="horizontal"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginBottom="10dp"
+android:weightSum="10"
+android:gravity="center"
+android:padding="10dp"
+android:background="@drawable/background_white">
 
-    <TextView
-        android:id="@+id/scriptName"
+    <LinearLayout
+        android:id="@+id/lnMode"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="5"
-        android:text="@string/app_name"
-        android:textAppearance="?attr/textAppearanceListItem"
-        android:textSize="20dp"
-        android:textStyle="bold" />
+        android:layout_height="40dp"
+        android:layout_weight="8.5"
+        android:paddingLeft="10dp">
 
-    <ImageButton
-        android:id="@+id/btnActiveScript"
+        <TextView
+            android:id="@+id/scriptName"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="left|center"
+            android:text="Thức dậy buổi sáng"
+            android:textColor="@color/nDarkGray"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:scaleType="fitCenter"
-        app:srcCompat="@drawable/play" />
+        android:layout_height="40dp"
+        android:layout_weight="1.5"
+        android:background="@drawable/background_mode_play"
+        android:paddingBottom="0dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="0dp"
+        android:paddingTop="0dp"
+        android:weightSum="1">
+
+        <ImageButton
+            android:id="@+id/btnActiveScript"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@drawable/icn_run"
+            android:tint="@color/nGreen1" />
+    </LinearLayout>
 </LinearLayout>
