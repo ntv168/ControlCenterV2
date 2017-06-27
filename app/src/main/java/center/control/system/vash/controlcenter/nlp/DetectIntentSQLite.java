@@ -15,7 +15,7 @@ public class DetectIntentSQLite {
     public static final String TABLE_FUNCTION_DETECT = "detect_function";
     // Contacts Table Columns names
     private static final String KEY_ID = "id";
-    private static final String KEY_FUNCTION_NAME = "functi onName";
+    private static final String KEY_FUNCTION_NAME = "functionName";
     private static final String KEY_NAME = "name";
     private static final String KEY_REPLY_PATTERN = "replyPattern";
     private static final String KEY_QUESTION_PATTERN = "questionPattern";
@@ -73,7 +73,7 @@ public class DetectIntentSQLite {
 
 
 
-    public void delete( ) {
+    public void clearAll( ) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         db.delete(TABLE_FUNCTION_DETECT,null,null);
         db.delete(TABLE_SOCIAL_DETECT,null,null);

@@ -35,7 +35,7 @@ public class TermSQLite {
                 + DETECT_DEVICE_ID + " INTEGER , "
                 + DETECT_AREA_ID + " INTEGER , "
                 + DETECT_SCRIPT_ID + " INTEGER , "
-                + KEY_TFIDF_POINT + " REAL "+ ")";
+                + KEY_TFIDF_POINT + " REAL "+ " ) ";
     }
 
     public static String createHumanTerm(){
@@ -63,7 +63,7 @@ public class TermSQLite {
 
         return newId;
     }
-    public int insertHumanTerm(HumanTermEntity term) {
+    public int insertHumanTerm(TermEntity term) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_CONTENT, term.getContent());
@@ -110,8 +110,8 @@ public class TermSQLite {
 
         return result;
     }
-    public List<HumanTermEntity> getHumanIntentInSentence(String sentence){
-        List<HumanTermEntity> result = new ArrayList<>();
+    public List<TermEntity> getHumanIntentInSentence(String sentence){
+        List<TermEntity> result = new ArrayList<>();
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
@@ -124,7 +124,7 @@ public class TermSQLite {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                HumanTermEntity term = new HumanTermEntity();
+                TermEntity term = new TermEntity();
                 term.setContent(cursor.getString(cursor.getColumnIndex(KEY_CONTENT)));
                 term.setDetectFunctionId(cursor.getInt(cursor.getColumnIndex(DETECT_FUNCTION_ID)));
                 term.setDetectSocialId(cursor.getInt(cursor.getColumnIndex(DETECT_SOCIAL_ID)));
@@ -142,7 +142,7 @@ public class TermSQLite {
 
     }
 
-    public void delete( ) {
+    public void clearAll( ) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         db.delete(TABLE_TARGET_TERM,null,null);
         db.delete(TABLE_HUMAN_TERM,null,null);

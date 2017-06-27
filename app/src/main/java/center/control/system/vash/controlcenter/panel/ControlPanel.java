@@ -260,7 +260,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     public void onAreaClick(AreaEntity area) {
         currentArea = area;
         areaAttributeAdapter.updateAttribute(area.generateValueArr(),area.getId());
-        Log.d(TAG," click ip");
+        Log.d(TAG," click id "+ area.getId());
     }
     @Override
     public void onAttributeClick(AreaAttribute areaAttribute, int areaId) {

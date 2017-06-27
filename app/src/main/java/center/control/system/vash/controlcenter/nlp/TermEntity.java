@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by Thuans on 5/29/2017.
  */
 
-public class HumanTermEntity {
+public class TermEntity {
     @SerializedName("id")
     private int id;
     @SerializedName("content")
@@ -17,6 +17,16 @@ public class HumanTermEntity {
     private int detectSocialId;
     @SerializedName("detectFunctionId")
     private int detectFunctionId;
+    public TermEntity(){
+
+    }
+    public TermEntity(String content, Double tfidfPoint, int detectSocialId, int detectFunctionId) {
+
+        this.content = content;
+        this.tfidfPoint = tfidfPoint;
+        this.detectSocialId = detectSocialId;
+        this.detectFunctionId = detectFunctionId;
+    }
 
     public int getId() {
         return id;

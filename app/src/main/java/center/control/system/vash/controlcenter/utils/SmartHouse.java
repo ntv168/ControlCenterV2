@@ -2,6 +2,7 @@ package center.control.system.vash.controlcenter.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
@@ -135,6 +136,7 @@ public class SmartHouse {
     public List<DeviceEntity> getDevicesByAreaId(int id) {
         List<DeviceEntity> result = new ArrayList<>();
         for (DeviceEntity device : this.getDevices()){
+            Log.d(TAG,device.getAreaId()+"  id");
             if (device.getAreaId() == id){
                 result.add(device);
             }
@@ -144,6 +146,7 @@ public class SmartHouse {
 
     public String generateDeviceByAreaForApi(int areaId){
         List<DeviceEntity> devices=  getDevicesByAreaId(areaId);
+        Log.d(TAG,devices.size()+"  s");
         String result = "";
         for (DeviceEntity deviceEntity: devices){
             result += deviceEntity.getName()+"="+
@@ -152,7 +155,6 @@ public class SmartHouse {
                     deviceEntity.getState()+"=["+
                     deviceEntity.getAttributeType()+"];";
         }
-
         return result;
     }
 
