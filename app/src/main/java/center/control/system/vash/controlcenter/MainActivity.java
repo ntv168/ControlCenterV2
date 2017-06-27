@@ -118,6 +118,47 @@ public class MainActivity extends Activity {
         password = sharedPreferences.getString(ConstManager.PASSWORD,"");
     }
 
+//    private void loginSmartHouse() {
+//        final HouseKeyDTO key = new HouseKeyDTO();
+//        key.setUsername(txtusername.getText().toString());
+//        key.setPassword(txtpassword.getText().toString());
+//        final CloudApi loginApi = RetroFitSingleton.getInstance().getCloudApi();
+//        loginApi.mobileLogin(key).enqueue(new Callback<LoginSmarthouseDTO>() {
+//            @Override
+//            public void onResponse(Call<LoginSmarthouseDTO> call, retrofit2.Response<LoginSmarthouseDTO> response) {
+//                if (response.body().getHouseId()!= null) {
+//                    Log.d(TAG,call.request().url()+" --- "+response.body().getHouseId());
+//                    username = key.getUsername();
+//                    password = key.getPassword();
+//                    houseId = response.body().getHouseId();
+//                    staticAddress = response.body().getStaticAddress();
+//                    contractCode = response.body().getContractCode();
+//                    ownerName = response.body().getOwnerName();
+//                    ownerAddress = response.body().getOwnerAddress();
+//                    ownerTel = response.body().getOwnerTel();
+//                    ownerCmnd = response.body().getOwnerCmnd();
+//                    contractId = response.body().getContractId();
+//                    activeDay = response.body().getActiveDay();
+//                    virtualAssistantName = response.body().getVirtualAssistantName();
+//                    virtualAssistantType = response.body().getVirtualAssistantType();
+//                    Intent i = new Intent(MainActivity.this, ControlPanel.class);
+//                    startActivity(i);
+//                } else {
+//                    Toast.makeText(MainActivity.this,"Sai tên đăng nhập mật khẩu",Toast.LENGTH_LONG);
+//                }
+//                loginDia.dismiss();
+//            }
+//
+//            @Override
+//            public void onFailure(Call<LoginSmarthouseDTO> call, Throwable t) {
+//                Log.d(TAG,call.request().url()+"  ---err "+t.getMessage());
+//                Toast.makeText(MainActivity.this,"Sai tên đăng nhập mật khẩu",Toast.LENGTH_LONG);
+//                loginDia.dismiss();
+//            }
+//        });
+//
+//    }
+
     private void loginSmartHouse() {
         final HouseKeyDTO key = new HouseKeyDTO();
         key.setUsername(txtusername.getText().toString());
@@ -126,7 +167,7 @@ public class MainActivity extends Activity {
         loginApi.mobileLogin(key).enqueue(new Callback<LoginSmarthouseDTO>() {
             @Override
             public void onResponse(Call<LoginSmarthouseDTO> call, retrofit2.Response<LoginSmarthouseDTO> response) {
-                if (response.body().getHouseId()!= null) {
+                if (false) {
                     Log.d(TAG,call.request().url()+" --- "+response.body().getHouseId());
                     username = key.getUsername();
                     password = key.getPassword();
@@ -145,6 +186,21 @@ public class MainActivity extends Activity {
                     startActivity(i);
                 } else {
                     Toast.makeText(MainActivity.this,"Sai tên đăng nhập mật khẩu",Toast.LENGTH_LONG);
+                    username = "Méo login được";
+                    password = "1111111";
+                    houseId = "32313123123";
+                    staticAddress = "null";
+                    contractCode = "null";
+                    ownerName = "Méo login được";
+                    ownerAddress = "null";
+                    ownerTel = "null";
+                    ownerCmnd = "null";
+                    contractId = "null";
+                    activeDay = "null";
+                    virtualAssistantName = "null";
+                    virtualAssistantType = "null";
+                    Intent i = new Intent(MainActivity.this, ControlPanel.class);
+                    startActivity(i);
                 }
                 loginDia.dismiss();
             }
@@ -153,6 +209,21 @@ public class MainActivity extends Activity {
             public void onFailure(Call<LoginSmarthouseDTO> call, Throwable t) {
                 Log.d(TAG,call.request().url()+"  ---err "+t.getMessage());
                 Toast.makeText(MainActivity.this,"Sai tên đăng nhập mật khẩu",Toast.LENGTH_LONG);
+
+                username = "Méo login được";
+                password = "1111111";
+                houseId = "32313123123";
+                staticAddress = "null";
+                contractCode = "null";
+                ownerName = "Méo login được";
+                ownerAddress = "null";
+                ownerTel = "null";
+                ownerCmnd = "null";
+                contractId = "null";
+                activeDay = "null";
+                virtualAssistantName = "null";
+                virtualAssistantType = "null";
+                Intent i = new Intent(MainActivity.this, ControlPanel.class);
                 loginDia.dismiss();
             }
         });
