@@ -1,5 +1,15 @@
 package center.control.system.vash.controlcenter.configuration;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import center.control.system.vash.controlcenter.area.AreaEntity;
+import center.control.system.vash.controlcenter.database.SQLiteManager;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 
 /**
@@ -9,24 +19,80 @@ import center.control.system.vash.controlcenter.script.ScriptSQLite;
 public class ConfigurationSQLite {
 
     public static final String TABLE_CONFIGURATION = "configuration";
-    public static final String TABLE_TRIGGER = "trigger_condition";
+
     // Contacts Table Columns names
     private static final String KEY_ID = "id";
     private static final String KEY_NAME = "name";
+    private static final String TAG = "Configuration SQLite";
 
-    private static final String KEY_GROUP_ID = ScriptSQLite.KEY_GROUP_ID;
-    private static final String KEY_CONFIG_ID = ScriptSQLite.KEY_CONFIG_ID;
-    private static final String KEY_DEVICE_ID = ScriptSQLite.KEY_DEVICE_ID;
-    private static final String KEY_DEVICE_STATE = ScriptSQLite.KEY_DEVICE_STATE;
 
     public static String createConfiguration(){
         return "CREATE TABLE " + TABLE_CONFIGURATION  + "("
                 + KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT    ,"
-                +  KEY_NAME+ "  TEXT "+ ")";
+                + KEY_NAME+ "  TEXT "
+                +")";
     }
-    public static String createTriggerConfigution(){
-        return "CREATE TABLE " + TABLE_TRIGGER  + "("
-                + KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT    ,"
-                +  KEY_NAME+ "  TEXT "+ ")";
+
+
+    public int insertConfiguration(ConfigurationEntity entity) {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, entity.getName());
+
+        // Inserting Row
+        int newId  = (int) db.insert(TABLE_CONFIGURATION, null, values);
+        SQLiteManager.getInstance().closeDatabase();
+
+        return newId;
+    }
+
+    public static List<ConfigurationEntity> getAll(){
+        List<ConfigurationEntity> result = new ArrayList<>();
+
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT * "
+                + " FROM " + TABLE_CONFIGURATION;
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{});
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                ConfigurationEntity configuration = cursorToEnt(cursor);
+                Log.d(TAG, configuration.getId()+"");
+                result.add(configuration);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        SQLiteManager.getInstance().closeDatabase();
+
+        return result;
+    }
+
+    public ConfigurationEntity findById(int id){
+
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT * "
+                + " FROM " + TABLE_CONFIGURATION
+                + " WHERE "+KEY_ID+" = ? ";
+
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(id)});
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            ConfigurationEntity configuration = new ConfigurationEntity();
+            configuration.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+            configuration.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+            cursor.close();
+            SQLiteManager.getInstance().closeDatabase();
+
+            return configuration;
+        } else return null;
+
+    }
+
+    static ConfigurationEntity cursorToEnt(Cursor cursor){
+        ConfigurationEntity configuration = new ConfigurationEntity();
+        configuration.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+        configuration.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+        return configuration;
     }
 }

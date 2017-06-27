@@ -4,8 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-import center.control.system.vash.controlcenter.script.CommandEntity;
-
 /**
  * Created by Thuans on 6/23/2017.
  */
@@ -17,6 +15,14 @@ public class ConfigurationEntity {
     private String name;
     private List<String> triggerName;
     private List<CommandEntity> commands;
+
+    public ConfigurationEntity() {
+    }
+
+    public ConfigurationEntity(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public List<CommandEntity> getCommands() {
         return commands;
