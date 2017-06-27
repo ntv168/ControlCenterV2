@@ -49,20 +49,10 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:hint="Nhập nội dung"
-                android:inputType="textLongMessage"
+                android:maxLines="1"
+                android:inputType="text"
                 android:textColor="@color/nWhite"
                 android:textColorHint="#80FFFFFF" />
-
-            <!--<Button-->
-                <!--android:id="@+id/btnChatSend"-->
-                <!--android:layout_width="100dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:background="@drawable/background_white"-->
-                <!--android:padding="10dp"-->
-                <!--android:text="Gửi"-->
-                <!--android:textColor="@color/nGreen1"-->
-                <!--android:textSize="18sp"-->
-                <!--android:textStyle="bold" />-->
 
             <ImageButton
                 android:id="@+id/btnChatSend"

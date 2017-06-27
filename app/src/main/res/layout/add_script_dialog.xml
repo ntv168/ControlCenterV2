@@ -44,7 +44,9 @@
             <EditText
                 android:id="@+id/txtScriptName"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:inputType="text"/>
         </LinearLayout>
 
         <LinearLayout
@@ -63,7 +65,9 @@
             <EditText
                 android:id="@+id/txtScriptNickname"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:inputType="text"/>
 
         </LinearLayout>
     </LinearLayout>
