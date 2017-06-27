@@ -83,7 +83,7 @@
             android:layout_height="60dp"
             android:background="@drawable/login_button"
             android:text="ĐĂNG NHẬP"
-            android:textColor="#ffffff"
+            android:textColor="@color/nWhite"
             android:textSize="18sp" />
     </LinearLayout>
 </LinearLayout>
