@@ -53,8 +53,8 @@ public class TriggerSQLite {
         return newId;
     }
 
-    public static List<ConfigurationEntity> getAll(){
-        List<ConfigurationEntity> result = new ArrayList<>();
+    public static List<TriggerEntity> getAll(){
+        List<TriggerEntity> result = new ArrayList<>();
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
@@ -63,7 +63,7 @@ public class TriggerSQLite {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                ConfigurationEntity configuration = cursorToEnt(cursor);
+                TriggerEntity configuration = cursorToEnt(cursor);
                 Log.d(TAG, configuration.getId()+"");
                 result.add(configuration);
             } while (cursor.moveToNext());
@@ -75,10 +75,39 @@ public class TriggerSQLite {
         return result;
     }
 
-    static ConfigurationEntity cursorToEnt(Cursor cursor){
-        ConfigurationEntity command = new ConfigurationEntity();
-        command.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
-        command.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-        return command;
+    public TriggerEntity findById(int id){
+
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT * "
+                + " FROM " + TABLE_TRIGGER
+                + " WHERE "+KEY_ID+" = ? ";
+
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(id)});
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+
+            TriggerEntity trigger = new TriggerEntity();
+            trigger.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+            trigger.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+            trigger.setConfigurationId(cursor.getInt(cursor.getColumnIndex(KEY_CONFIG_ID)));
+            trigger.setDeviceId(cursor.getInt(cursor.getColumnIndex(KEY_DEVICE_ID)));
+            trigger.setDeviceState(cursor.getString(cursor.getColumnIndex(KEY_DEVICE_STATE)));
+            cursor.close();
+            SQLiteManager.getInstance().closeDatabase();
+
+            return trigger;
+        } else return null;
+
+    }
+
+    static TriggerEntity cursorToEnt(Cursor cursor){
+        TriggerEntity trigger = new TriggerEntity();
+        trigger.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+        trigger.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+        trigger.setConfigurationId(cursor.getInt(cursor.getColumnIndex(KEY_CONFIG_ID)));
+        trigger.setDeviceId(cursor.getInt(cursor.getColumnIndex(KEY_DEVICE_ID)));
+        trigger.setDeviceState(cursor.getString(cursor.getColumnIndex(KEY_DEVICE_STATE)));
+
+        return trigger;
     }
 }

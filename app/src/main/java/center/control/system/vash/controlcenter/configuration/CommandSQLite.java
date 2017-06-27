@@ -77,7 +77,6 @@ public class CommandSQLite {
         command.setDeviceId(cursor.getInt(cursor.getColumnIndex(KEY_DEVICE_ID)));
         command.setDeviceState(cursor.getString(cursor.getColumnIndex(KEY_DEVICE_STATE)));
 
-
         return command;
     }
 }

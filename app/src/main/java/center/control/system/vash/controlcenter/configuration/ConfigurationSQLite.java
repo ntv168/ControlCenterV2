@@ -68,10 +68,31 @@ public class ConfigurationSQLite {
         return result;
     }
 
+    public ConfigurationEntity findById(int id){
+
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT * "
+                + " FROM " + TABLE_CONFIGURATION
+                + " WHERE "+KEY_ID+" = ? ";
+
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(id)});
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            ConfigurationEntity configuration = new ConfigurationEntity();
+            configuration.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+            configuration.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+            cursor.close();
+            SQLiteManager.getInstance().closeDatabase();
+
+            return configuration;
+        } else return null;
+
+    }
+
     static ConfigurationEntity cursorToEnt(Cursor cursor){
-        ConfigurationEntity command = new ConfigurationEntity();
-        command.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
-        command.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-        return command;
+        ConfigurationEntity configuration = new ConfigurationEntity();
+        configuration.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+        configuration.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+        return configuration;
     }
 }
