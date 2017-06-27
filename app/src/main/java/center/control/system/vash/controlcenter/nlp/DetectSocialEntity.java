@@ -16,6 +16,13 @@ public class DetectSocialEntity {
     @SerializedName("replyPattern")
     private String replyPattern;
 
+    public DetectSocialEntity(int id, String name, String questionPattern, String replyPattern) {
+        this.id = id;
+        this.name = name;
+        this.questionPattern = questionPattern;
+        this.replyPattern = replyPattern;
+    }
+
     public int getId() {
         return id;
     }

@@ -20,4 +20,6 @@ public class ConstManager {
     public static final String OWNER_CMND = "ownerCmnd";
     public static final String CONTRACT_ID = "contractId";
     public static final String ACTIVE_DAY = "activeDay";
+    public static final String BOT_TYPE_QUAN_GIA_GIA = "Quản gia già";
+    public static final String[] QUAN_GIA_GIA_BOT_ROLE_ARR = {"em", "tôi","cháu"};
 }

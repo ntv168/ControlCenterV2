@@ -69,6 +69,7 @@ public class HttpResponseThread extends Thread {
                     String[] reqElement  = request.split("/");
                     Log.d(TAG,"area id:  "+reqElement[2]);
                     response += house.generateDeviceByAreaForApi(Integer.parseInt(reqElement[2]));
+                    Log.d(TAG,response);
                 } else if (request.contains(ON_DEVICE)){
                     String[] reqElement  = request.split("/");
                     Log.d(TAG,"device id:  "+reqElement[2]);
@@ -90,7 +91,7 @@ public class HttpResponseThread extends Thread {
                     }
                     response += "";
                 } else if (request.contains(DATABASE_VERS)){
-                    response += "saf=3";
+                    response += "ver=4";
                 } else if (request.contains(MODE_TODAY)){
                     response += "Thức dậy buổi sáng=1=on=06:30;Đi làm=2=on=12:35;Ăn tối với cả nhà=3=on=17:00";
                 }
