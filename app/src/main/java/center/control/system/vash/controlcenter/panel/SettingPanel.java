@@ -25,7 +25,10 @@ import com.microsoft.projectoxford.face.contract.Person;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import center.control.system.vash.controlcenter.App;
 import center.control.system.vash.controlcenter.MainActivity;
@@ -40,6 +43,7 @@ import center.control.system.vash.controlcenter.helper.StorageHelper;
 import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
+import center.control.system.vash.controlcenter.nlp.TargetTernEntity;
 import center.control.system.vash.controlcenter.nlp.TermEntity;
 import center.control.system.vash.controlcenter.nlp.TermSQLite;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
@@ -52,8 +56,10 @@ import center.control.system.vash.controlcenter.server.RetroFitSingleton;
 import center.control.system.vash.controlcenter.server.SocialIntentDTO;
 import center.control.system.vash.controlcenter.server.TermDTO;
 import center.control.system.vash.controlcenter.service.WebServerService;
+import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
+import center.control.system.vash.controlcenter.utils.TFIDF;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -108,6 +114,7 @@ public class SettingPanel extends AppCompatActivity {
         btnActive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                refineNickNameTarget();
                 editOwnerName = (EditText) dialog.findViewById(R.id.txtOwnerName);
                 editOwnerName.setText(ownerName);
                 final Spinner spinOwnerRole = (Spinner) dialog.findViewById(R.id.spn_owner_role);
@@ -139,10 +146,10 @@ public class SettingPanel extends AppCompatActivity {
                         String ownerRole = ownerRoleAdapter.getItem(spinOwnerRole.getSelectedItemPosition());
                         SharedPreferences.Editor edit = sharedPreferences.edit();
                         edit.putString(ConstManager.BOT_ROLE,botRole);
-                        edit.putString(ConstManager.BOT_NAME,botName);
                         edit.putString(ConstManager.OWNER_ROLE,ownerRole);
-                        edit.putString(ConstManager.BOT_TYPE,botType);
                         edit.putString(ConstManager.OWNER_NAME,ownerName);
+                        SmartHouse house  = SmartHouse.getInstance();
+                        house.setBotOwnerNameRole(botName,botRole,ownerName,ownerRole);
                         edit.commit();
                         botApi.getDataVA(botTypeId).enqueue(new Callback<BotDataCentralDTO>() {
                             @Override
@@ -167,61 +174,10 @@ public class SettingPanel extends AppCompatActivity {
                                     sqlDect.insertFunction(new DetectFunctionEntity(funct.getId(),
                                             funct.getName(),funct.getSuccess(),funct.getFail(),funct.getRemind()));
                                 }
-                                final SmartHouse house = SmartHouse.getInstance();
-                                for (final DeviceEntity device: house.getDevices()){
-                                    if (device.getNickName().length()<2){
-                                        editNickNameDiag.setTitle("Tên gọi khác cho thiết bị"+device.getName());
-                                        final EditText input = new EditText(SettingPanel.this);
-                                        input.setInputType(InputType.TYPE_CLASS_TEXT);
-                                        editNickNameDiag.setView(input);
-                                        editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                device.setNickName(input.getText().toString());
-                                                DeviceSQLite.upById(device.getId(),device);
-                                                house.updateDeviceById(device.getId(),device);
-                                                dialog.dismiss();
-                                            }
-                                        });
-                                        editNickNameDiag.show();
-                                    }
-                                }
-                                for (final AreaEntity area: house.getAreas()){
-                                    if (area.getNickName().length()<2){
-                                        editNickNameDiag.setTitle("Tên gọi khác cho không gian "+area.getName());
-                                        final EditText input = new EditText(SettingPanel.this);
-                                        input.setInputType(InputType.TYPE_CLASS_TEXT);
-                                        editNickNameDiag.setView(input);
-                                        editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                area.setNickName(input.getText().toString());
-                                                AreaSQLite.upAddressAndNickById(area.getId(),area);
-                                                house.updateAreaById(area.getId(),area);
-                                                dialog.dismiss();
-                                            }
-                                        });
-                                        editNickNameDiag.show();
-                                    }
-                                }
-                                for (final ScriptEntity mode: house.getScripts()){
-                                    if (mode.getNickName().length()<2){
-                                        editNickNameDiag.setTitle("Tên gọi khác cho chế độ "+mode.getName());
-                                        final EditText input = new EditText(SettingPanel.this);
-                                        input.setInputType(InputType.TYPE_CLASS_TEXT);
-                                        editNickNameDiag.setView(input);
-                                        editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                mode.setNickName(input.getText().toString());
-                                                ScriptSQLite.upModeOnly(mode.getId(),mode);
-                                                house.updateModeById(mode.getId(),mode);
-                                                dialog.dismiss();
-                                            }
-                                        });
-                                        editNickNameDiag.show();
-                                    }
-                                }
+                                SmartHouse house = SmartHouse.getInstance();
+                                saveDeviceTFIDFTerm(house.getDevices());
+                                saveAreaTFIDFTerm(house.getAreas());
+                                saveScriptTFIDFTerm(house.getScripts());
                             }
 
                             @Override
@@ -296,14 +252,63 @@ public class SettingPanel extends AppCompatActivity {
         startActivity(new Intent(this, VAPanel.class));
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        stopService(new Intent(getApplicationContext(),WebServerService.class));
-        Log.d(TAG," destroy ");
+    private void refineNickNameTarget(){
+        final SmartHouse house = SmartHouse.getInstance();
+        for (final DeviceEntity device: house.getDevices()){
+            if (device.getNickName().length()<2){
+                editNickNameDiag.setTitle("Tên gọi khác cho thiết bị"+device.getName());
+                final EditText input = new EditText(SettingPanel.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                editNickNameDiag.setView(input);
+                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        device.setNickName(input.getText().toString());
+                        DeviceSQLite.upById(device.getId(),device);
+                        house.updateDeviceById(device.getId(),device);
+                        dialog.dismiss();
+                    }
+                });
+                editNickNameDiag.show();
+            }
+        }
+        for (final AreaEntity area: house.getAreas()){
+            if (area.getNickName().length()<2){
+                editNickNameDiag.setTitle("Tên gọi khác cho không gian "+area.getName());
+                final EditText input = new EditText(SettingPanel.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                editNickNameDiag.setView(input);
+                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        area.setNickName(input.getText().toString());
+                        AreaSQLite.upAddressAndNickById(area.getId(),area);
+                        house.updateAreaById(area.getId(),area);
+                        dialog.dismiss();
+                    }
+                });
+                editNickNameDiag.show();
+            }
+        }
+        for (final ScriptEntity mode: house.getScripts()){
+            if (mode.getNickName().length()<2){
+                editNickNameDiag.setTitle("Tên gọi khác cho chế độ "+mode.getName());
+                final EditText input = new EditText(SettingPanel.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                editNickNameDiag.setView(input);
+                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mode.setNickName(input.getText().toString());
+                        ScriptSQLite.upModeOnly(mode.getId(),mode);
+                        house.updateModeById(mode.getId(),mode);
+                        dialog.dismiss();
+                    }
+                });
+                editNickNameDiag.show();
+            }
+        }
     }
-
-
 
     class GetPersonIdsTask extends AsyncTask<String, String, Person[]> {
 
@@ -349,6 +354,91 @@ public class SettingPanel extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+            }
+        }
+    }
+    private void saveDeviceTFIDFTerm(List<DeviceEntity> listDevices) {
+        Map<Integer,Map<String,Integer>> trainingSetMap = BotUtils.readTargettoHashMap(listDevices);
+        Map<Integer,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
+        TermSQLite sqLite= new TermSQLite();
+        Iterator it = trainingSetMap.entrySet().iterator();
+        while (it.hasNext()){
+            Map.Entry pair = (Map.Entry) it.next();
+            int deviceId = (int) pair.getKey();
+            Map<String, Integer> wordCount = (Map<String, Integer>) pair.getValue();
+
+            Iterator wit = wordCount.entrySet().iterator();
+            while (wit.hasNext()){
+                Map.Entry termPair = (Map.Entry) wit.next();
+                String term = (String) termPair.getKey();
+
+                double termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, deviceId);
+                System.out.println(termTfidf+"   "+term+"   "+deviceId);
+
+                TargetTernEntity targetTerm = new TargetTernEntity();
+                targetTerm.setDetectDeviceId(deviceId);
+                targetTerm.setDetectAreaId(-1);
+                targetTerm.setDetectScriptId(-1);
+                targetTerm.setTfidfPoint(termTfidf);
+                targetTerm.setContent(" "+term+" ");
+                sqLite.insertTargetTerm(targetTerm);
+            }
+        }
+    }
+    private void saveAreaTFIDFTerm(List<AreaEntity> listArea) {
+        Map<Integer,Map<String,Integer>> trainingSetMap = BotUtils.readTargettoHashMap(listArea);
+        Map<Integer,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
+        TermSQLite sqLite= new TermSQLite();
+        Iterator it = trainingSetMap.entrySet().iterator();
+        while (it.hasNext()){
+            Map.Entry pair = (Map.Entry) it.next();
+            int areaId = (int) pair.getKey();
+            Map<String, Integer> wordCount = (Map<String, Integer>) pair.getValue();
+
+            Iterator wit = wordCount.entrySet().iterator();
+            while (wit.hasNext()){
+                Map.Entry termPair = (Map.Entry) wit.next();
+                String term = (String) termPair.getKey();
+
+                double termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, areaId);
+                System.out.println(termTfidf+"   "+term+"   "+areaId);
+
+                TargetTernEntity targetTerm = new TargetTernEntity();
+                targetTerm.setDetectAreaId(areaId);
+                targetTerm.setDetectDeviceId(-1);
+                targetTerm.setDetectScriptId(-1);
+                targetTerm.setTfidfPoint(termTfidf);
+                targetTerm.setContent(" "+term+" ");
+                sqLite.insertTargetTerm(targetTerm);
+            }
+        }
+    }
+
+    private void saveScriptTFIDFTerm(List<ScriptEntity> listScript) {
+        Map<Integer,Map<String,Integer>> trainingSetMap = BotUtils.readTargettoHashMap(listScript);
+        Map<Integer,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
+        TermSQLite sqLite= new TermSQLite();
+        Iterator it = trainingSetMap.entrySet().iterator();
+        while (it.hasNext()){
+            Map.Entry pair = (Map.Entry) it.next();
+            int scriptId = (int) pair.getKey();
+            Map<String, Integer> wordCount = (Map<String, Integer>) pair.getValue();
+
+            Iterator wit = wordCount.entrySet().iterator();
+            while (wit.hasNext()){
+                Map.Entry termPair = (Map.Entry) wit.next();
+                String term = (String) termPair.getKey();
+
+                double termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, scriptId);
+                System.out.println(termTfidf+"   "+term+"   "+scriptId);
+
+                TargetTernEntity targetTerm = new TargetTernEntity();
+                targetTerm.setDetectScriptId(scriptId);
+                targetTerm.setDetectAreaId(-1);
+                targetTerm.setDetectDeviceId(-1);
+                targetTerm.setTfidfPoint(termTfidf);
+                targetTerm.setContent(" "+term+" ");
+                sqLite.insertTargetTerm(targetTerm);
             }
         }
     }

@@ -79,13 +79,12 @@ public class TermSQLite {
     }
 
 
-    public List<TargetTernEntity> getTargetInSentence(String sentence){
+    public static List<TargetTernEntity> getTargetInSentence(String sentence){
         List<TargetTernEntity> result = new ArrayList<>();
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
                 + " FROM " + TABLE_TARGET_TERM
-//                + " WHERE ? MATCH '*' + "+KEY_CONTENT+" + '*' ";
                 + " WHERE instr(?,"+KEY_CONTENT+") > 0";
 
         Log.d(TABLE_TARGET_TERM, selectQuery);
@@ -148,4 +147,5 @@ public class TermSQLite {
         db.delete(TABLE_HUMAN_TERM,null,null);
         SQLiteManager.getInstance().closeDatabase();
     }
+
 }

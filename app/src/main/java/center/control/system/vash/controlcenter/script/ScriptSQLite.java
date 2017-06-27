@@ -112,7 +112,7 @@ public class ScriptSQLite {
         script.setWeeksDay(cursor.getString(cursor.getColumnIndex(KEY_WEEKSDAY)));
         return script;
     }
-    public ScriptEntity findById(String id){
+    public static ScriptEntity findById(int id){
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
                 + " FROM " + TABLE_SCRIPT

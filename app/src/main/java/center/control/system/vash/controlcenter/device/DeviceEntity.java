@@ -10,17 +10,13 @@ import java.util.Set;
  * Created by Thuans on 5/28/2017.
  */
 
-public class DeviceEntity {
+public class DeviceEntity extends TargetObject{
     public static final String [] types = new  String[]{"light","bell","door","fan","camera","tivi","airCondition","cooker","curtain"};
     public static final String [] typeNames = new  String[]{"đèn","chuông","cửa","quạt","camera","ti-vi","máy lạnh","nồi cơm","rèm cửa"};
     public static final String remoteTypes = new  String("tivi,airCondition");
 
-    @SerializedName("id")
-    private int id;
     @SerializedName("port")
     private String port;
-    @SerializedName("name")
-    private String name;
     @SerializedName("type")
     private String type;
     @SerializedName("attributeType")
@@ -29,27 +25,9 @@ public class DeviceEntity {
     private String state;
     @SerializedName("areaId")
     private int areaId;
-    @SerializedName("nickName")
-    private String nickName;
 
     Set<String> attributeSet;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getAttributeType() {
         return attributeType;
@@ -77,14 +55,6 @@ public class DeviceEntity {
 
     public void setAreaId(int areaId) {
         this.areaId = areaId;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
     }
 
     public String getPort() {
