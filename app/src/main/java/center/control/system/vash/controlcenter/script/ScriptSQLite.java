@@ -164,4 +164,10 @@ public class ScriptSQLite {
         db.delete(TABLE_SCRIPT,null,null);
         SQLiteManager.getInstance().closeDatabase();
     }
+
+    public static void upModeOnly(int id, ScriptEntity mode) {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        db.update(TABLE_SCRIPT, scriptToCV(mode), KEY_ID + " = "+id, null);
+        SQLiteManager.getInstance().closeDatabase();
+    }
 }

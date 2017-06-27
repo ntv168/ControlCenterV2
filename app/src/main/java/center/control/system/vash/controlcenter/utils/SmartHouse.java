@@ -253,4 +253,12 @@ public class SmartHouse {
         }
         return null;
     }
+
+    public void updateModeById(int id, ScriptEntity mode) {
+        for (int i=0; i<this.getScripts().size();i++){
+            if (this.getScripts().get(i).getId() == id){
+                this.getScripts().set(i,mode);
+            }
+        }
+    }
 }

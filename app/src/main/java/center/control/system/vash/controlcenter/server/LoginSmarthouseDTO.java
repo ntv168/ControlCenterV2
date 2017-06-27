@@ -42,6 +42,9 @@ public class LoginSmarthouseDTO {
     @SerializedName("virtualAssistantType")
     @Expose
     private String virtualAssistantType;
+    @SerializedName("virtualAssistantTypeId")
+    @Expose
+    private int virtualAssistantTypeId;
 
     public String getHouseId() {
         return houseId;
@@ -129,5 +132,13 @@ public class LoginSmarthouseDTO {
 
     public void setVirtualAssistantType(String virtualAssistantType) {
         this.virtualAssistantType = virtualAssistantType;
+    }
+
+    public int getVirtualAssistantTypeId() {
+        return virtualAssistantTypeId;
+    }
+
+    public void setVirtualAssistantTypeId(int virtualAssistantTypeId) {
+        this.virtualAssistantTypeId = virtualAssistantTypeId;
     }
 }

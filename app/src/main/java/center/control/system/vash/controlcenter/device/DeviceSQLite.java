@@ -98,7 +98,7 @@ public class DeviceSQLite {
         db.delete(TABLE_DEVICE,null,null);
         SQLiteManager.getInstance().closeDatabase();
     }
-    private ContentValues createContent(DeviceEntity device){
+    private static ContentValues createContent(DeviceEntity device){
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, device.getName());
         values.put(KEY_PORT, device.getPort());
@@ -122,7 +122,7 @@ public class DeviceSQLite {
         return deviceEntity;
     }
 
-    public void upById(int id, DeviceEntity device) {
+    public static void upById(int id, DeviceEntity device) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         db.update(TABLE_DEVICE, createContent(device), KEY_ID + " = "+id, null);
         SQLiteManager.getInstance().closeDatabase();
