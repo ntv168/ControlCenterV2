@@ -10,6 +10,7 @@ import java.util.List;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
+import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 
 /**
@@ -22,25 +23,27 @@ public class CommandSQLite {
     private static final String TAG = "Command SQLite" ;
 
     // Contacts Table Columns names
-    private static final String KEY_CONFIG_ID = ScriptSQLite.KEY_CONFIG_ID;
+    private static final String KEY_TRIGGER_ID = ScriptSQLite.KEY_CONFIG_ID;
     private static final String KEY_DEVICE_ID = ScriptSQLite.KEY_DEVICE_ID;
+    private static final String KEY_DEVICE_NAME = "name";
     private static final String KEY_DEVICE_STATE = ScriptSQLite.KEY_DEVICE_STATE;
 
     public static String createCommand(){
         return "CREATE TABLE " + TABLE_COMMAND  + "("
-                + KEY_CONFIG_ID + "INTEGER"
-                + KEY_DEVICE_ID + "INTEGER"
-                + KEY_DEVICE_STATE + "TEXT"
+                + KEY_TRIGGER_ID + " INTEGER,"
+                + KEY_DEVICE_ID + " INTEGER,"
+                + KEY_DEVICE_NAME + " TEXT,"
+                + KEY_DEVICE_STATE + " TEXT"
                 + ")";
     }
 
 
-    public int insertConfiguration(CommandEntity entity) {
+    public int insertCommands(DeviceEntity entity) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_CONFIG_ID, entity.getConfigurationId());
-        values.put(KEY_DEVICE_ID, entity.getDeviceId());
-        values.put(KEY_DEVICE_STATE, entity.getDeviceState());
+        values.put(KEY_TRIGGER_ID, 0);
+        values.put(KEY_DEVICE_ID, entity.getId());
+        values.put(KEY_DEVICE_NAME, entity.getName());
 
         // Inserting Row
         int newId  = (int) db.insert(TABLE_COMMAND, null, values);
@@ -73,9 +76,10 @@ public class CommandSQLite {
 
     static CommandEntity cursorToEnt(Cursor cursor){
         CommandEntity command = new CommandEntity();
-        command.setConfigurationId(cursor.getInt(cursor.getColumnIndex(KEY_CONFIG_ID)));
+        command.setConfigurationId(cursor.getInt(cursor.getColumnIndex(KEY_TRIGGER_ID)));
         command.setDeviceId(cursor.getInt(cursor.getColumnIndex(KEY_DEVICE_ID)));
         command.setDeviceState(cursor.getString(cursor.getColumnIndex(KEY_DEVICE_STATE)));
+        command.setDeviceName(cursor.getString(cursor.getColumnIndex(KEY_DEVICE_NAME)));
 
         return command;
     }

@@ -74,7 +74,7 @@ public class DeviceSQLite {
 
         return result;
     }
-    public DeviceEntity findById(String id){
+    public static DeviceEntity findById(int id){
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "

@@ -127,12 +127,23 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         houseId = sharedPreferences.getString(ConstManager.SYSTEM_ID,"");
+        staticAddress = sharedPreferences.getString(ConstManager.STATIC_ADDRESS,"");
+        contractCode = sharedPreferences.getString(ConstManager.CONTRACT_CODE,"");
+        ownerName = sharedPreferences.getString(ConstManager.OWNER_NAME,"");
+        ownerAddress = sharedPreferences.getString(ConstManager.OWNER_ADD,"");
+        ownerTel = sharedPreferences.getString(ConstManager.OWNER_TEL,"");
+        ownerCmnd = sharedPreferences.getString(ConstManager.OWNER_CMND,"");
+        contractId = sharedPreferences.getString(ConstManager.CONTRACT_ID,"");
+        activeDay = sharedPreferences.getString(ConstManager.ACTIVE_DAY,"");
+        virtualAssistantName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
+        virtualAssistantType = sharedPreferences.getString(ConstManager.BOT_TYPE,"");
+        virtualAssistantId = sharedPreferences.getInt(ConstManager.BOT_TYPE_ID,-1);
+        username = sharedPreferences.getString(ConstManager.USERNAME,"");
+        password = sharedPreferences.getString(ConstManager.PASSWORD,"");
         if (!houseId.equals("")){
             Intent intent = new Intent(MainActivity.this, ControlPanel.class);
             startActivity(intent);
         }
-        username = sharedPreferences.getString(ConstManager.USERNAME,"");
-        password = sharedPreferences.getString(ConstManager.PASSWORD,"");
     }
 
     private void loginSmartHouse() {
@@ -160,10 +171,9 @@ public class MainActivity extends Activity {
                     virtualAssistantType = response.body().getVirtualAssistantType();
                     Log.d(TAG,virtualAssistantType);
                     virtualAssistantId = response.body().getVirtualAssistantTypeId();
-                    Intent i = new Intent(MainActivity.this, ControlPanel.class);
-                    startActivity(i);
+                    startActivity( new Intent(MainActivity.this, ControlPanel.class));
                 } else {
-                    Log.d(TAG,call.request().url()+"sai ten");
+                    Log.d(TAG,call.request().url()+" sai ten");
                     Toast.makeText(MainActivity.this,"Sai tên đăng nhập mật khẩu",Toast.LENGTH_LONG);
                 }
                 loginDia.dismiss();
@@ -197,6 +207,7 @@ public class MainActivity extends Activity {
         edit.putString(ConstManager.BOT_NAME,virtualAssistantName);
         edit.putString(ConstManager.BOT_TYPE,virtualAssistantType);
         edit.putInt(ConstManager.BOT_TYPE_ID,virtualAssistantId);
+        Log.d(TAG,"saved on pause "+virtualAssistantType);
         edit.commit();
     }
 }

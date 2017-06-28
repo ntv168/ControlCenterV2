@@ -26,4 +26,6 @@ public class ConstManager {
     public static final String BOT_TYPE_ID = "bot.type.Id";
     public static final String BOT_ROLE = "bot.role";
     public static final String OWNER_ROLE = "owner.role";
+    public static final String NOT_UNDERSTD = "notUnderstand";
+    public static final String FUNCTION_FOR_SCRIPT = "startMode,stopMode";
 }

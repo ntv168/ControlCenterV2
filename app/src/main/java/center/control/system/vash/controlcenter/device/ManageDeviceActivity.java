@@ -105,6 +105,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
             public void onClick(View v) {
 
                 ipArea = (EditText) dialog.findViewById(R.id.txtAreaAddress);
+                ipArea.setText("192.168.");
                 final EditText areaName = (EditText) dialog.findViewById(R.id.txtAreaName);
                 final EditText areaNickName= (EditText) dialog.findViewById(R.id.txtAreaNickname);
                 final TextView txtErr  = (TextView) dialog.findViewById(R.id.txtError);
@@ -117,7 +118,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                         progressDialog.setTitle("Dò tìm thiết bị khu vực "+ipArea.getText().toString());
                         progressDialog.setMessage("Đợi tý nha");
 
-                        String url = "http://"+ipArea.getText().toString().trim()+"/get";
+                        final String url = "http://"+ipArea.getText().toString().trim()+"/get";
                         Log.d(TAG,url);
 
                         StringRequest connectAreaIP = new StringRequest(Request.Method.GET,
@@ -136,8 +137,18 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
+
                                 txtErr.setText("Không kết nối được thiết bị");
-                                progressDialog.dismiss();
+                                if (url.equals("http://1.1.1.1:80/get")) {
+                                    String encodedResp = "";
+                                    currentArea = saveArea(areaName.getText().toString(),
+                                            areaNickName.getText().toString(),
+                                            ipArea.getText().toString());
+                                    insertDeviceByPort(encodedResp, currentArea.getId());
+                                    progressDialog.dismiss();
+                                    dialog.dismiss();
+                                } else
+                                    progressDialog.dismiss();
                             }
                         });
                         VolleySingleton.getInstance(ManageDeviceActivity.this).addToRequestQueue(connectAreaIP);

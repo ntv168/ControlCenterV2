@@ -50,6 +50,7 @@ import center.control.system.vash.controlcenter.area.AreaAdapter;
 import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaAttributeAdapter;
 import center.control.system.vash.controlcenter.area.AreaEntity;
+import center.control.system.vash.controlcenter.configuration.CommandEntity;
 import center.control.system.vash.controlcenter.device.DeviceAdapter;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
@@ -57,7 +58,6 @@ import center.control.system.vash.controlcenter.helper.StorageHelper;
 import center.control.system.vash.controlcenter.nlp.VoiceUtils;
 import center.control.system.vash.controlcenter.recognition.Facedetect;
 import center.control.system.vash.controlcenter.recognition.ImageHelper;
-import center.control.system.vash.controlcenter.script.CommandEntity;
 
 import center.control.system.vash.controlcenter.service.ControlMonitorService;
 import center.control.system.vash.controlcenter.service.WebServerService;
@@ -106,7 +106,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control_panel);
-        showReply("Xin chào anh Đại, quán cà phê thông minh xin được phục vụ ạ");
+//        showReply("Xin chào anh Đại, quán cà phê thông minh xin được phục vụ ạ");
         final ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnHome);
         currentTab.setImageResource(R.drawable.tab_home_active);
         currentTab.setBackgroundResource(R.drawable.background_tab_home_active);
@@ -255,7 +255,16 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     protected void onPause() {
         super.onPause();
         stopService(new Intent(this,ControlMonitorService.class));
+
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(getApplicationContext(),WebServerService.class));
+        Log.d(TAG," destroy ");
+    }
+
 
     @Override
     public void onAreaClick(AreaEntity area) {
@@ -333,9 +342,12 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             remoteDialog.show();
         } else {
             if (device.getState().equals("on")){
+
                 SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"off"));
+                waitDialog(2000);
             } else {
                 SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"on"));
+                waitDialog(2000);
             }
         }
     }
@@ -499,7 +511,6 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
 
         @Override
         protected void onProgressUpdate(String... values) {
-            // Show the status of background detection task on screen.a
 
         }
 
