@@ -22,4 +22,10 @@ public class ConstManager {
     public static final String ACTIVE_DAY = "activeDay";
     public static final String BOT_TYPE_QUAN_GIA_GIA = "Quản gia già";
     public static final String[] QUAN_GIA_GIA_BOT_ROLE_ARR = {"em", "tôi","cháu"};
+    public static final String[] QUAN_GIA_GIA_OWNER_ROLE_ARR = {"ông","bà","ông chủ","bà chủ"};
+    public static final String BOT_TYPE_ID = "bot.type.Id";
+    public static final String BOT_ROLE = "bot.role";
+    public static final String OWNER_ROLE = "owner.role";
+    public static final String NOT_UNDERSTD = "notUnderStand";
+    public static final String FUNCTION_FOR_SCRIPT = "startMode,stopMode";
 }

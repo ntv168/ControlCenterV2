@@ -113,7 +113,7 @@ public class ScriptSQLite {
         script.setWeeksDay(cursor.getString(cursor.getColumnIndex(KEY_WEEKSDAY)));
         return script;
     }
-    public ScriptEntity findById(String id){
+    public static ScriptEntity findById(int id){
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
                 + " FROM " + TABLE_SCRIPT
@@ -163,6 +163,12 @@ public class ScriptSQLite {
     public void delete( ) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         db.delete(TABLE_SCRIPT,null,null);
+        SQLiteManager.getInstance().closeDatabase();
+    }
+
+    public static void upModeOnly(int id, ScriptEntity mode) {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        db.update(TABLE_SCRIPT, scriptToCV(mode), KEY_ID + " = "+id, null);
         SQLiteManager.getInstance().closeDatabase();
     }
 }

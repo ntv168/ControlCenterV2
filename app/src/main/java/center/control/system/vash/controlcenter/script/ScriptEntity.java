@@ -7,20 +7,17 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import center.control.system.vash.controlcenter.device.TargetObject;
+
 /**
  * Created by Thuans on 5/29/2017.
  */
 
-public class ScriptEntity {
+public class ScriptEntity extends TargetObject{
     public static String[] weekDays = {"T2","T3","T4","T5","T6","T7","CN"};
     public static int[] weekDayValue = {Calendar.MONDAY,Calendar.TUESDAY,Calendar.WEDNESDAY,
             Calendar.THURSDAY,Calendar.FRIDAY,Calendar.SATURDAY,Calendar.SUNDAY};
-    @SerializedName("id")
-    private int id;
-    @SerializedName("name")
-    private String name;
-    @SerializedName("nickName")
-    private String nickName;
+
     @SerializedName("hour")
     private int hour;
     @SerializedName("minute")
@@ -29,29 +26,6 @@ public class ScriptEntity {
     private String weekDay;
     Set<Integer> weeksDay;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
 
     public void setWeeksDay(String weekDay) {
         this.weekDay = weekDay;

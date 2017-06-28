@@ -254,7 +254,16 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     protected void onPause() {
         super.onPause();
         stopService(new Intent(this,ControlMonitorService.class));
+
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(getApplicationContext(),WebServerService.class));
+        Log.d(TAG," destroy ");
+    }
+
 
     @Override
     public void onAreaClick(AreaEntity area) {

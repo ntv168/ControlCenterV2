@@ -348,8 +348,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                 currentDevice.setState("off");
                 SmartHouse house = SmartHouse.getInstance();
                 house.updateDeviceById(currentDevice.getId(),currentDevice);
-                DeviceSQLite sqLite = new DeviceSQLite();
-                sqLite.upById(currentDevice.getId(),currentDevice);
+                DeviceSQLite.upById(currentDevice.getId(),currentDevice);
                 devicesAdapter.setDevices(house.getDevicesByAreaId(currentArea.getId()));
                 deviceDialog.dismiss();
             }

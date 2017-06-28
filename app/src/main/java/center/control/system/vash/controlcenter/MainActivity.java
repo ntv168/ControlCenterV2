@@ -63,6 +63,8 @@ public class MainActivity extends Activity {
     private ProgressDialog loginDia;
     EditText txtusername;
     EditText txtpassword;
+    private int virtualAssistantId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -156,25 +158,12 @@ public class MainActivity extends Activity {
                     activeDay = response.body().getActiveDay();
                     virtualAssistantName = response.body().getVirtualAssistantName();
                     virtualAssistantType = response.body().getVirtualAssistantType();
+                    Log.d(TAG,virtualAssistantType);
+                    virtualAssistantId = response.body().getVirtualAssistantTypeId();
                     Intent i = new Intent(MainActivity.this, ControlPanel.class);
                     startActivity(i);
                 } else {
                     Log.d(TAG,call.request().url()+"sai ten");
-                    username = key.getUsername();
-                    password = key.getPassword();
-                    houseId = "21321321321";
-                    staticAddress = "21321321321";
-                    contractCode = "sads";
-                    ownerName = "fake account";
-                    ownerAddress = "21321321321";
-                    ownerTel = "21321321321";
-                    ownerCmnd = "21321321321";
-                    contractId = "21321321321";
-                    activeDay = "21321321321";
-                    virtualAssistantName = "Sen";
-                    virtualAssistantType = "21321321321";
-                    Intent i = new Intent(MainActivity.this, ControlPanel.class);
-                    startActivity(i);
                     Toast.makeText(MainActivity.this,"Sai tên đăng nhập mật khẩu",Toast.LENGTH_LONG);
                 }
                 loginDia.dismiss();
@@ -207,6 +196,7 @@ public class MainActivity extends Activity {
         edit.putString(ConstManager.ACTIVE_DAY,activeDay);
         edit.putString(ConstManager.BOT_NAME,virtualAssistantName);
         edit.putString(ConstManager.BOT_TYPE,virtualAssistantType);
+        edit.putInt(ConstManager.BOT_TYPE_ID,virtualAssistantId);
         edit.commit();
     }
 }

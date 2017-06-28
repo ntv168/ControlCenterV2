@@ -83,7 +83,7 @@ public class AreaSQLite {
         return result;
     }
 
-    public void upAddressAndNickById(int id, AreaEntity area) {
+    public static void upAddressAndNickById(int id, AreaEntity area) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         ContentValues cv = new ContentValues();
         cv.put(KEY_ADDRESS,area.getConnectAddress());
@@ -92,7 +92,7 @@ public class AreaSQLite {
         SQLiteManager.getInstance().closeDatabase();
     }
 
-    public AreaEntity findById(int id){
+    public static AreaEntity findById(int id){
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "

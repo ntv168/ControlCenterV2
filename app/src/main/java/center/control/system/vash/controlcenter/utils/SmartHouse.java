@@ -32,6 +32,11 @@ public class SmartHouse {
     private List<AreaEntity> areas;
     private List<DeviceEntity> devices;
     private List<ScriptEntity> scripts;
+    private String botName;
+    private String botRole;
+    private String ownerName;
+    private String ownerRole;
+
     private List<ConfigurationEntity> configurations;
 
     private SmartHouse() { }
@@ -275,7 +280,33 @@ public class SmartHouse {
         return null;
     }
 
+    public void updateModeById(int id, ScriptEntity mode) {
+        for (int i=0; i<this.getScripts().size();i++){
+            if (this.getScripts().get(i).getId() == id){
+                this.getScripts().set(i,mode);
+            }
+        }
+    }
 
+    public String getBotName() {
+        return botName;
+    }
 
+    public String getBotRole() {
+        return botRole;
+    }
 
+    public String getOwnerRole() {
+        return ownerRole;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+    public void setBotOwnerNameRole(String bn,String br, String on, String or){
+        this.botName = bn;
+        this.botRole = br;
+        this.ownerName = on;
+        this.ownerRole = or;
+    }
 }
