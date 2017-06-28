@@ -12,9 +12,12 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
+import center.control.system.vash.controlcenter.configuration.CommandEntity;
+import center.control.system.vash.controlcenter.configuration.ConfigurationEntity;
+import center.control.system.vash.controlcenter.configuration.ConfigurationSQLite;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
-import center.control.system.vash.controlcenter.script.CommandEntity;
+
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 
@@ -29,10 +32,14 @@ public class SmartHouse {
     private List<AreaEntity> areas;
     private List<DeviceEntity> devices;
     private List<ScriptEntity> scripts;
+    private List<ConfigurationEntity> configurations;
 
     private SmartHouse() { }
 
+
+
     public static SmartHouse getInstance() {
+
         if(houseInstance == null) {
             synchronized(SmartHouse.class) {
                 if(houseInstance == null) {
@@ -41,6 +48,7 @@ public class SmartHouse {
                     houseInstance.setAreas(AreaSQLite.getAll());
                     houseInstance.setDevices(DeviceSQLite.getAll());
                     houseInstance.setScripts(ScriptSQLite.getAll());
+                    houseInstance.setConfigurations(ConfigurationSQLite.getAll());
                 }
             }
 
@@ -113,6 +121,13 @@ public class SmartHouse {
         this.scripts = scripts;
     }
 
+    public void setConfigurations(List<ConfigurationEntity> configurations) {
+        if (configurations == null) {
+            configurations = new ArrayList<>();
+        }
+        this.configurations = configurations;
+    }
+
     public List<ScriptEntity> getScripts() {
         return scripts;
     }
@@ -120,6 +135,12 @@ public class SmartHouse {
     public List<DeviceEntity> getDevices() {
         return devices;
     }
+
+    public List<ConfigurationEntity> getConfigurations() {
+        return configurations;
+    }
+
+
 
     public void setDevices(List<DeviceEntity> devices) {
         this.devices = devices;
@@ -253,4 +274,8 @@ public class SmartHouse {
         }
         return null;
     }
+
+
+
+
 }

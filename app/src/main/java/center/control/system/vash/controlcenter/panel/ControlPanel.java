@@ -49,6 +49,7 @@ import center.control.system.vash.controlcenter.area.AreaAdapter;
 import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaAttributeAdapter;
 import center.control.system.vash.controlcenter.area.AreaEntity;
+import center.control.system.vash.controlcenter.configuration.CommandEntity;
 import center.control.system.vash.controlcenter.device.DeviceAdapter;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
@@ -56,7 +57,6 @@ import center.control.system.vash.controlcenter.helper.StorageHelper;
 import center.control.system.vash.controlcenter.nlp.VoiceUtils;
 import center.control.system.vash.controlcenter.recognition.Facedetect;
 import center.control.system.vash.controlcenter.recognition.ImageHelper;
-import center.control.system.vash.controlcenter.script.CommandEntity;
 
 import center.control.system.vash.controlcenter.service.ControlMonitorService;
 import center.control.system.vash.controlcenter.service.WebServerService;

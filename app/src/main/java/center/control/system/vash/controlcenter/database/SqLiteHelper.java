@@ -1,11 +1,16 @@
 package center.control.system.vash.controlcenter.database;
 
+import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import center.control.system.vash.controlcenter.App;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
+import center.control.system.vash.controlcenter.configuration.CommandSQLite;
+import center.control.system.vash.controlcenter.configuration.ConfigurationEntity;
+import center.control.system.vash.controlcenter.configuration.ConfigurationSQLite;
+import center.control.system.vash.controlcenter.configuration.TriggerSQLite;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
@@ -39,6 +44,12 @@ public class SqLiteHelper extends SQLiteOpenHelper {
         db.execSQL(TermSQLite.createTargetTerm());
         db.execSQL(DetectIntentSQLite.createFunction());
         db.execSQL(DetectIntentSQLite.createSocial());
+
+        //Create configuration
+        db.execSQL(ConfigurationSQLite.createConfiguration());
+        db.execSQL(CommandSQLite.createCommand());
+        db.execSQL(TriggerSQLite.createTriggerConfigution());
+
     }
 
     @Override
@@ -54,6 +65,12 @@ public class SqLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TermSQLite.TABLE_TARGET_TERM);
         db.execSQL("DROP TABLE IF EXISTS " + DetectIntentSQLite.TABLE_FUNCTION_DETECT);
         db.execSQL("DROP TABLE IF EXISTS " + DetectIntentSQLite.TABLE_SOCIAL_DETECT);
+
+        //Configuration
+        db.execSQL("DROP TABLE IF EXISTS " + ConfigurationSQLite.TABLE_CONFIGURATION);
+        db.execSQL("DROP TABLE IF EXISTS " + CommandSQLite.TABLE_COMMAND);
+        db.execSQL("DROP TABLE IF EXISTS " + TriggerSQLite.TABLE_TRIGGER);
+
         onCreate(db);
     }
 

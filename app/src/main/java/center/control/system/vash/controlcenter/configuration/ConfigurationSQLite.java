@@ -28,16 +28,16 @@ public class ConfigurationSQLite {
 
     public static String createConfiguration(){
         return "CREATE TABLE " + TABLE_CONFIGURATION  + "("
-                + KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT    ,"
+                + KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + KEY_NAME+ "  TEXT "
                 +")";
     }
 
 
-    public int insertConfiguration(ConfigurationEntity entity) {
+    public int insertConfiguration(String name) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_NAME, entity.getName());
+        values.put(KEY_NAME, name);
 
         // Inserting Row
         int newId  = (int) db.insert(TABLE_CONFIGURATION, null, values);
@@ -64,7 +64,7 @@ public class ConfigurationSQLite {
 
         cursor.close();
         SQLiteManager.getInstance().closeDatabase();
-
+        Log.d(TAG, result.size() + "");
         return result;
     }
 

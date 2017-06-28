@@ -32,6 +32,7 @@ import java.util.Set;
 import center.control.system.vash.controlcenter.App;
 import center.control.system.vash.controlcenter.MainActivity;
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.configuration.ConfigurationActivity;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.helper.StorageHelper;
@@ -62,13 +63,6 @@ public class SettingPanel extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Button btnStartServ = (Button) dialog.findViewById(R.id.btnStartServer);
-                btnStartServ.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
 
                 Button btnUpdatePerson = (Button) dialog.findViewById(R.id.btnUpdatePersons);
                 btnUpdatePerson.setOnClickListener(new View.OnClickListener() {
@@ -114,6 +108,16 @@ public class SettingPanel extends AppCompatActivity {
                 startActivity(new Intent(SettingPanel.this, MainActivity.class));
             }
         });
+
+        ImageButton btnSetConfig = (ImageButton) findViewById(R.id.btnSetConfig);
+        btnSetConfig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SettingPanel.this, ConfigurationActivity.class));
+            }
+        });
+
+
     }
 
     public void clicktoControlPanel(View view) {
