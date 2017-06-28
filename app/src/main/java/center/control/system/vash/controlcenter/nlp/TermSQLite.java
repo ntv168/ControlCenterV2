@@ -87,7 +87,7 @@ public class TermSQLite {
                 + " FROM " + TABLE_TARGET_TERM
                 + " WHERE instr(?,"+KEY_CONTENT+") > 0";
 
-        Log.d(TABLE_TARGET_TERM, selectQuery);
+//        Log.d(TABLE_TARGET_TERM, selectQuery);
         Cursor cursor = db.rawQuery(selectQuery,  new String[]{sentence});
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
@@ -118,7 +118,7 @@ public class TermSQLite {
 //                + " WHERE ? MATCH '*' + "+KEY_CONTENT+" + '*' ";
                 + " WHERE instr(?,"+KEY_CONTENT+") > 0";
 
-        Log.d(TABLE_HUMAN_TERM, selectQuery);
+//        Log.d(TABLE_HUMAN_TERM, selectQuery);
         Cursor cursor = db.rawQuery(selectQuery,  new String[]{sentence});
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {

@@ -104,7 +104,14 @@ public class SmartHouse {
             }
         }
     }
-
+    public void removeCameraArea(int areaId){
+        for (AreaEntity area: this.getAreas()) {
+            if (area.getId() == areaId) {
+                area.setHasCamera(false);
+                return;
+            }
+        }
+    }
     public void updateCameraArea(int areaId, Bitmap tmp) {
         for (AreaEntity area: this.getAreas()){
             if (area.getId() == areaId){
@@ -287,6 +294,12 @@ public class SmartHouse {
         this.botRole = br;
         this.ownerName = on;
         this.ownerRole = or;
+    }
+
+    public void removeAllAreaAndItsDevice() {
+        for (int i = 0; i<this.getAreas().size(); i++) {
+                this.getAreas().remove(i);
+        }
     }
 }
 

@@ -38,6 +38,7 @@ public class ControlMonitorService extends Service {
     public static final String MONITOR = "monitor.action";
     public static final String CAMERA = "camera.action";
     public static final String NOBODY = "Nobody";
+    public static final String NOT_SUPPORT = "None";
     private static Timer repeatScheduler;
     private LocalBroadcastManager broadcaster;
     private boolean areaChecked = false;
@@ -145,9 +146,12 @@ public class ControlMonitorService extends Service {
                     @Override
                     public void onResponse(String response) {
                         Log.d(TAG, response.length()+"");
-                        if (response.contains(NOBODY)) {
+                        if (response.trim().equals(NOBODY)) {
                             SmartHouse.getInstance().updateSensorArea(area.getId(), "security:Không thấy ai cả");
                             sendResult(MONITOR, area.getId());
+                            return;
+                        }else if (response.trim().equals(NOT_SUPPORT)) {
+                            SmartHouse.getInstance().removeCameraArea(area.getId());
                             return;
                         } else if (response.length() > 10) {
                             byte[] decodedString = Base64.decode(response, Base64.NO_WRAP);
@@ -160,6 +164,7 @@ public class ControlMonitorService extends Service {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                SmartHouse.getInstance().removeCameraArea(area.getId());
             }
         });
         readRoom.setRetryPolicy(new DefaultRetryPolicy(VolleySingleton.CHECK_CAMERA_TIMEOUT,0,1f));

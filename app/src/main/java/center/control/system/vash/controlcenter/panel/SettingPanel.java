@@ -2,6 +2,7 @@ package center.control.system.vash.controlcenter.panel;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,6 +30,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import center.control.system.vash.controlcenter.App;
 import center.control.system.vash.controlcenter.MainActivity;
@@ -65,19 +68,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SettingPanel extends AppCompatActivity {
-    private AlertDialog.Builder botTypeDiag;
-    private ArrayAdapter<String> botTypeAdapter;
     private static final String TAG = "Setting Panel";
-    private List<AssistantTypeDTO> typeDTOs;
-    private AlertDialog.Builder editNickNameDiag;
-    private SharedPreferences sharedPreferences;
-    private int botTypeId;
-    private String botType;
-    private String botName;
-    private String ownerName;
-    private ArrayAdapter<String> botRoleAdapter;
-    private EditText editOwnerName;
-    private ArrayAdapter<String> ownerRoleAdapter;
 
     @Override
     protected void onStart() {
@@ -93,103 +84,15 @@ public class SettingPanel extends AppCompatActivity {
         currentTab.setImageResource(R.drawable.tab_setting_active);
         currentTab.setBackgroundColor(Color.WHITE);
 
-        sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME,MODE_PRIVATE);
-        botType = sharedPreferences.getString(ConstManager.BOT_TYPE,"");
-        if (botType.length() < 2){
-            Log.d(TAG,botType + "  loai");
-            Toast.makeText(this,"Chưa chọn loại quản gia",Toast.LENGTH_SHORT);
-        }
-        botName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
-        if (botName.equals("")){
-            Toast.makeText(this,"Chưa Tên quản gia",Toast.LENGTH_SHORT);
-        }
-        botTypeId = sharedPreferences.getInt(ConstManager.BOT_TYPE_ID,-1);
-        ownerName = sharedPreferences.getString(ConstManager.OWNER_NAME,"");
 
         final Dialog dialog = new Dialog(SettingPanel.this);
         dialog.setContentView(R.layout.activate_diaglog);
 
-        final CloudApi botApi = RetroFitSingleton.getInstance().getCloudApi();
         ImageButton btnActive = (ImageButton) findViewById(R.id.btnSetReset);
         btnActive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                refineNickNameTarget();
-                editOwnerName = (EditText) dialog.findViewById(R.id.txtOwnerName);
-                editOwnerName.setText(ownerName);
-                final Spinner spinOwnerRole = (Spinner) dialog.findViewById(R.id.spn_owner_role);
-                final Spinner spinBotRole = (Spinner) dialog.findViewById(R.id.spn_bot_role);
-                ((TextView)dialog.findViewById(R.id.txtBotName)).setText(botName);
-                ((TextView)dialog.findViewById(R.id.txtBotType)).setText(botType);
-                editNickNameDiag = new AlertDialog.Builder(SettingPanel.this);
 
-                if (botType.equals(ConstManager.BOT_TYPE_QUAN_GIA_GIA)){
-                    String[] botRole = ConstManager.QUAN_GIA_GIA_BOT_ROLE_ARR;
-                    botRoleAdapter = new ArrayAdapter<String>(SettingPanel.this, android.R.layout.simple_spinner_dropdown_item, botRole);
-                    spinBotRole.setAdapter(botRoleAdapter);
-                    String[] ownerRole = ConstManager.QUAN_GIA_GIA_OWNER_ROLE_ARR;
-                    ownerRoleAdapter = new ArrayAdapter<String>(SettingPanel.this, android.R.layout.simple_spinner_dropdown_item, ownerRole);
-                    spinOwnerRole.setAdapter(ownerRoleAdapter);
-                } else {
-                    Log.d(TAG,"bot tye chua ho tro : "+ botType);
-                    //truong hop bot type khac
-                }
-                spinOwnerRole.setSelection(ownerRoleAdapter.getPosition("ông"));
-                spinBotRole.setSelection(ownerRoleAdapter.getPosition("tôi"));
-
-                Button btnLoadBot = (Button) dialog.findViewById(R.id.btnLoadBot);
-                btnLoadBot.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String botRole = botRoleAdapter.getItem(spinBotRole.getSelectedItemPosition());
-                        ownerName = editOwnerName.getText().toString();
-                        String ownerRole = ownerRoleAdapter.getItem(spinOwnerRole.getSelectedItemPosition());
-                        SharedPreferences.Editor edit = sharedPreferences.edit();
-                        edit.putString(ConstManager.BOT_ROLE,botRole);
-                        edit.putString(ConstManager.OWNER_ROLE,ownerRole);
-                        edit.putString(ConstManager.OWNER_NAME,ownerName);
-                        SmartHouse house  = SmartHouse.getInstance();
-                        house.setBotOwnerNameRole(botName,botRole,ownerName,ownerRole);
-                        edit.commit();
-                        botApi.getDataVA(botTypeId).enqueue(new Callback<BotDataCentralDTO>() {
-                            @Override
-                            public void onResponse(Call<BotDataCentralDTO> call, Response<BotDataCentralDTO> response) {
-                                Log.d(TAG,call.request().url()+"");
-                                TermSQLite sqLite = new TermSQLite();
-                                DetectIntentSQLite sqlDect = new DetectIntentSQLite();
-                                sqLite.clearAll();
-                                sqlDect.clearAll();
-                                Log.d(TAG,"term ;"+response.body().getTermDTOS().size());
-                                Log.d(TAG,"funct ;"+response.body().getFunctions().size());
-                                Log.d(TAG,"soc ;"+response.body().getSocials().size());
-                                for (TermDTO term : response.body().getTermDTOS()){
-                                    sqLite.insertHumanTerm(new TermEntity(term.getVal()
-                                    ,term.getTfidf(),term.getSocialId(),term.getFunctId()));
-                                }
-                                for (SocialIntentDTO soc : response.body().getSocials()){
-                                    sqlDect.insertSocial(new DetectSocialEntity(soc.getId(),
-                                            soc.getName(),soc.getQuestion(),soc.getReply()));
-                                }
-                                for (FunctionIntentDTO funct : response.body().getFunctions()){
-                                    sqlDect.insertFunction(new DetectFunctionEntity(funct.getId(),
-                                            funct.getName(),funct.getSuccess(),funct.getFail(),funct.getRemind()));
-                                }
-                                SmartHouse house = SmartHouse.getInstance();
-                                saveDeviceTFIDFTerm(house.getDevices());
-                                saveAreaTFIDFTerm(house.getAreas());
-                                saveScriptTFIDFTerm(house.getScripts());
-                            }
-
-                            @Override
-                            public void onFailure(Call<BotDataCentralDTO> call, Throwable t) {
-                                Log.d(TAG,"down load bot data failed");
-                            }
-                        });
-                    }
-                });
-                if (botTypeId == -1){
-                    btnLoadBot.setEnabled(false);
-                }
                 Button btnUpdatePerson = (Button) dialog.findViewById(R.id.btnUpdatePersons);
                 btnUpdatePerson.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -228,6 +131,7 @@ public class SettingPanel extends AppCompatActivity {
             public void onClick(View v) {
                 SharedPreferences sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
                 SharedPreferences.Editor edit = sharedPreferences.edit();
+                SmartHouse.getInstance().removeAllAreaAndItsDevice();
                 edit.putString(ConstManager.SYSTEM_ID,"");
                 edit.commit();
                 SQLiteManager.getInstance().clearAllData();
@@ -252,63 +156,6 @@ public class SettingPanel extends AppCompatActivity {
         startActivity(new Intent(this, VAPanel.class));
     }
 
-    private void refineNickNameTarget(){
-        final SmartHouse house = SmartHouse.getInstance();
-        for (final DeviceEntity device: house.getDevices()){
-            if (device.getNickName().length()<2){
-                editNickNameDiag.setTitle("Tên gọi khác cho thiết bị"+device.getName());
-                final EditText input = new EditText(SettingPanel.this);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                editNickNameDiag.setView(input);
-                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        device.setNickName(input.getText().toString());
-                        DeviceSQLite.upById(device.getId(),device);
-                        house.updateDeviceById(device.getId(),device);
-                        dialog.dismiss();
-                    }
-                });
-                editNickNameDiag.show();
-            }
-        }
-        for (final AreaEntity area: house.getAreas()){
-            if (area.getNickName().length()<2){
-                editNickNameDiag.setTitle("Tên gọi khác cho không gian "+area.getName());
-                final EditText input = new EditText(SettingPanel.this);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                editNickNameDiag.setView(input);
-                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        area.setNickName(input.getText().toString());
-                        AreaSQLite.upAddressAndNickById(area.getId(),area);
-                        house.updateAreaById(area.getId(),area);
-                        dialog.dismiss();
-                    }
-                });
-                editNickNameDiag.show();
-            }
-        }
-        for (final ScriptEntity mode: house.getScripts()){
-            if (mode.getNickName().length()<2){
-                editNickNameDiag.setTitle("Tên gọi khác cho chế độ "+mode.getName());
-                final EditText input = new EditText(SettingPanel.this);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                editNickNameDiag.setView(input);
-                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mode.setNickName(input.getText().toString());
-                        ScriptSQLite.upModeOnly(mode.getId(),mode);
-                        house.updateModeById(mode.getId(),mode);
-                        dialog.dismiss();
-                    }
-                });
-                editNickNameDiag.show();
-            }
-        }
-    }
 
     class GetPersonIdsTask extends AsyncTask<String, String, Person[]> {
 
@@ -357,89 +204,5 @@ public class SettingPanel extends AppCompatActivity {
             }
         }
     }
-    private void saveDeviceTFIDFTerm(List<DeviceEntity> listDevices) {
-        Map<Integer,Map<String,Integer>> trainingSetMap = BotUtils.readTargettoHashMap(listDevices);
-        Map<Integer,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
-        TermSQLite sqLite= new TermSQLite();
-        Iterator it = trainingSetMap.entrySet().iterator();
-        while (it.hasNext()){
-            Map.Entry pair = (Map.Entry) it.next();
-            int deviceId = (int) pair.getKey();
-            Map<String, Integer> wordCount = (Map<String, Integer>) pair.getValue();
 
-            Iterator wit = wordCount.entrySet().iterator();
-            while (wit.hasNext()){
-                Map.Entry termPair = (Map.Entry) wit.next();
-                String term = (String) termPair.getKey();
-
-                double termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, deviceId);
-                System.out.println(termTfidf+"   "+term+"   "+deviceId);
-
-                TargetTernEntity targetTerm = new TargetTernEntity();
-                targetTerm.setDetectDeviceId(deviceId);
-                targetTerm.setDetectAreaId(-1);
-                targetTerm.setDetectScriptId(-1);
-                targetTerm.setTfidfPoint(termTfidf);
-                targetTerm.setContent(" "+term+" ");
-                sqLite.insertTargetTerm(targetTerm);
-            }
-        }
-    }
-    private void saveAreaTFIDFTerm(List<AreaEntity> listArea) {
-        Map<Integer,Map<String,Integer>> trainingSetMap = BotUtils.readTargettoHashMap(listArea);
-        Map<Integer,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
-        TermSQLite sqLite= new TermSQLite();
-        Iterator it = trainingSetMap.entrySet().iterator();
-        while (it.hasNext()){
-            Map.Entry pair = (Map.Entry) it.next();
-            int areaId = (int) pair.getKey();
-            Map<String, Integer> wordCount = (Map<String, Integer>) pair.getValue();
-
-            Iterator wit = wordCount.entrySet().iterator();
-            while (wit.hasNext()){
-                Map.Entry termPair = (Map.Entry) wit.next();
-                String term = (String) termPair.getKey();
-
-                double termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, areaId);
-                System.out.println(termTfidf+"   "+term+"   "+areaId);
-
-                TargetTernEntity targetTerm = new TargetTernEntity();
-                targetTerm.setDetectAreaId(areaId);
-                targetTerm.setDetectDeviceId(-1);
-                targetTerm.setDetectScriptId(-1);
-                targetTerm.setTfidfPoint(termTfidf);
-                targetTerm.setContent(" "+term+" ");
-                sqLite.insertTargetTerm(targetTerm);
-            }
-        }
-    }
-
-    private void saveScriptTFIDFTerm(List<ScriptEntity> listScript) {
-        Map<Integer,Map<String,Integer>> trainingSetMap = BotUtils.readTargettoHashMap(listScript);
-        Map<Integer,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
-        TermSQLite sqLite= new TermSQLite();
-        Iterator it = trainingSetMap.entrySet().iterator();
-        while (it.hasNext()){
-            Map.Entry pair = (Map.Entry) it.next();
-            int scriptId = (int) pair.getKey();
-            Map<String, Integer> wordCount = (Map<String, Integer>) pair.getValue();
-
-            Iterator wit = wordCount.entrySet().iterator();
-            while (wit.hasNext()){
-                Map.Entry termPair = (Map.Entry) wit.next();
-                String term = (String) termPair.getKey();
-
-                double termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, scriptId);
-                System.out.println(termTfidf+"   "+term+"   "+scriptId);
-
-                TargetTernEntity targetTerm = new TargetTernEntity();
-                targetTerm.setDetectScriptId(scriptId);
-                targetTerm.setDetectAreaId(-1);
-                targetTerm.setDetectDeviceId(-1);
-                targetTerm.setTfidfPoint(termTfidf);
-                targetTerm.setContent(" "+term+" ");
-                sqLite.insertTargetTerm(targetTerm);
-            }
-        }
-    }
 }

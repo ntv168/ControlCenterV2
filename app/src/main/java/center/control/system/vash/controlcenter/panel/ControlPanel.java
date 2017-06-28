@@ -105,7 +105,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control_panel);
-        showReply("Xin chào anh Đại, quán cà phê thông minh xin được phục vụ ạ");
+//        showReply("Xin chào anh Đại, quán cà phê thông minh xin được phục vụ ạ");
         final ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnHome);
         currentTab.setImageResource(R.drawable.tab_home_active);
         currentTab.setBackgroundResource(R.drawable.background_tab_home_active);
@@ -319,9 +319,12 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             remoteDialog.show();
         } else {
             if (device.getState().equals("on")){
+
                 SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"off"));
+                waitDialog(2000);
             } else {
                 SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"on"));
+                waitDialog(2000);
             }
         }
     }
@@ -485,7 +488,6 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
 
         @Override
         protected void onProgressUpdate(String... values) {
-            // Show the status of background detection task on screen.a
 
         }
 

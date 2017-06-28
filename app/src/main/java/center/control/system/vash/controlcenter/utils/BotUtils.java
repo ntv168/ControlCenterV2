@@ -50,11 +50,11 @@ public class BotUtils {
             }
         }
 
-        Log.d(TAG, bestIntentId+ " function founded "+maxTfidf);
         if (bestIntentId != -1) {
             DetectIntentSQLite sqLite = new DetectIntentSQLite();
             DetectFunctionEntity res = sqLite.findFunctionById(bestIntentId);
             res.setDetectScore(maxTfidf);
+            Log.d(TAG, res.getFunctionName()+ " function founded "+maxTfidf);
             return res;
         } else
                 return null;
@@ -76,11 +76,11 @@ public class BotUtils {
                 }
             }
         }
-        Log.d(TAG, bestIntentId+ " social founded "+maxTfidf);
         if (bestIntentId != -1) {
             DetectIntentSQLite sqLite = new DetectIntentSQLite();
             DetectSocialEntity res = sqLite.findSocialById(bestIntentId);
             res.setDetectScore(maxTfidf);
+            Log.d(TAG, res.getName()+ " social founded "+maxTfidf);
             return res;
         } else
             return null;
@@ -134,6 +134,7 @@ public class BotUtils {
                 count++;
             }
             tmp.put(words[i], count);
+            Log.d(TAG,words[i] +  "  co: "+count);
         }
         return tmp;
     }
