@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -36,6 +37,7 @@ import java.util.TimerTask;
 import center.control.system.vash.controlcenter.App;
 import center.control.system.vash.controlcenter.MainActivity;
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.configuration.ConfigurationActivity;
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
@@ -138,6 +140,16 @@ public class SettingPanel extends AppCompatActivity {
                 startActivity(new Intent(SettingPanel.this, MainActivity.class));
             }
         });
+
+        ImageButton btnSetConfig = (ImageButton) findViewById(R.id.btnSetConfig);
+        btnSetConfig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SettingPanel.this, ConfigurationActivity.class));
+            }
+        });
+
+
     }
 
     public void clicktoControlPanel(View view) {
@@ -155,6 +167,8 @@ public class SettingPanel extends AppCompatActivity {
     public void clicktoVAPanel(View view) {
         startActivity(new Intent(this, VAPanel.class));
     }
+
+
 
 
     class GetPersonIdsTask extends AsyncTask<String, String, Person[]> {

@@ -22,9 +22,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
+import center.control.system.vash.controlcenter.configuration.CommandEntity;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
-import center.control.system.vash.controlcenter.script.CommandEntity;
+
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
 
