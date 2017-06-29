@@ -1,6 +1,7 @@
 package center.control.system.vash.controlcenter.panel;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -14,11 +15,13 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -108,7 +111,7 @@ public class VAPanel extends AppCompatActivity {
         ownerRole = sharedPreferences.getString(ConstManager.OWNER_ROLE,"ông");
         SmartHouse.getInstance().setBotOwnerNameRole(botName,botRole,ownerName,ownerRole);
         btnSend = (ImageButton) findViewById(R.id.btnChatSend);
-        Button btnSpeak = (Button) findViewById(R.id.btnSpeak);
+        ImageButton btnSpeak = (ImageButton) findViewById(R.id.btnSpeak);
         btnSpeak.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,14 +151,30 @@ public class VAPanel extends AppCompatActivity {
         final ProgressDialog waitDialog = new ProgressDialog(VAPanel.this);
         waitDialog.setTitle("Vui lòng đợi");
         waitDialog.setIndeterminate(true);
+
+        // Display VA Setting Dialog
+
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.va_setting_dialog);
+
+        ImageView btnConfig = (ImageView) findViewById(R.id.btnVAConfig);
+
+        btnConfig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.show();
+            }
+        });
+
 //        waitDialog.setCancelable(false);
         editNickNameDiag = new AlertDialog.Builder(VAPanel.this);
-        editOwnerName = (EditText) findViewById(R.id.txtOwnerName);
+        editOwnerName = (EditText) dialog.findViewById(R.id.txtOwnerName);
         editOwnerName.setText(ownerName);
-        final Spinner spinOwnerRole = (Spinner) findViewById(R.id.spn_owner_role);
-        final Spinner spinBotRole = (Spinner) findViewById(R.id.spn_bot_role);
-        ((TextView)findViewById(R.id.txtBotName)).setText(botName);
-        ((TextView)findViewById(R.id.txtBotType)).setText(botType);
+        final Spinner spinOwnerRole = (Spinner) dialog.findViewById(R.id.spn_owner_role);
+        final Spinner spinBotRole = (Spinner) dialog.findViewById(R.id.spn_bot_role);
+        ((TextView)dialog.findViewById(R.id.txtBotName)).setText(botName);
+        ((TextView)dialog.findViewById(R.id.txtBotType)).setText(botType);
         refineNickNameTarget();
 
         if (botType.equals(ConstManager.BOT_TYPE_QUAN_GIA_GIA)){
@@ -172,7 +191,7 @@ public class VAPanel extends AppCompatActivity {
             //truong hop bot type khac
         }
 
-        Button btnLoadBot = (Button)findViewById(R.id.btnLoadBot);
+        Button btnLoadBot = (Button)dialog.findViewById(R.id.btnLoadBot);
         btnLoadBot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
