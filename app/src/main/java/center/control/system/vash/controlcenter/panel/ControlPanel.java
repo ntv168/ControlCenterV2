@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -335,20 +336,25 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         currentDevice = device;
         ((TextView) remoteDialog.findViewById(R.id.txtRemoteName)).setText(device.getName()+" ở "+currentArea.getName()+ " ");
         if (DeviceEntity.remoteTypes.contains(device.getType())){
-            ImageButton btnOn = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteOnOff);
-            btnOn.setOnClickListener(new View.OnClickListener() {
+
+            final ImageButton btnOnOff = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteOnOff);
+            final TextView txtOnOff= (TextView) remoteDialog.findViewById(R.id.txtRemoteOnOff);
+            btnOnOff.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"on"));
-                    waitDialog.show();
-                }
-            });
-            ImageButton btnOff = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteOnOff);
-            btnOff.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"off"));
-                    waitDialog.show();
+                    if (txtOnOff.getText().toString().toUpperCase().equals("TẮT")) {
+                        SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(), "off"));
+                        waitDialog.show();
+                        txtOnOff.setText("BẬT");
+                        txtOnOff.setTextColor(getResources().getColor(R.color.nGreen1));
+                        btnOnOff.setColorFilter(getResources().getColor(R.color.nGreen1));
+                    } else {
+                        SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(), "on"));
+                        waitDialog.show();
+                        txtOnOff.setText("TẮT");
+                        txtOnOff.setTextColor(Color.parseColor("#D52B2B"));
+                        btnOnOff.setColorFilter(Color.TRANSPARENT);
+                    }
                 }
             });
             ImageButton btnInc = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteInc);
@@ -378,6 +384,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             }
         }
     }
+
 
 
     private void detect(Bitmap bitmap) {
