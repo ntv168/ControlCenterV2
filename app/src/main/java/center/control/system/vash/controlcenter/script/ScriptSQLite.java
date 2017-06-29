@@ -8,6 +8,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import center.control.system.vash.controlcenter.configuration.CommandEntity;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
 
 /**
@@ -112,7 +113,7 @@ public class ScriptSQLite {
         script.setWeeksDay(cursor.getString(cursor.getColumnIndex(KEY_WEEKSDAY)));
         return script;
     }
-    public ScriptEntity findById(String id){
+    public static ScriptEntity findById(int id){
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
                 + " FROM " + TABLE_SCRIPT
@@ -128,7 +129,7 @@ public class ScriptSQLite {
             return script;
         } else return null;
     }
-    public List<CommandEntity> getCommandByScriptId(int scriptId){
+    public static List<CommandEntity> getCommandByScriptId(int scriptId){
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
                 + " FROM " + TABLE_SCRIPT_DEVICE

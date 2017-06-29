@@ -17,7 +17,16 @@ public class DetectFunctionEntity {
     private String failPattern;
     @SerializedName("remindPattern")
     private String remindPattern;
+    private double detectScore;
 
+    public double getDetectScore() {
+        return detectScore;
+    }
+
+    public void setDetectScore(double detectScore) {
+        this.detectScore = detectScore;
+    }
+    public DetectFunctionEntity(){}
     public DetectFunctionEntity(int id, String functionName, String successPattern, String failPattern, String remindPattern) {
         this.id = id;
         this.functionName = functionName;

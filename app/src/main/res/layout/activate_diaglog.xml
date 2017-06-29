@@ -1,96 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="@dimen/dialog_small_width"
+    android:layout_height="@dimen/dialog_small_height"
     android:gravity="center"
-    android:weightSum="2"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="2">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:weightSum="3"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/textView11"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="tên trợ lý" />
-
-            <TextView
-                android:id="@+id/txtBotName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TextView" />
-
-            <TextView
-                android:id="@+id/textView110"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="loại trợ lý" />
-
-            <TextView
-                android:id="@+id/txtBotType"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TextView" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/textView101"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="tên Chủ nhà" />
-
-            <EditText
-                android:id="@+id/txtOwnerName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:text="Name" />
-
-            <TextView
-                android:id="@+id/textView1101"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Gọi chủ nhà bằng" />
-
-            <Spinner
-                android:id="@+id/spn_owner_role"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dialog" />
-
-            <TextView
-                android:id="@+id/textView12"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Gọi trợ lý bằng" />
-
-            <Spinner
-                android:id="@+id/spn_bot_role"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dialog" />
-        </LinearLayout>
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -112,13 +27,6 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Close" />
-
-        <Button
-            android:id="@+id/btnLoadBot"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="Get VA data" />
 
         <Button
             android:id="@+id/btnUpdatePersons"

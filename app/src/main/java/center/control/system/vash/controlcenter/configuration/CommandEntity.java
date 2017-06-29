@@ -68,4 +68,12 @@ public class CommandEntity {
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
     }
+
+    public void inverseDeviceState() {
+        if (deviceState.equals("on")){
+            deviceState.equals("off");
+        } else if (deviceState.equals("off")){
+            deviceState.equals("on");
+        }
+    }
 }

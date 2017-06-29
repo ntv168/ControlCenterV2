@@ -1,5 +1,7 @@
 package center.control.system.vash.controlcenter.server;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -9,10 +11,16 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+import center.control.system.vash.controlcenter.MainActivity;
 import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.script.CommandEntity;
+
+import center.control.system.vash.controlcenter.configuration.CommandEntity;
+import center.control.system.vash.controlcenter.database.SQLiteManager;
+import center.control.system.vash.controlcenter.panel.SettingPanel;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
+import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
+import retrofit2.http.Path;
 
 /**
  * Created by Thuans on 4/19/2017.
@@ -32,6 +40,7 @@ public class HttpResponseThread extends Thread {
     private static final String RESPONSE_SUCCESS = "tung=success";
     private static final String DATABASE_VERS = "databaseVersion";
     private static final String RESPONSE_FAIL = "tung=fail";
+    private static final String DEACTIVATE = "deactivateSystem";
     private final String TAG = "HttpResponseThread";
     Socket socket;
 
@@ -52,8 +61,8 @@ public class HttpResponseThread extends Thread {
             String response = "";
             os = socket.getOutputStream();
             if (request != null ) {
-                request = request.split(" ")[1];
                 Log.d(TAG,"req:  " +request);
+//                request = request.split(" ")[1];
                 SmartHouse house = SmartHouse.getInstance();
                 if (request.contains(AREA_REQ)){
                     for (AreaEntity area : house.getAreas()){
@@ -91,8 +100,14 @@ public class HttpResponseThread extends Thread {
                     }
                     response += "";
                 } else if (request.contains(DATABASE_VERS)){
-                    response += "ver=4";
-                } else if (request.contains(MODE_TODAY)){
+                    response += "ver=6";
+                }else if (request.contains(DEACTIVATE)) {
+                    String[] reqElement = request.split("/");
+                    Log.d(TAG, "mode id:  " + reqElement[2]);
+                    if (reqElement[2].equals(house.getContractId())) {
+                        SmartHouse.getInstance().setContractId(null);
+                    }
+                }else if (request.contains(MODE_TODAY)){
                     response += "Thức dậy buổi sáng=1=on=06:30;Đi làm=2=on=12:35;Ăn tối với cả nhà=3=on=17:00";
                 }
             }

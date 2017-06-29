@@ -15,12 +15,25 @@ public class DetectSocialEntity {
     private String questionPattern;
     @SerializedName("replyPattern")
     private String replyPattern;
+    private double detectScore;
+
+    public double getDetectScore() {
+        return detectScore;
+    }
+
+    public void setDetectScore(double detectScore) {
+        this.detectScore = detectScore;
+    }
 
     public DetectSocialEntity(int id, String name, String questionPattern, String replyPattern) {
         this.id = id;
         this.name = name;
         this.questionPattern = questionPattern;
         this.replyPattern = replyPattern;
+    }
+
+    public DetectSocialEntity() {
+
     }
 
     public int getId() {

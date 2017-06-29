@@ -6,7 +6,6 @@
         android:name="android.hardware.camera"
         android:required="true" />
 
-
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -33,6 +32,7 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,18 +41,20 @@
         </activity>
         <activity
             android:name=".panel.ControlPanel"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape" ></activity>
         <activity
             android:name=".panel.ModePanel"
             android:screenOrientation="landscape" />
         <activity
             android:name=".panel.SettingPanel"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape" ></activity>
         <activity
             android:name=".panel.VAPanel"
             android:screenOrientation="landscape" />
-        <activity android:name=".device.ManageDeviceActivity"
-            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".device.ManageDeviceActivity"
+            android:screenOrientation="landscape" />
+        <activity android:name=".configuration.ConfigurationActivity"></activity>
     </application>
 
 </manifest>

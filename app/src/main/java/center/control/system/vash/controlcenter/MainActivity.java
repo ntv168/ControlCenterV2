@@ -127,12 +127,24 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         houseId = sharedPreferences.getString(ConstManager.SYSTEM_ID,"");
+        staticAddress = sharedPreferences.getString(ConstManager.STATIC_ADDRESS,"");
+        contractCode = sharedPreferences.getString(ConstManager.CONTRACT_CODE,"");
+        ownerName = sharedPreferences.getString(ConstManager.OWNER_NAME,"");
+        ownerAddress = sharedPreferences.getString(ConstManager.OWNER_ADD,"");
+        ownerTel = sharedPreferences.getString(ConstManager.OWNER_TEL,"");
+        ownerCmnd = sharedPreferences.getString(ConstManager.OWNER_CMND,"");
+        contractId = sharedPreferences.getString(ConstManager.CONTRACT_ID,"");
+        activeDay = sharedPreferences.getString(ConstManager.ACTIVE_DAY,"");
+        virtualAssistantName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
+        virtualAssistantType = sharedPreferences.getString(ConstManager.BOT_TYPE,"");
+        virtualAssistantId = sharedPreferences.getInt(ConstManager.BOT_TYPE_ID,-1);
+        username = sharedPreferences.getString(ConstManager.USERNAME,"");
+        password = sharedPreferences.getString(ConstManager.PASSWORD,"");
+        Log.d(TAG,houseId+" id house");
         if (!houseId.equals("")){
             Intent intent = new Intent(MainActivity.this, ControlPanel.class);
             startActivity(intent);
         }
-        username = sharedPreferences.getString(ConstManager.USERNAME,"");
-        password = sharedPreferences.getString(ConstManager.PASSWORD,"");
     }
 
     private void loginSmartHouse() {
@@ -160,11 +172,10 @@ public class MainActivity extends Activity {
                     virtualAssistantType = response.body().getVirtualAssistantType();
                     Log.d(TAG,virtualAssistantType);
                     virtualAssistantId = response.body().getVirtualAssistantTypeId();
-                    Intent i = new Intent(MainActivity.this, ControlPanel.class);
-                    startActivity(i);
+                    startActivity( new Intent(MainActivity.this, ControlPanel.class));
                 } else {
-                    Log.d(TAG,call.request().url()+"sai ten");
-                    Toast.makeText(MainActivity.this,"Sai tên đăng nhập mật khẩu",Toast.LENGTH_LONG);
+                    Log.d(TAG,call.request().url()+" sai ten");
+                    Toast.makeText(MainActivity.this,"Sai tên đăng nhập mật khẩu",Toast.LENGTH_LONG).show();
                 }
                 loginDia.dismiss();
             }
@@ -172,7 +183,22 @@ public class MainActivity extends Activity {
             @Override
             public void onFailure(Call<LoginSmarthouseDTO> call, Throwable t) {
                 Log.d(TAG,call.request().url()+"  ---err "+t.getMessage());
-                Toast.makeText(MainActivity.this,"Sai tên đăng nhập mật khẩu",Toast.LENGTH_LONG);
+                Toast.makeText(MainActivity.this,"Không kết nối được server",Toast.LENGTH_LONG).show();
+//                username = key.getUsername();
+//                password = key.getPassword();
+//                houseId = "123123";
+//                staticAddress = "123123";
+//                contractCode = "123123";
+//                ownerName = "Mỹ";
+//                ownerAddress = "123123";
+//                ownerTel = "123123";
+//                ownerCmnd = "123123";
+//                contractId = "123123";
+//                activeDay = "123123";
+//                virtualAssistantName = "Sen";
+//                virtualAssistantType = "Quản gia già";
+//                Log.d(TAG,virtualAssistantType);
+//                virtualAssistantId = response.body().getVirtualAssistantTypeId();
                 loginDia.dismiss();
             }
         });
@@ -197,6 +223,8 @@ public class MainActivity extends Activity {
         edit.putString(ConstManager.BOT_NAME,virtualAssistantName);
         edit.putString(ConstManager.BOT_TYPE,virtualAssistantType);
         edit.putInt(ConstManager.BOT_TYPE_ID,virtualAssistantId);
+        SmartHouse.getInstance().setContractId(contractId);
+        Log.d(TAG,"saved on pause "+virtualAssistantType);
         edit.commit();
     }
 }

@@ -5,36 +5,44 @@ import android.graphics.Bitmap;
 import com.google.gson.annotations.SerializedName;
 
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.device.DeviceEntity;
+import center.control.system.vash.controlcenter.device.DeviceSQLite;
+import center.control.system.vash.controlcenter.device.TargetObject;
+import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 /**
  * Created by Thuans on 5/26/2017.
  */
 
-public class AreaEntity {
+public class AreaEntity extends TargetObject{
     public  static final String[] attrivutes = {"An ninh","Ánh sáng","Nhiệt độ","Âm thanh", "Thiết bị sử dụng điện"};
     public  static final String[] attrivutesValues = {"security","light","temperature","sound","runningDevice"};
     public  static final int[] attributeIcon = {R.drawable.shield,R.drawable.light,
             R.drawable.temp,R.drawable.music,R.drawable.electric};
-    @SerializedName("id")
-    private int id;
+
     @SerializedName("temperature")
     private String temperature;
     @SerializedName("light")
     private String light;
     @SerializedName("safety")
     private String safety;
-    @SerializedName("nickName")
-    private String nickName;
     @SerializedName("electricUsing")
     private String electricUsing;
     @SerializedName("sound")
     private String sound;
     @SerializedName("connectAddress")
     private String connectAddress;
-    @SerializedName("name")
-    private String name;
+    private String personDetect;
     private Bitmap imageBitmap;
     private boolean hasCamera = true;
+
+    public String getPersonDetect() {
+        return personDetect;
+    }
+
+    public void setPersonDetect(String personDetect) {
+        this.personDetect = personDetect;
+    }
 
     public boolean isHasCamera() {
         return hasCamera;
@@ -48,13 +56,6 @@ public class AreaEntity {
         return attrivutes;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getTemperature() {
         return temperature;
@@ -80,16 +81,18 @@ public class AreaEntity {
         this.safety = safety;
     }
 
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
 
     public String getElectricUsing() {
-        return electricUsing;
+        int usingDev = 0;
+        for (DeviceEntity dev : SmartHouse.getInstance().getDevicesByAreaId(getId())){
+            if (dev.getAttributeType()!= null && dev.getAttributeType().contains(attrivutesValues[4])) {
+                if (dev.getState().equals("on") ||
+                        dev.getState().equals("open")) {
+                    usingDev++;
+                }
+            }
+        }
+        return usingDev + " thiết bị sử dụng điện";
     }
 
     public void setElectricUsing(String electricUsing) {
@@ -112,13 +115,6 @@ public class AreaEntity {
         this.connectAddress = connectAddress;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public Bitmap getImageBitmap() {
         return imageBitmap;
