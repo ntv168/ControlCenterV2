@@ -5,8 +5,10 @@ import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -15,12 +17,16 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.speech.RecognizerIntent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -44,22 +50,37 @@ import java.util.TimerTask;
 import java.util.UUID;
 
 import center.control.system.vash.controlcenter.App;
+import center.control.system.vash.controlcenter.MainActivity;
 import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.area.AreaAdapter;
 import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaAttributeAdapter;
 import center.control.system.vash.controlcenter.area.AreaEntity;
+import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.configuration.CommandEntity;
+import center.control.system.vash.controlcenter.database.SQLiteManager;
 import center.control.system.vash.controlcenter.device.DeviceAdapter;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
+import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.helper.StorageHelper;
+import center.control.system.vash.controlcenter.nlp.ChatAdapter;
+import center.control.system.vash.controlcenter.nlp.CurrentContext;
+import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
+import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
+import center.control.system.vash.controlcenter.nlp.TargetTernEntity;
+import center.control.system.vash.controlcenter.nlp.TermEntity;
+import center.control.system.vash.controlcenter.nlp.TermSQLite;
 import center.control.system.vash.controlcenter.nlp.VoiceUtils;
 import center.control.system.vash.controlcenter.recognition.Facedetect;
 import center.control.system.vash.controlcenter.recognition.ImageHelper;
 
+import center.control.system.vash.controlcenter.script.ScriptEntity;
+import center.control.system.vash.controlcenter.script.ScriptSQLite;
+import center.control.system.vash.controlcenter.server.VolleySingleton;
 import center.control.system.vash.controlcenter.service.ControlMonitorService;
 import center.control.system.vash.controlcenter.service.WebServerService;
+import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 
@@ -83,29 +104,46 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     private DeviceAdapter deviceAdapter;
     private DeviceEntity currentDevice;
     private String currentAttrib;
-    FaceServiceClient fsClient;
-    boolean detecting;
-    String mPersonGroupId;
+    private FaceServiceClient fsClient;
+    private boolean detecting;
+    private String mPersonGroupId;
+    private ProgressDialog waitDialog;
 
     @Override
     protected void onResume() {
         super.onResume();
         sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
         systemId = sharedPreferences.getString(ConstManager.SYSTEM_ID,"");
+        Log.i(TAG,"system Id " + systemId);
+        if (systemId.equals("")){
+            startActivity(new Intent(this,MainActivity.class));
+        }
         SmartHouse house = SmartHouse.getInstance();
         if (house.getAreas().size()>0) {
             currentArea = house.getAreas().get(0);
             currentAttrib = AreaEntity.attrivutesValues[0];
+            startService(new Intent(this, ControlMonitorService.class));
+            String botRole = sharedPreferences.getString(ConstManager.BOT_ROLE,"");
+            String botName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
+            String ownerName = sharedPreferences.getString(ConstManager.OWNER_NAME,"");
+            String ownerRole = sharedPreferences.getString(ConstManager.OWNER_ROLE,"ông");
+            SmartHouse.getInstance().setBotOwnerNameRole(botName,botRole,ownerName,ownerRole);
+//            showReply(BotUtils.completeSentence("Xin chào <owner-name>, quán cà phê thông minh xin được phục vụ","",""));
+
         } else {
             startActivity(new Intent(this,ManageDeviceActivity.class));
         }
-        startService(new Intent(this, ControlMonitorService.class));
+
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control_panel);
-//        showReply("Xin chào anh Đại, quán cà phê thông minh xin được phục vụ ạ");
+        waitDialog = new ProgressDialog(this);
+        waitDialog.setTitle("Vui lòng đợi");
+        waitDialog.setIndeterminate(true);
+        waitDialog.setCancelable(false);
+
         final ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnHome);
         currentTab.setImageResource(R.drawable.tab_home_active);
         currentTab.setBackgroundResource(R.drawable.background_tab_home_active);
@@ -138,9 +176,29 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                     NotificationManager man = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                     man.notify(0,noticBuilder.build());
 
-                }  else if (resultType.equals(ControlMonitorService.CONTROL)){
+                } else if (resultType.equals(ControlMonitorService.DEACTIVATE)){
+                    SharedPreferences sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
+                    SharedPreferences.Editor edit = sharedPreferences.edit();
+                    SmartHouse.getInstance().removeAllAreaAndItsDevice();
+                    edit.putString(ConstManager.SYSTEM_ID,"");
+                    edit.commit();
+                    SQLiteManager.getInstance().clearAllData();
+                    startActivity(new Intent(ControlPanel.this, MainActivity.class));
+                } else if (resultType.equals(ControlMonitorService.WAIT)){
+                    waitDialog.show();
+                } else if (resultType.equals(ControlMonitorService.CONTROL)){
+                    waitDialog.dismiss();
+                    int result = intent.getIntExtra(AREA_ID, -1);
+                    CurrentContext current = CurrentContext.getInstance();
+                    if (result == ControlMonitorService.SUCCESS){
+                        showReply(BotUtils.completeSentence(
+                                current.getDetectedFunction().getSuccessPattern(),"",current.getDevice().getName()));
                         SmartHouse house = SmartHouse.getInstance();
                         deviceAdapter.updateHouseDevice(house.getDevicesInAreaAttribute(currentArea.getId(),currentAttrib));
+                    } else if (result == ControlMonitorService.FAIL){
+                        showReply(BotUtils.completeSentence(
+                                current.getDetectedFunction().getFailPattern(),"",current.getDevice().getName()));
+                    }
                 } else if (resultType.equals(ControlMonitorService.MONITOR)) {
                     int areaId = intent.getIntExtra(AREA_ID, -1);
                     if ( currentArea!=null && areaId == currentArea.getId()) {
@@ -185,7 +243,6 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                         cameraDialog.show();
                     }
                 }
-
             }
         };
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
@@ -250,12 +307,6 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         startActivity(new Intent(this, VAPanel.class));
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopService(new Intent(this,ControlMonitorService.class));
-
-    }
 
     @Override
     protected void onDestroy() {
@@ -289,7 +340,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                 @Override
                 public void onClick(View v) {
                     SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"on"));
-                    waitDialog(2000);
+                    waitDialog.show();
                 }
             });
             ImageButton btnOff = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteOnOff);
@@ -297,7 +348,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                 @Override
                 public void onClick(View v) {
                     SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"off"));
-                    waitDialog(2000);
+                    waitDialog.show();
                 }
             });
             ImageButton btnInc = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteInc);
@@ -305,7 +356,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                 @Override
                 public void onClick(View v) {
                     SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"inc"));
-                    waitDialog(2000);
+                    waitDialog.show();
                 }
             });
             ImageButton btnDec = (ImageButton) remoteDialog.findViewById(R.id.btnRemoteDec);
@@ -313,38 +364,20 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                 @Override
                 public void onClick(View v) {
                     SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"dec"));
-                    waitDialog(2000);
+                    waitDialog.show();
                 }
             });
             remoteDialog.show();
         } else {
             if (device.getState().equals("on")){
-
                 SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"off"));
-                waitDialog(2000);
+                waitDialog.show();
             } else {
                 SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"on"));
-                waitDialog(2000);
+                waitDialog.show();
             }
         }
     }
-    private void waitDialog(int sec){
-        final ProgressDialog waitDialog = new ProgressDialog(this);
-        waitDialog.setTitle("Vui lòng đợi");
-        waitDialog.setIndeterminate(true);
-        waitDialog.setCancelable(false);
-        waitDialog.show();
-
-        long delayInMillis = sec;
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                waitDialog.dismiss();
-            }
-        }, delayInMillis);
-    }
-
 
 
     private void detect(Bitmap bitmap) {
@@ -548,6 +581,192 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     private  void showReply(String sentenceReply){
         VoiceUtils.speak(sentenceReply);
         Log.d(TAG, "showReply: ----------------" + sentenceReply);
+    }
+    private void processFunction(String humanSay, DetectFunctionEntity functionIntent){
+        List<TargetTernEntity> termTargets = TermSQLite.getTargetInSentence(humanSay);
+        if (ConstManager.FUNCTION_FOR_SCRIPT.contains(functionIntent.getFunctionName())){
+            ScriptEntity mode = BotUtils.findBestScript(termTargets);
+            if (mode != null) {
+                BotUtils.implementCommand(functionIntent,null,mode);
+            } else {
+                DetectSocialEntity askWhichMode = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_MODE);
+
+                CurrentContext current = CurrentContext.getInstance();
+                current.setDetectedFunction(functionIntent);
+
+                String replyComplete = BotUtils.completeSentence(askWhichMode.getQuestionPattern(),
+                        BotUtils.getVerbByIntent(functionIntent.getFunctionName()), "");
+                showReply(replyComplete);
+            }
+        } else if (ConstManager.FUNCTION_FOR_DEVICE.contains(functionIntent.getFunctionName())){
+            AreaEntity area = BotUtils.findBestArea(termTargets);
+            String target;
+            if (area != null) {
+                DeviceEntity device = BotUtils.findBestDevice(termTargets,area.getId());
+                if (device == null) {
+                    Log.d(TAG, "Tim thấy không gian " + area.getName() + " mà không tìm thấy thiết bị");
+                    DetectSocialEntity askWhichDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEAREA);
+                    CurrentContext current = CurrentContext.getInstance();
+                    current.setDetectedFunction(functionIntent);
+                    current.setArea(area);
+
+                    target = area.getName();
+                    String replyComplete = BotUtils.completeSentence(askWhichDevice.getQuestionPattern(),
+                            BotUtils.getVerbByIntent(functionIntent.getFunctionName()), target);
+                    showReply(replyComplete);
+                } else {
+                    Log.d(TAG, "Tìm thấy cả hai" + device.getName()+area.getName());
+                    BotUtils.implementCommand(functionIntent,device,null);
+                }
+            } else {
+                DeviceEntity deviceOnly = BotUtils.findBestDevice(termTargets, -1);
+                if (deviceOnly != null) {
+                    Log.d(TAG, "Tim thấy thiet bị ,mà không co không gian " + deviceOnly.getName());
+
+                    CurrentContext current = CurrentContext.getInstance();
+                    current.setDetectedFunction(functionIntent);
+                    current.setDevice(deviceOnly);
+                    current.setSentence(humanSay);
+
+                    area = AreaSQLite.findById(deviceOnly.getAreaId());
+                    target = deviceOnly.getName()+" trong "+area.getName();
+                    String replyComplete = BotUtils.completeSentence(functionIntent.getRemindPattern(), "", target);
+                    showReply(replyComplete);
+                } else {
+                    CurrentContext current = CurrentContext.getInstance();
+                    if (current.getDevice() != null){
+                        BotUtils.implementCommand(functionIntent,current.getDevice(),null);
+                    } else {
+                        String verb = BotUtils.getVerbByIntent(functionIntent.getFunctionName());
+                        DetectSocialEntity askDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEONLY);
+                        String replyComplete = BotUtils.completeSentence(askDevice.getQuestionPattern(), verb, "");
+                        showReply(replyComplete);
+                    }
+                }
+            }
+        } else if (functionIntent.getFunctionName().contains("check")){
+            Log.d(TAG,"check trang thai phong");
+            AreaEntity area = BotUtils.findBestArea(termTargets);
+            if (area != null) {
+                Log.d(TAG,"Thay phong "+area.getName());
+                String resultVal = BotUtils.getAttributeByFunction(functionIntent.getFunctionName(),area);
+                String replyComplete ="";
+                if (resultVal == null){
+                    replyComplete=BotUtils.completeSentence(functionIntent.getFailPattern(), resultVal, area.getName());
+                } else {
+                    replyComplete=BotUtils.completeSentence(functionIntent.getSuccessPattern(), resultVal, area.getName());
+                }
+                showReply(replyComplete);
+                //
+            } else {
+                Log.d(TAG,"Khong tim thay phong");
+                CurrentContext current = CurrentContext.getInstance();
+                current.setDetectedFunction(functionIntent);
+                current.setSentence(humanSay);
+
+                String replyComplete = BotUtils.completeSentence(functionIntent.getRemindPattern(),"","");
+                showReply(replyComplete);
+            }
+        }
+    }
+    private void processSocial(String humanSay, DetectSocialEntity socialIntent){
+        CurrentContext current = CurrentContext.getInstance();
+//        current.setDetectSocial(socialIntent);
+//        showReply("Mục đích "+socialIntent.getName());
+        String replyComplete;
+        String result = "";
+        if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_TIME)){
+            result = BotUtils.getTime();
+        } else if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_DAY)){
+            result = BotUtils.getDay();
+        } else if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_SEX)){
+            result = "gái";
+        } else if (socialIntent.getName().equals(ConstManager.SOCIAL_AGREE)){
+            if (current.getDetectedFunction() != null){
+                processFunction(current.getSentence(),current.getDetectedFunction());
+            }
+        }
+        replyComplete = BotUtils.completeSentence(socialIntent.getReplyPattern(), result, "");
+        showReply(replyComplete);
+    }
+
+    private void botReplyToSentence(String humanSay){
+
+        TermSQLite termSQLite = new TermSQLite();
+        List<TermEntity> terms = termSQLite.getHumanIntentInSentence(humanSay);
+        DetectFunctionEntity functFound = BotUtils.findBestFunctDetected(terms);
+        DetectSocialEntity socialFound = BotUtils.findBestSocialDetected(terms);
+        if (functFound != null && socialFound != null) {
+            if (functFound.getDetectScore()> socialFound.getDetectScore()){
+                processFunction(humanSay,functFound);
+            } else {
+                processSocial(humanSay,socialFound);
+            }
+        } else if (functFound == null && socialFound != null) {
+            processSocial(humanSay, socialFound);
+        }else if (functFound != null && socialFound == null){
+            processFunction(humanSay, functFound);
+        } else {
+            DetectSocialEntity notUnderReply = BotUtils.getSocialByName(ConstManager.NOT_UNDERSTD);
+            String replyComplete = BotUtils.completeSentence(notUnderReply.getQuestionPattern(), "", "");
+            showReply(replyComplete);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopService(new Intent(this,ControlMonitorService.class));
+
+    }
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"vi");
+        try {
+            startActivityForResult(intent, VAPanel.REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(this,"Fail to nhận diện giọng nói",Toast.LENGTH_SHORT).show();
+        }
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d(TAG,requestCode+"--" );
+        switch (requestCode) {
+            case VAPanel.REQ_CODE_SPEECH_INPUT: {
+                if (resultCode == -1 && null != data) {
+
+                    ArrayList<String> result = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    Log.d(TAG,result.get(0));
+                    botReplyToSentence(result.get(0));
+                }
+                break;
+            }
+
+        }
+    }
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int action = event.getAction();
+        int keyCode = event.getKeyCode();
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    promptSpeechInput();
+                }
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    //TODO
+                }
+                return true;
+            default:
+                return super.dispatchKeyEvent(event);
+        }
     }
 
 

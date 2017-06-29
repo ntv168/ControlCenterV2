@@ -16,8 +16,8 @@ import java.io.UnsupportedEncodingException;
 public class VolleySingleton {
 
     public static final int CHECK_AREA_TIMEOUT = 2000;
-    public static final int CHECK_CAMERA_TIMEOUT = 5000;
-    public static  String SERVER_HOST = "https://b0381819.ngrok.io/";
+    public static final int CHECK_CAMERA_TIMEOUT = 3000;
+    public static  String SERVER_HOST = "https://8b48b749.ngrok.io/";
     private static VolleySingleton mInstance;
     private RequestQueue mRequestQueue;
     private static Context context;

@@ -73,12 +73,6 @@ public class SettingPanel extends AppCompatActivity {
     private static final String TAG = "Setting Panel";
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_panel);

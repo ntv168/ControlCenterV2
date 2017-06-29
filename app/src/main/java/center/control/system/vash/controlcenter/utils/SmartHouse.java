@@ -36,6 +36,24 @@ public class SmartHouse {
     private String botRole;
     private String ownerName;
     private String ownerRole;
+    private String contractId;
+    private int databseVer;
+
+    public String getContractId() {
+        return contractId;
+    }
+
+    public void setContractId(String contractId) {
+        this.contractId = contractId;
+    }
+
+    public int getDatabseVer() {
+        return databseVer;
+    }
+
+    public void setDatabseVer(int databseVer) {
+        this.databseVer = databseVer;
+    }
 
     private List<ConfigurationEntity> configurations;
 
@@ -103,8 +121,6 @@ public class SmartHouse {
                             area.setTemperature(val[1]);
                         }else if (val[0].equals(AreaEntity.attrivutesValues[3])){
                             area.setSound(val[1]);
-                        }else if (val[0].equals(AreaEntity.attrivutesValues[4])){
-                            area.setElectricUsing(val[1]);
                         }
                     }
                 }
@@ -169,7 +185,7 @@ public class SmartHouse {
     public List<DeviceEntity> getDevicesByAreaId(int id) {
         List<DeviceEntity> result = new ArrayList<>();
         for (DeviceEntity device : this.getDevices()){
-            Log.d(TAG,device.getAreaId()+"  id");
+//            Log.d(TAG,device.getAreaId()+"  id");
             if (device.getAreaId() == id){
                 result.add(device);
             }

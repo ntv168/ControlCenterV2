@@ -17,6 +17,15 @@ public class CurrentContext {
     private AreaEntity area;
     private DeviceEntity device;
     private ScriptEntity script;
+    private String sentence;
+
+    public void setSentence(String sentence) {
+        this.sentence = sentence;
+    }
+
+    public String getSentence() {
+        return sentence;
+    }
 
     public AreaEntity getArea() {
         return area;
@@ -78,5 +87,14 @@ public class CurrentContext {
 
     public ScriptEntity getScript() {
         return script;
+    }
+
+    public void renew() {
+        this.detectedFunction = null;
+        this.detectSocial = null;
+        this.area = null;
+        this.device = null;
+        this.script = null;
+        this.sentence = null;
     }
 }

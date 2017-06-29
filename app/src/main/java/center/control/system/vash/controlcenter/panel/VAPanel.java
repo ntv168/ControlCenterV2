@@ -2,11 +2,13 @@ package center.control.system.vash.controlcenter.panel;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.graphics.Color;
+import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
@@ -22,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +33,7 @@ import java.util.Map;
 import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
+import center.control.system.vash.controlcenter.configuration.CommandEntity;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.nlp.ChatAdapter;
@@ -40,6 +44,7 @@ import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
 import center.control.system.vash.controlcenter.nlp.TargetTernEntity;
 import center.control.system.vash.controlcenter.nlp.TermEntity;
 import center.control.system.vash.controlcenter.nlp.TermSQLite;
+import center.control.system.vash.controlcenter.nlp.VoiceUtils;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.server.AssistantTypeDTO;
@@ -59,6 +64,7 @@ import retrofit2.Response;
 
 public class VAPanel extends AppCompatActivity {
     private static final String TAG = "VAPanel em đây";
+    public static final int REQ_CODE_SPEECH_INPUT = 111;
     private ImageButton btnSend;
     private ChatAdapter chatAdapter;
     private ListView chatList;
@@ -99,8 +105,16 @@ public class VAPanel extends AppCompatActivity {
         }
         botTypeId = sharedPreferences.getInt(ConstManager.BOT_TYPE_ID,-1);
         ownerName = sharedPreferences.getString(ConstManager.OWNER_NAME,"");
+        ownerRole = sharedPreferences.getString(ConstManager.OWNER_ROLE,"ông");
         SmartHouse.getInstance().setBotOwnerNameRole(botName,botRole,ownerName,ownerRole);
         btnSend = (ImageButton) findViewById(R.id.btnChatSend);
+        Button btnSpeak = (Button) findViewById(R.id.btnSpeak);
+        btnSpeak.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                promptSpeechInput();
+            }
+        });
 
         chatList = (ListView) findViewById(R.id.lstMsgChat);
 
@@ -194,9 +208,10 @@ public class VAPanel extends AppCompatActivity {
                                     funct.getName(),funct.getSuccess(),funct.getFail(),funct.getRemind()));
                         }
                         SmartHouse house = SmartHouse.getInstance();
-                        saveDeviceTFIDFTerm(house.getDevices());
-                        saveAreaTFIDFTerm(house.getAreas());
-                        saveScriptTFIDFTerm(house.getScripts());
+                        BotUtils bot = new BotUtils();
+                        bot.saveDeviceTFIDFTerm(house.getDevices());
+                        bot.saveAreaTFIDFTerm(house.getAreas());
+                        bot.saveScriptTFIDFTerm(house.getScripts());
                         waitDialog.dismiss();
                     }
 
@@ -214,7 +229,8 @@ public class VAPanel extends AppCompatActivity {
         }
     }
 
-//    private void botReplyCommandByResult(String commandResult, String resultValue){
+
+    //    private void botReplyCommandByResult(String commandResult, String resultValue){
 //        CurrentContext current = CurrentContext.getInstance();
 //        DetectIntent currentDetect = current.getDetected();
 //        ConnectedDevice currentTarget = current.getDeviceTarget();
@@ -246,49 +262,118 @@ public class VAPanel extends AppCompatActivity {
 ////        launchCheckSensorService();
 //    }
     private void processFunction(String humanSay, DetectFunctionEntity functionIntent){
-        CurrentContext current = CurrentContext.getInstance();
-        current.setDetectedFunction(functionIntent);
-        showReply("Mục đích "+functionIntent.getFunctionName());
         List<TargetTernEntity> termTargets = TermSQLite.getTargetInSentence(humanSay);
         if (ConstManager.FUNCTION_FOR_SCRIPT.contains(functionIntent.getFunctionName())){
             ScriptEntity mode = BotUtils.findBestScript(termTargets);
             if (mode != null) {
-                current.setScript(mode);
-                showReply("Tim thấy chế độ "+mode.getName());
+//                BotUtils.implementCommand(functionIntent,null,mode);
+                CurrentContext.getInstance().renew();
             } else {
-                Log.d(TAG, "Khong tim thay mode " + humanSay);
+                DetectSocialEntity askWhichMode = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_MODE);
+
+                CurrentContext current = CurrentContext.getInstance();
+                current.setDetectedFunction(functionIntent);
+
+                String replyComplete = BotUtils.completeSentence(askWhichMode.getQuestionPattern(),
+                        BotUtils.getVerbByIntent(functionIntent.getFunctionName()), "");
+                showReply(replyComplete);
             }
-        } else {
+        } else if (ConstManager.FUNCTION_FOR_DEVICE.contains(functionIntent.getFunctionName())){
+            AreaEntity area = BotUtils.findBestArea(termTargets);
+            String target;
+            if (area != null) {
+                DeviceEntity device = BotUtils.findBestDevice(termTargets,area.getId());
+                if (device == null) {
+                    Log.d(TAG, "Tim thấy không gian " + area.getName() + " mà không tìm thấy thiết bị");
+                    DetectSocialEntity askWhichDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEAREA);
+                    CurrentContext current = CurrentContext.getInstance();
+                    current.setDetectedFunction(functionIntent);
+                    current.setArea(area);
+
+                    target = area.getName();
+                    String replyComplete = BotUtils.completeSentence(askWhichDevice.getQuestionPattern(),
+                            BotUtils.getVerbByIntent(functionIntent.getFunctionName()), target);
+                    showReply(replyComplete);
+                } else {
+                    Log.d(TAG, "Tìm thấy cả hai" + device.getName()+area.getName());
+//                    BotUtils.implementCommand(functionIntent,device,null);
+                    CurrentContext.getInstance().renew();
+                }
+            } else {
+                DeviceEntity deviceOnly = BotUtils.findBestDevice(termTargets, -1);
+                if (deviceOnly != null) {
+                    Log.d(TAG, "Tim thấy thiet bị ,mà không co không gian " + deviceOnly.getName());
+
+                    CurrentContext current = CurrentContext.getInstance();
+                    current.setDetectedFunction(functionIntent);
+                    current.setDevice(deviceOnly);
+                    current.setSentence(humanSay);
+
+                    area = AreaSQLite.findById(deviceOnly.getAreaId());
+                    target = deviceOnly.getName()+" trong "+area.getName();
+                    String replyComplete = BotUtils.completeSentence(functionIntent.getRemindPattern(), "", target);
+                    showReply(replyComplete);
+                } else {
+                    CurrentContext current = CurrentContext.getInstance();
+                    if (current.getDevice() != null){
+//                        BotUtils.implementCommand(functionIntent,current.getDevice(),null);
+                        current.renew();
+                    } else {
+                        String verb = BotUtils.getVerbByIntent(functionIntent.getFunctionName());
+                        DetectSocialEntity askDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEONLY);
+                        String replyComplete = BotUtils.completeSentence(askDevice.getQuestionPattern(), verb, "");
+                        showReply(replyComplete);
+                    }
+                }
+            }
+        } else if (functionIntent.getFunctionName().contains("check")){
+            Log.d(TAG,"check trang thai phong");
             AreaEntity area = BotUtils.findBestArea(termTargets);
             if (area != null) {
-                current.setArea(area);
-                showReply("Tim thấy không gian "+area.getName());
+                Log.d(TAG,"Thay phong "+area.getName());
+                String resultVal = BotUtils.getAttributeByFunction(functionIntent.getFunctionName(),area);
+                String replyComplete ="";
+                if (resultVal == null){
+                    replyComplete=BotUtils.completeSentence(functionIntent.getFailPattern(), resultVal, area.getName());
+                } else {
+                    replyComplete=BotUtils.completeSentence(functionIntent.getSuccessPattern(), resultVal, area.getName());
+                }
+                showReply(replyComplete);
+                //
             } else {
-                Log.d(TAG, "Khong tim thay area " + humanSay);
-            }
-            DeviceEntity device = BotUtils.findBestDevice(termTargets);
-            if (device != null) {
-                current.setDevice(device);
-                showReply("Tim thấy thiết bị "+device.getName());
-            } else {
-                Log.d(TAG, "Khong tim thay device " + humanSay);
+                Log.d(TAG,"Khong tim thay phong");
+                CurrentContext current = CurrentContext.getInstance();
+                current.setDetectedFunction(functionIntent);
+                current.setSentence(humanSay);
+
+                String replyComplete = BotUtils.completeSentence(functionIntent.getRemindPattern(),"","");
+                showReply(replyComplete);
             }
         }
     }
     private void processSocial(String humanSay, DetectSocialEntity socialIntent){
         CurrentContext current = CurrentContext.getInstance();
-        current.setDetectSocial(socialIntent);
-        showReply("Mục đích "+socialIntent.getName());
-        String replyComplete = "Câu này <bot-role> chưa được học. <owner-name> vui lòng đóng tiền";
-        if (socialIntent.getReplyPattern() != null) {
-            replyComplete = BotUtils.completeSentence(socialIntent.getReplyPattern(), "", "");
-        } else {
-            replyComplete = BotUtils.completeSentence(replyComplete, "", "");
+//        current.setDetectSocial(socialIntent);
+//        showReply("Mục đích "+socialIntent.getName());
+        String replyComplete;
+        String result = "";
+        if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_TIME)){
+            result = BotUtils.getTime();
+        } else if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_DAY)){
+            result = BotUtils.getDay();
+        } else if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_SEX)){
+            result = "gái";
+        } else if (socialIntent.getName().equals(ConstManager.SOCIAL_AGREE)){
+            if (current.getDetectedFunction() != null){
+                processFunction(current.getSentence(),current.getDetectedFunction());
+            }
         }
+        replyComplete = BotUtils.completeSentence(socialIntent.getReplyPattern(), result, "");
         showReply(replyComplete);
     }
 
     private void showReply(String replyComplete) {
+        VoiceUtils.getInstance().speak(replyComplete);
         chatAdapter.add(new ChatAdapter.ViewHolder(true, replyComplete));
     }
 
@@ -309,17 +394,10 @@ public class VAPanel extends AppCompatActivity {
         }else if (functFound != null && socialFound == null){
             processFunction(humanSay, functFound);
         } else {
-
             DetectSocialEntity notUnderReply = BotUtils.getSocialByName(ConstManager.NOT_UNDERSTD);
-            String replyComplete;
-            if (notUnderReply.getReplyPattern() != null) {
-                replyComplete  = BotUtils.completeSentence(notUnderReply.getReplyPattern(), "", "");
-            }else {
-                replyComplete = BotUtils.completeSentence("Câu này <bot-role> chưa được học. <owner-name> vui lòng đóng tiền", "", "");
-            }
+            String replyComplete = BotUtils.completeSentence(notUnderReply.getQuestionPattern(), "", "");
             showReply(replyComplete);
         }
-
     }
     public void clicktoControlPanel(View view) {
         startActivity(new Intent(this, ControlPanel.class));
@@ -338,7 +416,7 @@ public class VAPanel extends AppCompatActivity {
     private void refineNickNameTarget(){
         final SmartHouse house = SmartHouse.getInstance();
         for (final DeviceEntity device: house.getDevices()){
-            if (device.getNickName().length()<2){
+            if (device.getNickName() == null || device.getNickName().equals("")){
                 editNickNameDiag.setTitle("Tên gọi khác cho thiết bị"+device.getName());
                 final EditText input = new EditText(VAPanel.this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -392,97 +470,7 @@ public class VAPanel extends AppCompatActivity {
             }
         }
     }
-    private void saveDeviceTFIDFTerm(List<DeviceEntity> listDevices) {
-        Map<Integer,Map<String,Integer>> trainingSetMap = BotUtils.readTargettoHashMap(listDevices);
-        Map<Integer,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
-        TermSQLite sqLite= new TermSQLite();
-        Iterator it = trainingSetMap.entrySet().iterator();
-        while (it.hasNext()){
-            Map.Entry pair = (Map.Entry) it.next();
-            int deviceId = (int) pair.getKey();
-            Map<String, Integer> wordCount = (Map<String, Integer>) pair.getValue();
 
-            Iterator wit = wordCount.entrySet().iterator();
-            while (wit.hasNext()){
-                Map.Entry termPair = (Map.Entry) wit.next();
-                String term = (String) termPair.getKey();
-                double termTfidf =1.0;
-                if (listDevices.size() >1) {
-                    termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, deviceId);
-                    Log.d(TAG, termTfidf + "   " + term + "   " + deviceId);
-                }
-
-                TargetTernEntity targetTerm = new TargetTernEntity();
-                targetTerm.setDetectDeviceId(deviceId);
-                targetTerm.setDetectAreaId(-1);
-                targetTerm.setDetectScriptId(-1);
-                targetTerm.setTfidfPoint(termTfidf);
-                targetTerm.setContent(" "+term+" ");
-                sqLite.insertTargetTerm(targetTerm);
-            }
-        }
-    }
-    private void saveAreaTFIDFTerm(List<AreaEntity> listArea) {
-        Map<Integer,Map<String,Integer>> trainingSetMap = BotUtils.readTargettoHashMap(listArea);
-        Map<Integer,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
-        TermSQLite sqLite= new TermSQLite();
-        Iterator it = trainingSetMap.entrySet().iterator();
-        while (it.hasNext()){
-            Map.Entry pair = (Map.Entry) it.next();
-            int areaId = (int) pair.getKey();
-            Map<String, Integer> wordCount = (Map<String, Integer>) pair.getValue();
-
-            Iterator wit = wordCount.entrySet().iterator();
-            while (wit.hasNext()){
-                Map.Entry termPair = (Map.Entry) wit.next();
-                String term = (String) termPair.getKey();
-                double termTfidf =1.0;
-                if (listArea.size() >1) {
-                    termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, areaId);
-                    Log.d(TAG,termTfidf+"   "+term+"   "+areaId);
-                }
-
-                TargetTernEntity targetTerm = new TargetTernEntity();
-                targetTerm.setDetectAreaId(areaId);
-                targetTerm.setDetectDeviceId(-1);
-                targetTerm.setDetectScriptId(-1);
-                targetTerm.setTfidfPoint(termTfidf);
-                targetTerm.setContent(" "+term+" ");
-                sqLite.insertTargetTerm(targetTerm);
-            }
-        }
-    }
-
-    private void saveScriptTFIDFTerm(List<ScriptEntity> listScript) {
-        Map<Integer,Map<String,Integer>> trainingSetMap = BotUtils.readTargettoHashMap(listScript);
-        Map<Integer,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
-        TermSQLite sqLite= new TermSQLite();
-        Iterator it = trainingSetMap.entrySet().iterator();
-        while (it.hasNext()){
-            Map.Entry pair = (Map.Entry) it.next();
-            int scriptId = (int) pair.getKey();
-            Map<String, Integer> wordCount = (Map<String, Integer>) pair.getValue();
-
-            Iterator wit = wordCount.entrySet().iterator();
-            while (wit.hasNext()){
-                Map.Entry termPair = (Map.Entry) wit.next();
-                String term = (String) termPair.getKey();
-                double termTfidf =1.0;
-                if (listScript.size() >1) {
-                    termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, scriptId);
-                    Log.d(TAG,termTfidf+" ");
-                }
-
-                TargetTernEntity targetTerm = new TargetTernEntity();
-                targetTerm.setDetectScriptId(scriptId);
-                targetTerm.setDetectAreaId(-1);
-                targetTerm.setDetectDeviceId(-1);
-                targetTerm.setTfidfPoint(termTfidf);
-                targetTerm.setContent(" "+term+" ");
-                sqLite.insertTargetTerm(targetTerm);
-            }
-        }
-    }
 
     @Override
     protected void onPause() {
@@ -495,5 +483,36 @@ public class VAPanel extends AppCompatActivity {
         edit.putString(ConstManager.BOT_TYPE,botType);
         edit.putString(ConstManager.BOT_NAME,botName);
         edit.commit();
+    }
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"vi");
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(this,"Fail to nhận diện giọng nói",Toast.LENGTH_SHORT).show();
+        }
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d(TAG,requestCode+"--" );
+        switch (requestCode) {
+            case REQ_CODE_SPEECH_INPUT: {
+                if (resultCode == -1 && null != data) {
+
+                    ArrayList<String> result = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    Log.d(TAG,result.get(0));
+                    chatAdapter.add(new ChatAdapter.ViewHolder(false, result.get(0)));
+                    botReplyToSentence(result.get(0));
+                }
+                break;
+            }
+
+        }
     }
 }

@@ -26,6 +26,7 @@ import center.control.system.vash.controlcenter.configuration.CommandEntity;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
 
+import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
 
@@ -36,8 +37,12 @@ import center.control.system.vash.controlcenter.server.VolleySingleton;
 public class ControlMonitorService extends Service {
     private static final String TAG = "---Read Sensor---";
     public static final String CONTROL = "control.action";
+    public static final String WAIT = "wait.action";
     public static final String MONITOR = "monitor.action";
     public static final String CAMERA = "camera.action";
+    public static final int SUCCESS = -3;
+    public static final int FAIL = -2;
+    public static final String DEACTIVATE = "deactivate.action";
     public static final String NOBODY = "Nobody";
     public static final String NOT_SUPPORT = "None";
     private static Timer repeatScheduler;
@@ -50,30 +55,40 @@ public class ControlMonitorService extends Service {
         intent.putExtra(ControlPanel.AREA_ID, areaId);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
-    public void sendControl(DeviceEntity deviceEntity, final String status){
+    public void sendControl(final DeviceEntity deviceEntity, final String status){
         if (SmartHouse.getAreaById(deviceEntity.getAreaId()) != null) {
+            sendResult(WAIT,-1);
             String url = "http://" + SmartHouse.getAreaById(deviceEntity.getAreaId()).getConnectAddress().trim()
                     + "/" + deviceEntity.getPort().trim() + "/" + status.trim();
             Log.d(TAG, url);
             StringRequest control = new StringRequest(Request.Method.GET,
-                    url,
-                    new Response.Listener<String>() {
+                    url,new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
+                            Log.d(TAG,"send success");
+                            if (status.equals("on") || status.equals("off")) {
+                                SmartHouse house = SmartHouse.getInstance();
+                                deviceEntity.setState(status);
+                                house.updateDeviceStateById(deviceEntity.getId(),status);
+                                Log.d(TAG,deviceEntity.getName()+ " với lệnh: " + status);
+                            }
+                            sendResult(CONTROL,SUCCESS);
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG,"send fail");
+//                    if (status.equals("on") || status.equals("off")) {
+//                        SmartHouse house = SmartHouse.getInstance();
+//                        deviceEntity.setState(status);
+//                        house.updateDeviceStateById(deviceEntity.getId(),status);
+//                        Log.d(TAG,deviceEntity.getName()+ " với lệnh: " + status);
+//                    }
+                    sendResult(CONTROL,FAIL);
                 }
             });
             control.setRetryPolicy(new DefaultRetryPolicy(1000,0,1f));
-            if (status.equals("on") || status.equals("off")) {
-                SmartHouse house = SmartHouse.getInstance();
-                deviceEntity.setState(status);
-                house.updateDeviceStateById(deviceEntity.getId(),status);
-                Log.d(TAG,deviceEntity.getName()+ " với lệnh: " + status);
-                sendResult(CONTROL,-1);
-            }
+
             VolleySingleton.getInstance(this).addToRequestQueue(control);
         }
     };
@@ -89,6 +104,10 @@ public class ControlMonitorService extends Service {
             public void run() {
                 SmartHouse smartHouse = SmartHouse.getInstance();
                 try {
+                    if (smartHouse.getContractId() == null){
+                        sendResult(DEACTIVATE,-1);
+                        return;
+                    }
                     if (smartHouse.getOwnerCommand().size() == 0){
                         for (AreaEntity area: smartHouse.getAreas()){
                             if (area.isHasCamera() && areaChecked) {
@@ -113,7 +132,7 @@ public class ControlMonitorService extends Service {
 
 
             }
-        }, 1500, 4000);
+        }, VolleySingleton.CHECK_CAMERA_TIMEOUT, ConstManager.SERVICE_PERIOD);
     }
 
     private  void checkArea(final AreaEntity area){

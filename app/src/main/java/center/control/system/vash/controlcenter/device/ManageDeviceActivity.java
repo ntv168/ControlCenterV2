@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -46,6 +47,9 @@ import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.area.ListAreaAdapter;
+import center.control.system.vash.controlcenter.panel.VAPanel;
+import center.control.system.vash.controlcenter.script.ScriptEntity;
+import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
@@ -58,7 +62,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
     private ListAreaAdapter areaAdapter;
     private DeviceEntity currentDevice;
     private AreaEntity currentArea;
-
+    private android.app.AlertDialog.Builder editNickNameDiag;
     private Dialog deviceDialog;
     private EditText ipArea;
 
@@ -68,6 +72,8 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
         setContentView(R.layout.activity_manage_device);
         RecyclerView lstAreaManage = (RecyclerView) findViewById(R.id.listItemLeft);
         lstAreaManage.setHasFixedSize(true);
+        editNickNameDiag = new android.app.AlertDialog.Builder(ManageDeviceActivity.this);
+        editNickNameDiag.setCancelable(false);
         LinearLayoutManager verticalLayout = new LinearLayoutManager(this);
         verticalLayout.setOrientation(LinearLayoutManager.VERTICAL);
         lstAreaManage.setLayoutManager(verticalLayout);
@@ -114,45 +120,51 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                 btnSave.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final ProgressDialog progressDialog = new ProgressDialog(ManageDeviceActivity.this);
-                        progressDialog.setTitle("Dò tìm thiết bị khu vực "+ipArea.getText().toString());
-                        progressDialog.setMessage("Đợi tý nha");
+                        if (areaNickName.getText().length() > 2) {
+                            final ProgressDialog progressDialog = new ProgressDialog(ManageDeviceActivity.this);
+                            progressDialog.setTitle("Dò tìm thiết bị khu vực " + ipArea.getText().toString());
+                            progressDialog.setMessage("Đợi tý nha");
 
-                        final String url = "http://"+ipArea.getText().toString().trim()+"/get";
-                        Log.d(TAG,url);
+                            final String url = "http://" + ipArea.getText().toString().trim() + "/get";
+                            Log.d(TAG, url);
 
-                        StringRequest connectAreaIP = new StringRequest(Request.Method.GET,
-                                url,
-                                new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                String encodedResp = VolleySingleton.fixEncodingUnicode(response);
-                                currentArea = saveArea(areaName.getText().toString(),
-                                        areaNickName.getText().toString(),
-                                        ipArea.getText().toString());
-                                insertDeviceByPort(encodedResp, currentArea.getId());
-                                progressDialog.dismiss();
-                                dialog.dismiss();
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
+                            StringRequest connectAreaIP = new StringRequest(Request.Method.GET,
+                                    url,
+                                    new Response.Listener<String>() {
+                                        @Override
+                                        public void onResponse(String response) {
+                                            String encodedResp = VolleySingleton.fixEncodingUnicode(response);
+                                            currentArea = saveArea(areaName.getText().toString(),
+                                                    areaNickName.getText().toString(),
+                                                    ipArea.getText().toString());
+                                            insertDeviceByPort(encodedResp, currentArea.getId());
+                                            progressDialog.dismiss();
+                                            dialog.dismiss();
+                                            refineNickNameTarget();
+                                        }
+                                    }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
 
-                                txtErr.setText("Không kết nối được thiết bị");
-                                if (url.equals("http://1.1.1.1:80/get")) {
-                                    String encodedResp = "";
-                                    currentArea = saveArea(areaName.getText().toString(),
-                                            areaNickName.getText().toString(),
-                                            ipArea.getText().toString());
-                                    insertDeviceByPort(encodedResp, currentArea.getId());
-                                    progressDialog.dismiss();
-                                    dialog.dismiss();
-                                } else
-                                    progressDialog.dismiss();
-                            }
-                        });
-                        VolleySingleton.getInstance(ManageDeviceActivity.this).addToRequestQueue(connectAreaIP);
-                        progressDialog.show();
+                                    txtErr.setText("Không kết nối được thiết bị");
+                                    if (url.equals("http://1.1.1.1:80/get")) {
+                                        String encodedResp = "đèn bàn=db";
+                                        currentArea = saveArea(areaName.getText().toString(),
+                                                areaNickName.getText().toString(),
+                                                ipArea.getText().toString());
+                                        insertDeviceByPort(encodedResp, currentArea.getId());
+                                        progressDialog.dismiss();
+                                        dialog.dismiss();
+                                    } else
+                                        progressDialog.dismiss();
+                                    refineNickNameTarget();
+                                }
+                            });
+                            VolleySingleton.getInstance(ManageDeviceActivity.this).addToRequestQueue(connectAreaIP);
+                            progressDialog.show();
+                        } else {
+                            txtErr.setText("Tên phụ phải nhiều hơn 2 ký tự");
+                        }
                     }
 
                     private AreaEntity saveArea(String name, String nickName, String addrress) {
@@ -292,33 +304,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
     }
 
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_PHOTO_FOR_DEVICE && resultCode == Activity.RESULT_OK) {
-            if (data == null) {
-                Toast.makeText(this,"Vui long chon hinh",Toast.LENGTH_SHORT);
-                return;
-            } else {
-                Bitmap deviceIcon = null;
-                try {
-                    InputStream is  = this.getContentResolver().openInputStream(data.getData());
-                    Bitmap tmp = BitmapFactory.decodeStream(is);
-                    FileOutputStream fos = ManageDeviceActivity.this.openFileOutput(currentDevice.getId() +".png", Context.MODE_PRIVATE);
-                    deviceIcon = Bitmap.createScaledBitmap(tmp,100,100,true);
-                    deviceIcon.compress(Bitmap.CompressFormat.PNG, 90, fos);
-                    fos.close();
-                    Log.d(TAG,"Saved icon"+ManageDeviceActivity.this.getFilesDir().getAbsolutePath());
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
-
-            }
-        }
-    }
 
     @Override
     public void onDeviceClick(DeviceEntity device) {
@@ -338,30 +324,35 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
         Button btnSave = (Button) deviceDialog.findViewById(R.id.btnSave);
         final EditText txtName = (EditText) deviceDialog.findViewById(R.id.txtDeviceName);
         final EditText txtNickName = (EditText) deviceDialog.findViewById(R.id.txtDeviceNickname);
+        final TextView txtErr = (TextView) deviceDialog.findViewById(R.id.txtError);
         txtName.setText(currentDevice.getName()+"");
         txtNickName.setText(currentDevice.getNickName()+"");
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SparseBooleanArray checkedType = attCheckList.getCheckedItemPositions();
-                String attributeType = "";
-                for (int i = 0; i < attCheckList.getCount(); i++) {
-                    if (checkedType.get(i)) {
-                        attributeType += AreaEntity.attrivutesValues[i]+',';
+                if (txtNickName.getText().length()>2) {
+                    SparseBooleanArray checkedType = attCheckList.getCheckedItemPositions();
+                    String attributeType = "";
+                    for (int i = 0; i < attCheckList.getCount(); i++) {
+                        if (checkedType.get(i)) {
+                            attributeType += AreaEntity.attrivutesValues[i] + ',';
+                        }
                     }
+                    Log.d(TAG, attributeType);
+                    currentDevice.setName(txtName.getText().toString());
+                    currentDevice.setNickName(txtNickName.getText().toString());
+                    currentDevice.setAttributeType(attributeType);
+                    currentDevice.setType(DeviceEntity.types[spnDeviceType.getSelectedItemPosition()]);
+                    currentDevice.setAreaId(currentArea.getId());
+                    currentDevice.setState("off");
+                    SmartHouse house = SmartHouse.getInstance();
+                    house.updateDeviceById(currentDevice.getId(), currentDevice);
+                    DeviceSQLite.upById(currentDevice.getId(), currentDevice);
+                    devicesAdapter.setDevices(house.getDevicesByAreaId(currentArea.getId()));
+                    deviceDialog.dismiss();
+                } else {
+                    txtErr.setText("Tên phụ phải nhiều hơn 2 ký tự");
                 }
-                Log.d(TAG,attributeType);
-                currentDevice.setName(txtName.getText().toString());
-                currentDevice.setNickName(txtNickName.getText().toString());
-                currentDevice.setAttributeType(attributeType);
-                currentDevice.setType(DeviceEntity.types[spnDeviceType.getSelectedItemPosition()]);
-                currentDevice.setAreaId(currentArea.getId());
-                currentDevice.setState("off");
-                SmartHouse house = SmartHouse.getInstance();
-                house.updateDeviceById(currentDevice.getId(),currentDevice);
-                DeviceSQLite.upById(currentDevice.getId(),currentDevice);
-                devicesAdapter.setDevices(house.getDevicesByAreaId(currentArea.getId()));
-                deviceDialog.dismiss();
             }
         });
         Button btnCancel = (Button) deviceDialog.findViewById(R.id.btnCancel);
@@ -379,5 +370,26 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
     public void onDeviceLongClick(DeviceEntity deviceEntity) {
         DeviceSQLite.deleteByDevId(deviceEntity.getId());
         devicesAdapter.remove(deviceEntity);
+    }
+    private void refineNickNameTarget(){
+        final SmartHouse house = SmartHouse.getInstance();
+        for (final DeviceEntity device: house.getDevices()){
+            if (device.getNickName() == null || device.getNickName().equals("")){
+                editNickNameDiag.setTitle("Tên gọi khác cho thiết bị"+device.getName());
+                final EditText input = new EditText(ManageDeviceActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                editNickNameDiag.setView(input);
+                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        device.setNickName(input.getText().toString());
+                        DeviceSQLite.upById(device.getId(),device);
+                        house.updateDeviceById(device.getId(),device);
+                        dialog.dismiss();
+                    }
+                });
+                editNickNameDiag.show();
+            }
+        }
     }
 }

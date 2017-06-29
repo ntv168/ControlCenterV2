@@ -81,7 +81,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Tất cả chế độ"
+                    android:text="Không gian trong nhà"
                     android:textAllCaps="true"
                     android:textColor="@color/nGreen1"
                     android:textSize="28sp"

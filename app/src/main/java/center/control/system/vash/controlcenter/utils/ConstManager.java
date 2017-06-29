@@ -27,5 +27,22 @@ public class ConstManager {
     public static final String BOT_ROLE = "bot.role";
     public static final String OWNER_ROLE = "owner.role";
     public static final String NOT_UNDERSTD = "notUnderstand";
+    public static final String SOCIAL_AGREE = "agree";
+    public static final String SOCIAL_DENY = "deny";
+    public static final String SOCIAL_WHAT_TIME = "whatTime";
+    public static final String SOCIAL_WHAT_DAY = "whatDay";
+    public static final String SOCIAL_ASK_DEVICEAREA = "askAreaDevice";
+    public static final String SOCIAL_ASK_DEVICEONLY = "askWhichDevice";
+    public static final String SOCIAL_ASK_MODE = "askMode";
+    public static final String SOCIAL_WHAT_SEX = "whatSex";
     public static final String FUNCTION_FOR_SCRIPT = "startMode,stopMode";
+    public static final String FUNCTION_FOR_DEVICE = "turnObjectOn,turnObjectOff,increaseTemperature,decreaseTemperature";
+    public static final String NOT_LEARN_YET = "notLearnYet";
+    public static final String FUNCTION_TURN_ON = "turnObjectOn";
+    public static final String FUNCTION_TURN_OFF = "turnObjectOff";
+    public static final String FUNCTION_INC_TEMP = "increaseTemperature";
+    public static final String FUNCTION_DEC_TEMP = "decreaseTemperature";
+    public static final String FUNCTION_START_MODE = "startMode";
+    public static final String FUNCTION_STOP_MODE = "stopMode";
+    public static final int SERVICE_PERIOD = 4000;
 }

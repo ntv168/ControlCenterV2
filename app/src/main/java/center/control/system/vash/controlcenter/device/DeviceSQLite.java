@@ -57,14 +57,14 @@ public class DeviceSQLite {
                 + " FROM " + TABLE_DEVICE
                 ;
 
-        Log.d(TABLE_DEVICE, selectQuery);
+//        Log.d(TABLE_DEVICE, selectQuery);
         Cursor cursor = db.rawQuery(selectQuery,  new String[]{});
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
                 DeviceEntity deviceEntity = getByCursor(cursor);
                 if (deviceEntity.getName() == null) deviceEntity.setName("...");
-                Log.d(TAG,deviceEntity.getName()+ " --- "+deviceEntity.getAreaId());
+//                Log.d(TAG,deviceEntity.getName()+ " --- "+deviceEntity.getAreaId());
                 result.add(deviceEntity);
             } while (cursor.moveToNext());
         }

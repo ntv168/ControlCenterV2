@@ -5,7 +5,10 @@ import android.graphics.Bitmap;
 import com.google.gson.annotations.SerializedName;
 
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.device.DeviceEntity;
+import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.device.TargetObject;
+import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 /**
  * Created by Thuans on 5/26/2017.
@@ -29,8 +32,17 @@ public class AreaEntity extends TargetObject{
     private String sound;
     @SerializedName("connectAddress")
     private String connectAddress;
+    private String personDetect;
     private Bitmap imageBitmap;
     private boolean hasCamera = true;
+
+    public String getPersonDetect() {
+        return personDetect;
+    }
+
+    public void setPersonDetect(String personDetect) {
+        this.personDetect = personDetect;
+    }
 
     public boolean isHasCamera() {
         return hasCamera;
@@ -71,7 +83,16 @@ public class AreaEntity extends TargetObject{
 
 
     public String getElectricUsing() {
-        return electricUsing;
+        int usingDev = 0;
+        for (DeviceEntity dev : SmartHouse.getInstance().getDevicesByAreaId(getId())){
+            if (dev.getAttributeType()!= null && dev.getAttributeType().contains(attrivutesValues[4])) {
+                if (dev.getState().equals("on") ||
+                        dev.getState().equals("open")) {
+                    usingDev++;
+                }
+            }
+        }
+        return usingDev + " thiết bị sử dụng điện";
     }
 
     public void setElectricUsing(String electricUsing) {

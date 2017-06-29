@@ -129,7 +129,7 @@ public class ScriptSQLite {
             return script;
         } else return null;
     }
-    public List<CommandEntity> getCommandByScriptId(int scriptId){
+    public static List<CommandEntity> getCommandByScriptId(int scriptId){
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
                 + " FROM " + TABLE_SCRIPT_DEVICE

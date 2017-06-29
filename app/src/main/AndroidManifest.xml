@@ -33,21 +33,21 @@
             android:name=".MainActivity"
             android:screenOrientation="landscape">
 
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".panel.ControlPanel"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape" ></activity>
         <activity
             android:name=".panel.ModePanel"
             android:screenOrientation="landscape" />
         <activity
             android:name=".panel.SettingPanel"
-            android:screenOrientation="landscape" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter></activity>
+            android:screenOrientation="landscape" ></activity>
         <activity
             android:name=".panel.VAPanel"
             android:screenOrientation="landscape" />
