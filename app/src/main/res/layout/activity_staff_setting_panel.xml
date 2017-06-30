@@ -34,7 +34,7 @@
                 android:background="@android:color/transparent"
                 android:paddingLeft="70dp"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_user" />
+                app:srcCompat="@drawable/icn_personal" />
 
             <View
                 android:layout_width="1dp"
@@ -51,7 +51,7 @@
                 android:background="@android:color/transparent"
                 android:paddingRight="70dp"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/bell" />
+                app:srcCompat="@drawable/icn_notification" />
 
         </LinearLayout>
 
@@ -79,7 +79,7 @@
                 android:background="@android:color/transparent"
                 android:paddingLeft="70dp"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/phone" />
+                app:srcCompat="@drawable/icn_call" />
 
             <View
                 android:layout_width="1dp"
