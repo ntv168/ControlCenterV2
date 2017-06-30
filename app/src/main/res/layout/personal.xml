@@ -97,12 +97,13 @@
                 android:layout_weight="1"
                 android:paddingLeft="20dp"></ListView>
         </LinearLayout>
+
         <View
-            android:layout_height="match_parent"
             android:layout_width="1dp"
-            android:background="@color/nLGray"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="20dp"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"/>
+            android:background="@color/nLGray" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -234,6 +235,51 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:text="Cấu hình trợ lý ảo"
+                        android:textColor="@color/nDGray"
+                        android:textSize="18sp" />
+
+                    <ImageButton
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:background="@android:color/transparent"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/icn_arrow_right" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:layout_marginLeft="20dp"
+                    android:background="@color/nLGray" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnTrainVA"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="20dp"
+                    android:gravity="left|center"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginRight="10dp"
+                        android:src="@drawable/icn_book" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="Huấn luyện trợ lý ảo"
                         android:textColor="@color/nDGray"
                         android:textSize="18sp" />
 
