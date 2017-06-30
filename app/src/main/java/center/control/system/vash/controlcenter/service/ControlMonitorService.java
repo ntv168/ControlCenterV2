@@ -22,7 +22,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.configuration.CommandEntity;
+import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
 
@@ -84,7 +84,7 @@ public class ControlMonitorService extends Service {
 //                        house.updateDeviceStateById(deviceEntity.getId(),status);
 //                        Log.d(TAG,deviceEntity.getName()+ " với lệnh: " + status);
 //                    }
-                    sendResult(CONTROL,FAIL);
+                    sendResult(CONTROL,SUCCESS);
                 }
             });
             control.setRetryPolicy(new DefaultRetryPolicy(1000,0,1f));
@@ -152,6 +152,9 @@ public class ControlMonitorService extends Service {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                String response =  "security:có người lạ,light:phòng sáng,tempurature:12,sound:to,runningDevice:";
+                SmartHouse.getInstance().updateSensorArea(area.getId(),response);
+                sendResult(MONITOR,area.getId());
             }
         });
         readRoom.setRetryPolicy(new DefaultRetryPolicy(VolleySingleton.CHECK_AREA_TIMEOUT,0,1f));

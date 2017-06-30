@@ -53,9 +53,15 @@
         <activity
             android:name=".device.ManageDeviceActivity"
             android:screenOrientation="landscape" />
-        <activity android:name=".configuration.ConfigurationActivity" />
         <activity android:name=".panel.UserSettingPanel" />
         <activity android:name=".PersonalInfoActivity"></activity>
+        <activity android:name=".nlp.TrainVAActivity"
+            android:screenOrientation="landscape"/>
+        <activity
+            android:name=".configuration.ConfigurationActivity"
+            android:screenOrientation="landscape" />
+        <activity android:name=".trigger.MapDeviceTriggerActivity"
+            android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>

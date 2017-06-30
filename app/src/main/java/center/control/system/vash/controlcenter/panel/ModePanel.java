@@ -30,8 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
-import center.control.system.vash.controlcenter.SettingPanel;
-import center.control.system.vash.controlcenter.configuration.CommandEntity;
+import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.script.ListDeviceInScriptAdapter;
 import center.control.system.vash.controlcenter.script.ListScriptAdapter;
 import center.control.system.vash.controlcenter.script.ScriptEntity;

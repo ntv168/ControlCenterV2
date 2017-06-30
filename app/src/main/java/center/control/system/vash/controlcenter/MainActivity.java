@@ -21,12 +21,14 @@ import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.HouseKeyDTO;
 import center.control.system.vash.controlcenter.server.LoginSmarthouseDTO;
 import center.control.system.vash.controlcenter.server.RetroFitSingleton;
+import center.control.system.vash.controlcenter.server.StaffCodeDTO;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends Activity {
     private static final String TAG = "---Main Activity---";
@@ -60,16 +62,14 @@ public class MainActivity extends Activity {
         loginDia = new ProgressDialog(this);
         loginDia.setTitle("Đăng nhập vào hệ thống");
         loginDia.setMessage("Vui lòng đợi");
+        loginDia.setCancelable(false);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG,contractId+"");
-                if (contractId!= null &&
-                        txtpassword.getText().toString().length()>5 &&
-                        contractId.contains(txtpassword.getText().toString())){
-                    startActivity(new Intent(MainActivity.this,SettingPanel.class));
-                    finish();
+                if (txtusername.getText().toString().contains("admin")){
+                    loginStaffCode();
+                    loginDia.show();
                 } else {
                     loginDia.show();
                     loginSmartHouse();
@@ -95,7 +95,6 @@ public class MainActivity extends Activity {
                 .setNegativeButton("Xóa", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
-                        VoiceUtils.speak("Xin chào anh Đại, quán cà phê thông minh xin được phục vụ ạ");
                         dialog.dismiss();
 
                     }
@@ -103,19 +102,37 @@ public class MainActivity extends Activity {
         modHost.show();
     }
 
+    private void loginStaffCode() {
+        final StaffCodeDTO stff = new StaffCodeDTO();
+        stff.setUsername(txtusername.getText().toString().replace("admin",""));
+        stff.setStaffCode(txtpassword.getText().toString());
+        final CloudApi loginStaffApi = RetroFitSingleton.getInstance().getCloudApi();
+        loginStaffApi.staffLogin(stff).enqueue(new Callback<StaffCodeDTO>() {
+            @Override
+            public void onResponse(Call<StaffCodeDTO> call, Response<StaffCodeDTO> response) {
+                Log.d(TAG,call.request().url()+" sai staff cose "+response.body().getMessage());
+                if (response.body()!= null && response.body().getMessage().equals("success")){
+                    startActivity(new Intent(MainActivity.this,SettingPanel.class));
+                }else {
+                    Toast.makeText(MainActivity.this,"Sai code nhân viên ",Toast.LENGTH_LONG).show();
+                }
+                loginDia.dismiss();
+            }
+            @Override
+            public void onFailure(Call<StaffCodeDTO> call, Throwable t) {
+                Log.d(TAG,call.request().url()+" sai staff cose");
+                Toast.makeText(MainActivity.this,"Sai code nhân viên ",Toast.LENGTH_LONG).show();
+                loginDia.dismiss();
+            }
+        });
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        houseId = sharedPreferences.getString(ConstManager.SYSTEM_ID,"");
-        contractId = sharedPreferences.getString(ConstManager.CONTRACT_ID,"");
         username = sharedPreferences.getString(ConstManager.USERNAME,"");
         password = sharedPreferences.getString(ConstManager.PASSWORD,"");
-        Log.d(TAG,houseId+" id house");
-        if (houseId.length()>2){
-            Intent intent = new Intent(MainActivity.this, ControlPanel.class);
-            startActivity(intent);
-            finish();
-        }
+
     }
 
     private void loginSmartHouse() {
@@ -126,10 +143,9 @@ public class MainActivity extends Activity {
         loginApi.mobileLogin(key).enqueue(new Callback<LoginSmarthouseDTO>() {
             @Override
             public void onResponse(Call<LoginSmarthouseDTO> call, retrofit2.Response<LoginSmarthouseDTO> response) {
-                if (response.body()!= null && response.body().getHouseId()!= null) {
-                    Log.d(TAG,call.request().url()+" --- "+response.body().getHouseId());
+                if (response.body()!= null && response.body().getContractId()!= null) {
+                    Log.d(TAG,call.request().url()+" --- "+response.body().getContractId());
                     SharedPreferences.Editor edit = sharedPreferences.edit();
-                    edit.putString(ConstManager.SYSTEM_ID,response.body().getHouseId());
                     edit.putString(ConstManager.USERNAME,key.getUsername());
                     edit.putString(ConstManager.STATIC_ADDRESS,response.body().getStaticAddress());
                     edit.putString(ConstManager.CONTRACT_CODE,response.body().getContractCode());
@@ -153,7 +169,6 @@ public class MainActivity extends Activity {
                 }
                 loginDia.dismiss();
             }
-
             @Override
             public void onFailure(Call<LoginSmarthouseDTO> call, Throwable t) {
                 Log.d(TAG,call.request().url()+"  ---err "+t.getMessage());

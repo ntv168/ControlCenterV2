@@ -25,6 +25,8 @@ public class DeviceEntity extends TargetObject{
     private String state;
     @SerializedName("areaId")
     private int areaId;
+    @SerializedName("triggerId")
+    private int triggerId;
 
     private double detectScore;
 
@@ -81,5 +83,13 @@ public class DeviceEntity extends TargetObject{
 
     public String getType() {
         return type;
+    }
+
+    public int getTriggerId() {
+        return triggerId;
+    }
+
+    public void setTriggerId(int triggerId) {
+        this.triggerId = triggerId;
     }
 }

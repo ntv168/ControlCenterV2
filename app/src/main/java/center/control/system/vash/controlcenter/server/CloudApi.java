@@ -19,5 +19,7 @@ public  interface CloudApi {
     Call<BotDataCentralDTO> getDataVA( @Path("botId") int botId);
     @GET("/api/VirtualAssistant/getVAType")
     Call<List<AssistantTypeDTO>> getDataVAType();
+    @POST("/api/SmartHouse/StaffCodeLogin")
+    Call<StaffCodeDTO> staffLogin(@Body StaffCodeDTO staff);
 
 }

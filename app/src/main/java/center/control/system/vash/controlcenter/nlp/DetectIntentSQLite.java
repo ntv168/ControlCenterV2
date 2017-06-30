@@ -4,8 +4,12 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
+import center.control.system.vash.controlcenter.device.DeviceEntity;
 
 /**
  * Created by Thuans on 5/29/2017.
@@ -72,7 +76,32 @@ public class DetectIntentSQLite {
         return newId;
     }
 
+    public static List<DetectFunctionEntity> getAllFunction(){
+        List<DetectFunctionEntity> result = new ArrayList<>();
 
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT * "
+                + " FROM " + TABLE_FUNCTION_DETECT  ;
+
+//        Log.d(TABLE_DEVICE, selectQuery);
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{});
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                DetectFunctionEntity funct = new DetectFunctionEntity();
+                funct.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+                funct.setFailPattern(cursor.getString(cursor.getColumnIndex(KEY_FAIL_PATTERN)));
+                funct.setSuccessPattern(cursor.getString(cursor.getColumnIndex(KEY_SUCCESS_PATTERN)));
+                funct.setRemindPattern(cursor.getString(cursor.getColumnIndex(KEY_REMIND_PATTERN)));
+                funct.setFunctionName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                result.add(funct);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        SQLiteManager.getInstance().closeDatabase();
+        return result;
+    }
 
     public void clearAll( ) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();

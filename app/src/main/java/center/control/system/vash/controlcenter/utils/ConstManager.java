@@ -5,10 +5,9 @@ package center.control.system.vash.controlcenter.utils;
  */
 
 public class ConstManager {
-    public static final String ICON_FOLDER =  "/saved_icon";
+    public static final String STAFF_CODE =  "staff.code";
     public static final String SHARED_PREF_NAME = "Sharef preference controlcenter";
     public static final String USERNAME = "key_username";
-    public static final String SYSTEM_ID = "house token id";
     public static final String BOT_TYPE = "bot type";
     public static final String BOT_NAME = "bot name";
     public static final String PASSWORD = "password";

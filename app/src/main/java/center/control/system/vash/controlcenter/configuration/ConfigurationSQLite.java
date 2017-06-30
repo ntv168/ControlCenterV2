@@ -89,6 +89,14 @@ public class ConfigurationSQLite {
 
     }
 
+    public void cleardata() {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONFIGURATION);
+        db.execSQL(createConfiguration());
+        SQLiteManager.getInstance().closeDatabase();
+
+    }
+
     static ConfigurationEntity cursorToEnt(Cursor cursor){
         ConfigurationEntity configuration = new ConfigurationEntity();
         configuration.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));

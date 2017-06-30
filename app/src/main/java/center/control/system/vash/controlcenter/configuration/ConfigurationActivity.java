@@ -1,17 +1,20 @@
 package center.control.system.vash.controlcenter.configuration;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
-import center.control.system.vash.controlcenter.database.SQLiteManager;
-import center.control.system.vash.controlcenter.database.SqLiteHelper;
+import center.control.system.vash.controlcenter.command.CommandSQLite;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
+import center.control.system.vash.controlcenter.trigger.MapDeviceTriggerActivity;
+import center.control.system.vash.controlcenter.trigger.TriggerSQLite;
 
 public class ConfigurationActivity extends AppCompatActivity {
 
@@ -27,8 +30,9 @@ public class ConfigurationActivity extends AppCompatActivity {
         TriggerSQLite triggerSQLite = new TriggerSQLite();
         CommandSQLite commandSQLite = new CommandSQLite();
 
-        SQLiteManager manager = new SQLiteManager();
-        manager.clearAllData();
+        triggerSQLite.cleardata();
+        configurationSQLite.cleardata();
+        commandSQLite.cleardata();
 
         String[] ListConfigurationNames = {"Cảnh báo trộm", "Cháy nổ", "Xì khí gas"};
         String[] ListTriggerNames = {"Cửa chính mở", "Phát hiện người lạ","Phạt hiện người quen",
@@ -68,5 +72,10 @@ public class ConfigurationActivity extends AppCompatActivity {
         ListView lwConfiguration = (ListView) findViewById(R.id.lsConfig);
         lwConfiguration.setAdapter(adapter);
 
+    }
+
+
+    public void clicktoMapTrigger(View view) {
+        startActivity(new Intent(ConfigurationActivity.this,MapDeviceTriggerActivity.class));
     }
 }

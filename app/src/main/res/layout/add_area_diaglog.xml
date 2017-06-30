@@ -38,7 +38,8 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:inputType="text"
-            android:layout_marginBottom="10dp" />
+            android:layout_marginBottom="10dp"
+            android:text="@string/area_name"/>
 
         <TextView
             android:id="@+id/txtNickNameResult"
@@ -53,7 +54,8 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:inputType="text"
-            android:layout_marginBottom="10dp" />
+            android:layout_marginBottom="10dp"
+            android:text="@string/area_second_name"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -67,7 +69,8 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:inputType="text"
-            android:layout_marginBottom="10dp" />
+            android:layout_marginBottom="10dp"
+            android:text="@string/default_ip"/>
 
     </LinearLayout>
 

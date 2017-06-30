@@ -58,20 +58,31 @@ public class TermSQLite {
                 + KEY_WORDS + " TEXT "+ ")";
     }
 
-    public int insertOrUpdateTrain(OwnerTrainEntity train) {
+    public static String insertOrUpdateTrain(OwnerTrainEntity train) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_NAME, train.getName());
-        values.put(KEY_TYPE, train.getType());
-        values.put(KEY_WORDS, train.getWords());
+        String selectQuery =  " SELECT * "
+                + " FROM " + TABLE_OWNER_TRAIN_TERM
+                + " WHERE "+KEY_NAME+" = ? ";
 
-        // Inserting Row
-        int newId=(int)db.insert(TABLE_OWNER_TRAIN_TERM, null, values);
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{train.getName()});
+        if (cursor.moveToFirst()) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_CONTENT, train.getWords()+" "+cursor.getString(cursor.getColumnIndex(KEY_WORDS)));
+            db.update(TABLE_OWNER_TRAIN_TERM, values, KEY_NAME + " = "+train.getName(), null);
+            return train.getName();
+        } else {
+            ContentValues values = new ContentValues();
+            values.put(KEY_NAME, train.getName());
+            values.put(KEY_TYPE, train.getType());
+            values.put(KEY_WORDS, train.getWords());
+            db.insert(TABLE_OWNER_TRAIN_TERM, null, values);
+        };
+
+
         SQLiteManager.getInstance().closeDatabase();
 
-        return newId;
+        return train.getName();
     }
-
 
     public int insertTargetTerm(TargetTernEntity term) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
@@ -153,6 +164,31 @@ public class TermSQLite {
                 term.setDetectFunctionId(cursor.getInt(cursor.getColumnIndex(DETECT_FUNCTION_ID)));
                 term.setDetectSocialId(cursor.getInt(cursor.getColumnIndex(DETECT_SOCIAL_ID)));
                 term.setTfidfPoint(cursor.getDouble(cursor.getColumnIndex(KEY_TFIDF_POINT)));
+
+//                Log.d(TABLE_TERM, term.getContent());
+                result.add(term);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        SQLiteManager.getInstance().closeDatabase();
+
+        return result;
+
+    }
+    public List<OwnerTrainEntity> getOwnerTrain(){
+        List<OwnerTrainEntity> result = new ArrayList<>();
+
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT * "
+                + " FROM " + TABLE_OWNER_TRAIN_TERM;
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{});
+        if (cursor.moveToFirst()) {
+            do {
+                OwnerTrainEntity term = new OwnerTrainEntity();
+                term.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                term.setWords(cursor.getString(cursor.getColumnIndex(KEY_WORDS)));
+                term.setType(cursor.getString(cursor.getColumnIndex(KEY_TYPE)));
 
 //                Log.d(TABLE_TERM, term.getContent());
                 result.add(term);
