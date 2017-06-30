@@ -3,6 +3,7 @@ package center.control.system.vash.controlcenter;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -63,6 +64,13 @@ public class PersonalInfoActivity extends AppCompatActivity {
     private Spinner spinBotRole;
     private String botRole;
     private String ownerRole;
+    TextView txtHouseOwnerName;
+    TextView txtHouseOwnerID;
+    TextView txtHouseOwnerPhone;
+    TextView txtContractType;
+    TextView txtHouseAddress;
+    TextView txtContractID;
+    TextView txtActiveDay;
 
     @Override
     protected void onResume() {
@@ -103,6 +111,23 @@ public class PersonalInfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.personal);
+
+        txtHouseOwnerName = (TextView) findViewById(R.id.txtHouseOwnerName);
+        txtHouseOwnerID = (TextView) findViewById(R.id.txtHouseOwnerID);
+        txtHouseOwnerPhone = (TextView) findViewById(R.id.txtHouseOwnerPhone);
+        txtContractType = (TextView) findViewById(R.id.txtContractType);
+        txtHouseAddress = (TextView) findViewById(R.id.txtHouseAddress);
+        txtContractID = (TextView) findViewById(R.id.txtContractType);
+        txtActiveDay = (TextView) findViewById(R.id.txtActiveDay);
+
+        // Get House Owner and Contract Info
+        txtHouseOwnerName.setText(sharedPreferences.getString(ConstManager.OWNER_NAME,""));
+        txtHouseOwnerID.setText(sharedPreferences.getString(ConstManager.OWNER_CMND,""));
+        txtHouseOwnerPhone.setText(sharedPreferences.getString(ConstManager.OWNER_TEL,""));
+//        txtContractType.setText(sharedPreferences.getString(ConstManager.OWNE,""));
+        txtHouseAddress.setText(sharedPreferences.getString(ConstManager.OWNER_ADD,""));
+        txtContractID.setText(sharedPreferences.getString(ConstManager.CONTRACT_ID,""));
+        txtActiveDay.setText(sharedPreferences.getString(ConstManager.ACTIVE_DAY,""));
 
         final Dialog vaSetDiag = new Dialog(this);
         vaSetDiag.requestWindowFeature(Window.FEATURE_NO_TITLE);

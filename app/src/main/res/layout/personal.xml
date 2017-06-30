@@ -75,13 +75,98 @@
                 android:text="Thông tin khách hàng"
                 android:textColor="@color/nGreen1" />
 
-            <ListView
-                android:id="@+id/lsHouseOwnerInfo"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal"
+                android:weightSum="6">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Tên chủ nhà"
+                    android:textColor="@color/nMGray" />
+
+                <TextView
+                    android:id="@+id/txtHouseOwnerName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:text="Giá trị"
+                    android:textColor="@color/nDarkGray"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
                 android:layout_marginBottom="20dp"
-                android:layout_weight="1"
-                android:paddingLeft="20dp"></ListView>
+                android:layout_marginTop="10dp"
+                android:background="@color/nLGray" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal"
+                android:weightSum="6">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="CMND"
+                    android:textColor="@color/nMGray" />
+
+                <TextView
+                    android:id="@+id/txtHouseOwnerID"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:text="Giá trị"
+                    android:textColor="@color/nDarkGray"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/nLGray" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal"
+                android:weightSum="6">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="SĐT"
+                    android:textColor="@color/nMGray" />
+
+                <TextView
+                    android:id="@+id/txtHouseOwnerPhone"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:text="Giá trị"
+                    android:textColor="@color/nDarkGray"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/nLGray" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -90,12 +175,129 @@
                 android:text="Thông tin hợp đồng"
                 android:textColor="@color/nGreen1" />
 
-            <ListView
-                android:id="@+id/lsContractInfo"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingLeft="20dp"></ListView>
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal"
+                android:weightSum="6">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Gói hợp đồng"
+                    android:textColor="@color/nMGray" />
+
+                <TextView
+                    android:id="@+id/txtContractType"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:text="Giá trị"
+                    android:textColor="@color/nDarkGray"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/nLGray" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal"
+                android:weightSum="6">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Địa chỉ"
+                    android:textColor="@color/nMGray" />
+
+                <TextView
+                    android:id="@+id/txtHouseAddress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:text="Giá trị"
+                    android:textColor="@color/nDarkGray"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/nLGray" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal"
+                android:weightSum="6">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Mã hợp đồng"
+                    android:textColor="@color/nMGray" />
+
+                <TextView
+                    android:id="@+id/txtContractID"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:text="Giá trị"
+                    android:textColor="@color/nDarkGray"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/nLGray" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal"
+                android:weightSum="6">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Ngày ký hợp đồng"
+                    android:textColor="@color/nMGray" />
+
+                <TextView
+                    android:id="@+id/txtActiveDay"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:text="Giá trị"
+                    android:textColor="@color/nDarkGray"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/nLGray" />
         </LinearLayout>
 
         <View
