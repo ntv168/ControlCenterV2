@@ -16,22 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
-import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.area.AreaSQLite;
-import center.control.system.vash.controlcenter.device.DeviceEntity;
-import center.control.system.vash.controlcenter.device.DeviceSQLite;
-import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.nlp.VoiceUtils;
 import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.HouseKeyDTO;
@@ -50,20 +34,10 @@ public class MainActivity extends Activity {
     private String username;
     private String password;
     private String houseId;
-    private String staticAddress;
-    private String contractCode;
-    private String ownerName;
-    private String ownerAddress;
-    private String ownerTel;
-    private String ownerCmnd;
     private String contractId;
-    private String activeDay;
-    private String virtualAssistantName;
-    private String virtualAssistantType;
     private ProgressDialog loginDia;
     EditText txtusername;
     EditText txtpassword;
-    private int virtualAssistantId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,20 +54,26 @@ public class MainActivity extends Activity {
         Button btnLogin = (Button) findViewById(R.id.btnLogin);
           txtusername = (EditText) findViewById(R.id.txtUsername);
           txtpassword = (EditText) findViewById(R.id.txtPassword);
-
-        txtpassword.setText(password);
-        txtusername.setText(username);
         sharedPreferences =getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
-        String usename = sharedPreferences.getString(ConstManager.USERNAME,"");
-        ((EditText) findViewById(R.id.txtUsername)).setText(usename);
+        txtusername.setText(sharedPreferences.getString(ConstManager.USERNAME,""));
+
         loginDia = new ProgressDialog(this);
         loginDia.setTitle("Đăng nhập vào hệ thống");
         loginDia.setMessage("Vui lòng đợi");
+
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginDia.show();
-                loginSmartHouse();
+                Log.d(TAG,contractId+"");
+                if (contractId!= null &&
+                        txtpassword.getText().toString().length()>5 &&
+                        contractId.contains(txtpassword.getText().toString())){
+                    startActivity(new Intent(MainActivity.this,SettingPanel.class));
+                    finish();
+                } else {
+                    loginDia.show();
+                    loginSmartHouse();
+                }
             }
         });
 
@@ -127,23 +107,14 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         houseId = sharedPreferences.getString(ConstManager.SYSTEM_ID,"");
-        staticAddress = sharedPreferences.getString(ConstManager.STATIC_ADDRESS,"");
-        contractCode = sharedPreferences.getString(ConstManager.CONTRACT_CODE,"");
-        ownerName = sharedPreferences.getString(ConstManager.OWNER_NAME,"");
-        ownerAddress = sharedPreferences.getString(ConstManager.OWNER_ADD,"");
-        ownerTel = sharedPreferences.getString(ConstManager.OWNER_TEL,"");
-        ownerCmnd = sharedPreferences.getString(ConstManager.OWNER_CMND,"");
         contractId = sharedPreferences.getString(ConstManager.CONTRACT_ID,"");
-        activeDay = sharedPreferences.getString(ConstManager.ACTIVE_DAY,"");
-        virtualAssistantName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
-        virtualAssistantType = sharedPreferences.getString(ConstManager.BOT_TYPE,"");
-        virtualAssistantId = sharedPreferences.getInt(ConstManager.BOT_TYPE_ID,-1);
         username = sharedPreferences.getString(ConstManager.USERNAME,"");
         password = sharedPreferences.getString(ConstManager.PASSWORD,"");
         Log.d(TAG,houseId+" id house");
-        if (!houseId.equals("")){
+        if (houseId.length()>2){
             Intent intent = new Intent(MainActivity.this, ControlPanel.class);
             startActivity(intent);
+            finish();
         }
     }
 
@@ -157,22 +128,25 @@ public class MainActivity extends Activity {
             public void onResponse(Call<LoginSmarthouseDTO> call, retrofit2.Response<LoginSmarthouseDTO> response) {
                 if (response.body()!= null && response.body().getHouseId()!= null) {
                     Log.d(TAG,call.request().url()+" --- "+response.body().getHouseId());
-                    username = key.getUsername();
-                    password = key.getPassword();
-                    houseId = response.body().getHouseId();
-                    staticAddress = response.body().getStaticAddress();
-                    contractCode = response.body().getContractCode();
-                    ownerName = response.body().getOwnerName();
-                    ownerAddress = response.body().getOwnerAddress();
-                    ownerTel = response.body().getOwnerTel();
-                    ownerCmnd = response.body().getOwnerCmnd();
-                    contractId = response.body().getContractId();
-                    activeDay = response.body().getActiveDay();
-                    virtualAssistantName = response.body().getVirtualAssistantName();
-                    virtualAssistantType = response.body().getVirtualAssistantType();
-                    Log.d(TAG,virtualAssistantType);
-                    virtualAssistantId = response.body().getVirtualAssistantTypeId();
+                    SharedPreferences.Editor edit = sharedPreferences.edit();
+                    edit.putString(ConstManager.SYSTEM_ID,response.body().getHouseId());
+                    edit.putString(ConstManager.USERNAME,key.getUsername());
+                    edit.putString(ConstManager.STATIC_ADDRESS,response.body().getStaticAddress());
+                    edit.putString(ConstManager.CONTRACT_CODE,response.body().getContractCode());
+                    edit.putString(ConstManager.OWNER_NAME,response.body().getOwnerName());
+                    edit.putString(ConstManager.OWNER_ADD,response.body().getOwnerAddress());
+                    edit.putString(ConstManager.OWNER_TEL,response.body().getOwnerTel());
+                    edit.putString(ConstManager.OWNER_CMND,response.body().getOwnerCmnd());
+                    edit.putString(ConstManager.CONTRACT_ID,response.body().getContractId());
+                    edit.putString(ConstManager.ACTIVE_DAY,response.body().getActiveDay());
+                    edit.putString(ConstManager.BOT_NAME,response.body().getVirtualAssistantName());
+                    edit.putString(ConstManager.BOT_TYPE,response.body().getVirtualAssistantType());
+                    edit.putInt(ConstManager.BOT_TYPE_ID,response.body().getVirtualAssistantTypeId());
+                    SmartHouse.getInstance().setContractId(contractId);
+                    edit.commit();
+                    Log.d(TAG,response.body().getVirtualAssistantType());
                     startActivity( new Intent(MainActivity.this, ControlPanel.class));
+                    finish();
                 } else {
                     Log.d(TAG,call.request().url()+" sai ten");
                     Toast.makeText(MainActivity.this,"Sai tên đăng nhập mật khẩu",Toast.LENGTH_LONG).show();
@@ -203,28 +177,5 @@ public class MainActivity extends Activity {
             }
         });
 
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        SharedPreferences.Editor edit = sharedPreferences.edit();
-        edit.putString(ConstManager.SYSTEM_ID,houseId);
-        edit.putString(ConstManager.USERNAME,username);
-        edit.putString(ConstManager.PASSWORD,password);
-        edit.putString(ConstManager.STATIC_ADDRESS,staticAddress);
-        edit.putString(ConstManager.CONTRACT_CODE,contractCode);
-        edit.putString(ConstManager.OWNER_NAME,ownerName);
-        edit.putString(ConstManager.OWNER_ADD,ownerAddress);
-        edit.putString(ConstManager.OWNER_TEL,ownerTel);
-        edit.putString(ConstManager.OWNER_CMND,ownerCmnd);
-        edit.putString(ConstManager.CONTRACT_ID,contractId);
-        edit.putString(ConstManager.ACTIVE_DAY,activeDay);
-        edit.putString(ConstManager.BOT_NAME,virtualAssistantName);
-        edit.putString(ConstManager.BOT_TYPE,virtualAssistantType);
-        edit.putInt(ConstManager.BOT_TYPE_ID,virtualAssistantId);
-        SmartHouse.getInstance().setContractId(contractId);
-        Log.d(TAG,"saved on pause "+virtualAssistantType);
-        edit.commit();
     }
 }

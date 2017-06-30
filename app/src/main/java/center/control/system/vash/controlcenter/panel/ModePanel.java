@@ -21,7 +21,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -31,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.SettingPanel;
 import center.control.system.vash.controlcenter.configuration.CommandEntity;
 import center.control.system.vash.controlcenter.script.ListDeviceInScriptAdapter;
 import center.control.system.vash.controlcenter.script.ListScriptAdapter;
@@ -172,12 +172,8 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
         startActivity(new Intent(this, ControlPanel.class));
     }
 
-    public void clicktoModePanel(View view) {
-        startActivity(new Intent(this, ModePanel.class));
-    }
-
     public void clicktoSettingPanel(View view) {
-        startActivity(new Intent(this, SettingPanel.class));
+        startActivity(new Intent(this, UserSettingPanel.class));
     }
 
     public void clicktoVAPanel(View view) {

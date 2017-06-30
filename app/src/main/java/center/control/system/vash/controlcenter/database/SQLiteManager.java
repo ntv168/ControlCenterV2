@@ -62,6 +62,7 @@ public class SQLiteManager {
         db.execSQL("DROP TABLE IF EXISTS " + ScriptSQLite.TABLE_SCRIPT_DEVICE);
         db.execSQL("DROP TABLE IF EXISTS " + TermSQLite.TABLE_HUMAN_TERM);
         db.execSQL("DROP TABLE IF EXISTS " + TermSQLite.TABLE_TARGET_TERM);
+        db.execSQL("DROP TABLE IF EXISTS " + TermSQLite.TABLE_OWNER_TRAIN_TERM);
         db.execSQL("DROP TABLE IF EXISTS " + DetectIntentSQLite.TABLE_FUNCTION_DETECT);
         db.execSQL("DROP TABLE IF EXISTS " + DetectIntentSQLite.TABLE_SOCIAL_DETECT);
 
@@ -75,6 +76,7 @@ public class SQLiteManager {
         db.execSQL(ScriptSQLite.createScriptDeviceTable());
         db.execSQL(ScriptSQLite.createScriptTable());
         db.execSQL(TermSQLite.createHumanTerm());
+        db.execSQL(TermSQLite.createTrainTerm());
         db.execSQL(TermSQLite.createTargetTerm());
         db.execSQL(DetectIntentSQLite.createFunction());
         db.execSQL(DetectIntentSQLite.createSocial());

@@ -1,7 +1,5 @@
 package center.control.system.vash.controlcenter.server;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -11,16 +9,11 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-import center.control.system.vash.controlcenter.MainActivity;
 import center.control.system.vash.controlcenter.area.AreaEntity;
 
 import center.control.system.vash.controlcenter.configuration.CommandEntity;
-import center.control.system.vash.controlcenter.database.SQLiteManager;
-import center.control.system.vash.controlcenter.panel.SettingPanel;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
-import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
-import retrofit2.http.Path;
 
 /**
  * Created by Thuans on 4/19/2017.

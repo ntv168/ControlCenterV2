@@ -35,6 +35,15 @@ public class AreaEntity extends TargetObject{
     private String personDetect;
     private Bitmap imageBitmap;
     private boolean hasCamera = true;
+    private double detectScore;
+
+    public double getDetectScore() {
+        return detectScore;
+    }
+
+    public void setDetectScore(double detectScore) {
+        this.detectScore = detectScore;
+    }
 
     public String getPersonDetect() {
         return personDetect;

@@ -3,14 +3,12 @@ package center.control.system.vash.controlcenter.service;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import center.control.system.vash.controlcenter.panel.ControlPanel;
-import center.control.system.vash.controlcenter.panel.SettingPanel;
 import center.control.system.vash.controlcenter.server.WebServer;
 
 /**

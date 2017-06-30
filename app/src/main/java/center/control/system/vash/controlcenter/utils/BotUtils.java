@@ -16,6 +16,7 @@ import center.control.system.vash.controlcenter.configuration.CommandEntity;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.device.TargetObject;
+import center.control.system.vash.controlcenter.nlp.CurrentContext;
 import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
@@ -117,6 +118,23 @@ public class BotUtils {
             return bestDevice ;
 
     }
+    public static double findBestDeviceTfidf(List<TargetTernEntity> termTargets) {
+        Map<Integer,Double> sumTfidfTarget = new HashMap<>();
+        double maxTfidf = 0;
+        for (TargetTernEntity termTarget: termTargets){
+            if (termTarget.getDetectDeviceId() != -1) {
+                double currentPoint = termTarget.getTfidfPoint();
+                if (sumTfidfTarget.containsKey(termTarget.getDetectDeviceId())) {
+                    currentPoint += sumTfidfTarget.get(termTarget.getDetectDeviceId());
+                }
+                sumTfidfTarget.put(termTarget.getDetectDeviceId(), currentPoint);
+                if (currentPoint > maxTfidf ) {
+                    maxTfidf = currentPoint;
+                }
+            }
+        }
+        return maxTfidf ;
+    }
 
 
     public static Map<Integer,Map<String,Integer>> readTargettoHashMap(List<? extends TargetObject> objs) {
@@ -142,7 +160,7 @@ public class BotUtils {
                 count++;
             }
             tmp.put(words[i], count);
-            Log.d(TAG,words[i] +  "  co: "+count);
+//            Log.d(TAG,words[i] +  "  co: "+count);
         }
         return tmp;
     }
@@ -203,6 +221,23 @@ public class BotUtils {
         } else
             return null;
     }
+    public static double findBestArreaTfidf(List<TargetTernEntity> termTargets) {
+        Map<Integer,Double> sumTfidfTarget = new HashMap<>();
+        double maxTfidf = 0;
+        for (TargetTernEntity termTarget: termTargets){
+            if (termTarget.getDetectAreaId() != -1) {
+                double currentPoint = termTarget.getTfidfPoint();
+                if (sumTfidfTarget.containsKey(termTarget.getDetectAreaId())) {
+                    currentPoint += sumTfidfTarget.get(termTarget.getDetectAreaId());
+                }
+                sumTfidfTarget.put(termTarget.getDetectAreaId(), currentPoint);
+                if (currentPoint > maxTfidf) {
+                    maxTfidf = currentPoint;
+                }
+            }
+        }
+            return maxTfidf;
+    }
 
     public static ScriptEntity findBestScript(List<TargetTernEntity> termTargets) {
         Map<Integer,Double> sumTfidfTarget = new HashMap<>();
@@ -227,6 +262,24 @@ public class BotUtils {
         } else
             return null;
     }
+    public static double findBestScriptTfidf(List<TargetTernEntity> termTargets) {
+        Map<Integer,Double> sumTfidfTarget = new HashMap<>();
+        double maxTfidf = 0;
+        for (TargetTernEntity termTarget: termTargets){
+            if (termTarget.getDetectScriptId() != -1) {
+                double currentPoint = termTarget.getTfidfPoint();
+                if (sumTfidfTarget.containsKey(termTarget.getDetectScriptId())) {
+                    currentPoint += sumTfidfTarget.get(termTarget.getDetectScriptId());
+                }
+                sumTfidfTarget.put(termTarget.getDetectScriptId(), currentPoint);
+                if (currentPoint > maxTfidf) {
+                    maxTfidf = currentPoint;
+                }
+            }
+        }
+
+        return maxTfidf;
+    }
     public static String getTime(){
         Date time = new Date();
         Log.d(TAG,time.toString());
@@ -242,6 +295,62 @@ public class BotUtils {
 //        Log.d(TAG,time.getMonth()+ " "+time.getYear()+" "+time.getDate()+" "+time.getDay());
         result += " ngày "+day+" tháng "+month+" ";
         return result;
+    }
+    public void saveFunctionTFIDFTerm(Map<String,Map<String,Integer>> trainingSetMap) {
+
+        Map<String,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
+        TermSQLite sqLite= new TermSQLite();
+        Iterator it = trainingSetMap.entrySet().iterator();
+        while (it.hasNext()){
+            Map.Entry pair = (Map.Entry) it.next();
+            String functionName = (String)pair.getKey();
+            int functId = DetectIntentSQLite.findFunctionByName(functionName).getId();
+            Map<String, Integer> wordCount = (Map<String, Integer>) pair.getValue();
+
+            Iterator wit = wordCount.entrySet().iterator();
+            while (wit.hasNext()){
+                Map.Entry termPair = (Map.Entry) wit.next();
+                String term = (String) termPair.getKey();
+                double termTfidf =1.0;
+                termTfidf = TFIDFIntent.createTfIdf(cloneForCalculate, term, functionName);
+                Log.d(TAG, termTfidf + "   " + term + "  "+functionName);
+
+                TermEntity termEnt = new TermEntity();
+                termEnt.setDetectFunctionId(functId);
+                termEnt.setDetectSocialId(-1);
+                termEnt.setTfidfPoint(termTfidf);
+                termEnt.setContent(" "+term+" ");
+                sqLite.insertHumanTerm(termEnt);
+            }
+        }
+    }
+    public void saveSocialTFIDFTerm(Map<String,Map<String,Integer>> trainingSetMap) {
+
+        Map<String,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
+        TermSQLite sqLite= new TermSQLite();
+        Iterator it = trainingSetMap.entrySet().iterator();
+        while (it.hasNext()){
+            Map.Entry pair = (Map.Entry) it.next();
+            String socialName = (String)pair.getKey();
+            int socId = DetectIntentSQLite.findSocialByName(socialName).getId();
+            Map<String, Integer> wordCount = (Map<String, Integer>) pair.getValue();
+
+            Iterator wit = wordCount.entrySet().iterator();
+            while (wit.hasNext()){
+                Map.Entry termPair = (Map.Entry) wit.next();
+                String term = (String) termPair.getKey();
+                double termTfidf =1.0;
+                termTfidf = TFIDFIntent.createTfIdf(cloneForCalculate, term, socialName);
+                Log.d(TAG, termTfidf + "   " + term + "  "+socialName);
+
+                TermEntity termEnt = new TermEntity();
+                termEnt.setDetectFunctionId(-1);
+                termEnt.setDetectSocialId(socId);
+                termEnt.setTfidfPoint(termTfidf);
+                termEnt.setContent(" "+term+" ");
+                sqLite.insertHumanTerm(termEnt);
+            }
+        }
     }
     public void saveDeviceTFIDFTerm(List<DeviceEntity> listDevices) {
 
@@ -263,7 +372,7 @@ public class BotUtils {
                 if (termTfidf ==0.0){
                     termTfidf = 1.0;
                 }
-                Log.d(TAG, termTfidf + "   " + term + "   " + deviceId);
+//                Log.d(TAG, termTfidf + "   " + term + "   " + deviceId);
 
                 TargetTernEntity targetTerm = new TargetTernEntity();
                 targetTerm.setDetectDeviceId(deviceId);
@@ -295,7 +404,7 @@ public class BotUtils {
                 if (termTfidf ==0.0){
                     termTfidf = 1.0;
                 }
-                    Log.d(TAG,termTfidf+"   "+term+"   "+areaId);
+//                    Log.d(TAG,termTfidf+"   "+term+"   "+areaId);
 
                 TargetTernEntity targetTerm = new TargetTernEntity();
                 targetTerm.setDetectAreaId(areaId);
@@ -328,7 +437,7 @@ public class BotUtils {
                 if (termTfidf ==0.0){
                     termTfidf = 1.0;
                 }
-                    Log.d(TAG,termTfidf+" ");
+//                    Log.d(TAG,termTfidf+" ");
 
                 TargetTernEntity targetTerm = new TargetTernEntity();
                 targetTerm.setDetectScriptId(scriptId);
@@ -420,6 +529,142 @@ public class BotUtils {
                 return area.getElectricUsing();
         }
         return null;
+    }
+    public static String botReplyToSentence(String humanSay){
+
+        TermSQLite termSQLite = new TermSQLite();
+        List<TermEntity> terms = termSQLite.getHumanIntentInSentence(humanSay);
+        DetectFunctionEntity functFound = BotUtils.findBestFunctDetected(terms);
+        DetectSocialEntity socialFound = BotUtils.findBestSocialDetected(terms);
+        if (functFound != null && socialFound != null) {
+            double functionTfidf = functFound.getDetectScore();
+            List<TargetTernEntity> termTargets = TermSQLite.getTargetInSentence(humanSay);
+            functionTfidf += BotUtils.findBestArreaTfidf(termTargets)+ BotUtils.findBestDeviceTfidf(termTargets)
+                    +BotUtils.findBestScriptTfidf(termTargets);
+            Log.d(TAG,"funct point: "+functionTfidf+ " soc point "+socialFound.getDetectScore());
+            if (functionTfidf > socialFound.getDetectScore()){
+               return   processFunction(humanSay,functFound);
+            } else {
+                return  processSocial(humanSay,socialFound);
+            }
+        } else if (functFound == null && socialFound != null) {
+            processSocial(humanSay, socialFound);
+        }else if (functFound != null && socialFound == null){
+            processFunction(humanSay, functFound);
+        } else {
+            DetectSocialEntity notUnderReply = BotUtils.getSocialByName(ConstManager.NOT_UNDERSTD);
+            return BotUtils.completeSentence(notUnderReply.getQuestionPattern(), "", "");
+        }
+        return "";
+    }
+    private static String processFunction(String humanSay, DetectFunctionEntity functionIntent){
+        List<TargetTernEntity> termTargets = TermSQLite.getTargetInSentence(humanSay);
+        if (ConstManager.FUNCTION_FOR_SCRIPT.contains(functionIntent.getFunctionName())){
+            ScriptEntity mode = BotUtils.findBestScript(termTargets);
+            if (mode != null) {
+//                BotUtils.implementCommand(functionIntent,null,mode);
+                CurrentContext.getInstance().renew();
+            } else {
+                DetectSocialEntity askWhichMode = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_MODE);
+
+                CurrentContext current = CurrentContext.getInstance();
+                current.setDetectedFunction(functionIntent);
+
+                return BotUtils.completeSentence(askWhichMode.getQuestionPattern(),
+                        BotUtils.getVerbByIntent(functionIntent.getFunctionName()), "");
+
+            }
+        } else if (ConstManager.FUNCTION_FOR_DEVICE.contains(functionIntent.getFunctionName())){
+            AreaEntity area = BotUtils.findBestArea(termTargets);
+            String target;
+            if (area != null) {
+                DeviceEntity device = BotUtils.findBestDevice(termTargets,area.getId());
+                if (device == null) {
+                    Log.d(TAG, "Tim thấy không gian " + area.getName() + " mà không tìm thấy thiết bị");
+                    DetectSocialEntity askWhichDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEAREA);
+                    CurrentContext current = CurrentContext.getInstance();
+                    current.setDetectedFunction(functionIntent);
+                    current.setArea(area);
+
+                    target = area.getName();
+                    return BotUtils.completeSentence(askWhichDevice.getQuestionPattern(),
+                            BotUtils.getVerbByIntent(functionIntent.getFunctionName()), target);
+                } else {
+                    Log.d(TAG, "Tìm thấy cả hai" + device.getName()+area.getName());
+//                    BotUtils.implementCommand(functionIntent,device,null);
+                    CurrentContext.getInstance().renew();
+                }
+            } else {
+                DeviceEntity deviceOnly = BotUtils.findBestDevice(termTargets, -1);
+                if (deviceOnly != null) {
+                    Log.d(TAG, "Tim thấy thiet bị ,mà không co không gian " + deviceOnly.getName());
+
+                    CurrentContext current = CurrentContext.getInstance();
+                    current.setDetectedFunction(functionIntent);
+                    current.setDevice(deviceOnly);
+                    current.setSentence(humanSay);
+
+                    area = AreaSQLite.findById(deviceOnly.getAreaId());
+                    target = deviceOnly.getName()+" trong "+area.getName();
+                    return BotUtils.completeSentence(functionIntent.getRemindPattern(), "", target);
+
+                } else {
+                    CurrentContext current = CurrentContext.getInstance();
+                    if (current.getDevice() != null){
+//                        BotUtils.implementCommand(functionIntent,current.getDevice(),null);
+                        current.renew();
+                    } else {
+                        String verb = BotUtils.getVerbByIntent(functionIntent.getFunctionName());
+                        DetectSocialEntity askDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEONLY);
+                        return BotUtils.completeSentence(askDevice.getQuestionPattern(), verb, "");
+                    }
+                }
+            }
+        } else if (functionIntent.getFunctionName().contains("check")){
+            Log.d(TAG,"check trang thai phong");
+            AreaEntity area = BotUtils.findBestArea(termTargets);
+            if (area != null) {
+                Log.d(TAG,"Thay phong "+area.getName());
+                String resultVal = BotUtils.getAttributeByFunction(functionIntent.getFunctionName(),area);
+                String replyComplete ="";
+                if (resultVal == null){
+                    replyComplete=BotUtils.completeSentence(functionIntent.getFailPattern(), resultVal, area.getName());
+                } else {
+                    replyComplete=BotUtils.completeSentence(functionIntent.getSuccessPattern(), resultVal, area.getName());
+                }
+                return replyComplete;
+                //
+            } else {
+                Log.d(TAG,"Khong tim thay phong");
+                CurrentContext current = CurrentContext.getInstance();
+                current.setDetectedFunction(functionIntent);
+                current.setSentence(humanSay);
+
+                String replyComplete = BotUtils.completeSentence(functionIntent.getRemindPattern(),"","");
+                return replyComplete;
+            }
+        }
+        return "";
+    }
+    private static String processSocial(String humanSay, DetectSocialEntity socialIntent){
+        CurrentContext current = CurrentContext.getInstance();
+//        current.setDetectSocial(socialIntent);
+//        showReply("Mục đích "+socialIntent.getName());
+        String replyComplete;
+        String result = "";
+        if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_TIME)){
+            result = BotUtils.getTime();
+        } else if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_DAY)){
+            result = BotUtils.getDay();
+        } else if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_SEX)){
+            result = "gái";
+        } else if (socialIntent.getName().equals(ConstManager.SOCIAL_AGREE)){
+            if (current.getDetectedFunction() != null){
+                processFunction(current.getSentence(),current.getDetectedFunction());
+            }
+        }
+        return BotUtils.completeSentence(socialIntent.getReplyPattern(), result, "");
+
     }
 //    public static IntentLearned getIntentById(int id){
 //        IntentLearnedSQLite intentLearnedSQLite = new IntentLearnedSQLite();

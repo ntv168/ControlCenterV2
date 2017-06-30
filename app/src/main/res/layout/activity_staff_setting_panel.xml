@@ -7,9 +7,7 @@
     android:background="@drawable/background"
     android:gravity="right"
     android:weightSum="8"
-    tools:context="center.control.system.vash.controlcenter.SettingPanel">
-
-
+    tools:context="center.control.system.vash.controlcenter.panel.UserSettingPanel">
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -17,7 +15,7 @@
         android:layout_weight="8"
         android:background="@drawable/background_content"
         android:orientation="vertical"
-        android:weightSum="2">
+        android:weightSum="2.05">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,10 +23,10 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="horizontal"
-            android:weightSum="2">
+            android:weightSum="2.1">
 
             <ImageButton
-                android:id="@+id/btnSetDevice"
+                android:id="@+id/btnPerson"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_marginTop="20dp"
@@ -36,7 +34,7 @@
                 android:background="@android:color/transparent"
                 android:paddingLeft="70dp"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/icn_network" />
+                app:srcCompat="@drawable/ic_user" />
 
             <View
                 android:layout_width="1dp"
@@ -45,7 +43,7 @@
                 android:background="#80FFFFFF" />
 
             <ImageButton
-                android:id="@+id/btnSetConfig"
+                android:id="@+id/btnNotice"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_marginTop="20dp"
@@ -53,7 +51,7 @@
                 android:background="@android:color/transparent"
                 android:paddingRight="70dp"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/icn_wrench" />
+                app:srcCompat="@drawable/bell" />
 
         </LinearLayout>
 
@@ -73,7 +71,7 @@
             android:weightSum="2">
 
             <ImageButton
-                android:id="@+id/btnSetReset"
+                android:id="@+id/btnContact"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_marginBottom="20dp"
@@ -81,7 +79,7 @@
                 android:background="@android:color/transparent"
                 android:paddingLeft="70dp"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/icn_refresh" />
+                app:srcCompat="@drawable/phone" />
 
             <View
                 android:layout_width="1dp"
@@ -101,6 +99,14 @@
                 app:srcCompat="@drawable/icn_logout" />
 
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include layout="@layout/tab_menu" />
     </LinearLayout>
 
 </LinearLayout>

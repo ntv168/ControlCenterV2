@@ -1,73 +1,32 @@
-package center.control.system.vash.controlcenter.panel;
+package center.control.system.vash.controlcenter;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.microsoft.projectoxford.face.FaceServiceClient;
 import com.microsoft.projectoxford.face.contract.Person;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import center.control.system.vash.controlcenter.App;
-import center.control.system.vash.controlcenter.MainActivity;
-import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.configuration.ConfigurationActivity;
-import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
-import center.control.system.vash.controlcenter.device.DeviceEntity;
-import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.helper.StorageHelper;
-import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
-import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
-import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
-import center.control.system.vash.controlcenter.nlp.TargetTernEntity;
-import center.control.system.vash.controlcenter.nlp.TermEntity;
-import center.control.system.vash.controlcenter.nlp.TermSQLite;
-import center.control.system.vash.controlcenter.script.ScriptEntity;
-import center.control.system.vash.controlcenter.script.ScriptSQLite;
-import center.control.system.vash.controlcenter.server.AssistantTypeDTO;
-import center.control.system.vash.controlcenter.server.BotDataCentralDTO;
-import center.control.system.vash.controlcenter.server.CloudApi;
-import center.control.system.vash.controlcenter.server.FunctionIntentDTO;
-import center.control.system.vash.controlcenter.server.RetroFitSingleton;
-import center.control.system.vash.controlcenter.server.SocialIntentDTO;
-import center.control.system.vash.controlcenter.server.TermDTO;
-import center.control.system.vash.controlcenter.service.WebServerService;
-import center.control.system.vash.controlcenter.utils.BotUtils;
+import center.control.system.vash.controlcenter.panel.ControlPanel;
+import center.control.system.vash.controlcenter.panel.ModePanel;
+import center.control.system.vash.controlcenter.panel.VAPanel;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
-import center.control.system.vash.controlcenter.utils.TFIDF;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class SettingPanel extends AppCompatActivity {
     private static final String TAG = "Setting Panel";
@@ -76,10 +35,6 @@ public class SettingPanel extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_panel);
-        ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnSetting);
-        currentTab.setImageResource(R.drawable.tab_setting_active);
-        currentTab.setBackgroundColor(Color.WHITE);
-
 
         final Dialog dialog = new Dialog(SettingPanel.this);
         dialog.setContentView(R.layout.activate_diaglog);
@@ -125,12 +80,6 @@ public class SettingPanel extends AppCompatActivity {
         btnSetLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
-                SharedPreferences.Editor edit = sharedPreferences.edit();
-                SmartHouse.getInstance().removeAllAreaAndItsDevice();
-                edit.putString(ConstManager.SYSTEM_ID,"");
-                edit.commit();
-                SQLiteManager.getInstance().clearAllData();
                 startActivity(new Intent(SettingPanel.this, MainActivity.class));
             }
         });
@@ -145,24 +94,6 @@ public class SettingPanel extends AppCompatActivity {
 
 
     }
-
-    public void clicktoControlPanel(View view) {
-        startActivity(new Intent(this, ControlPanel.class));
-    }
-
-    public void clicktoModePanel(View view) {
-        startActivity(new Intent(this, ModePanel.class));
-    }
-
-    public void clicktoSettingPanel(View view) {
-        startActivity(new Intent(this, SettingPanel.class));
-    }
-
-    public void clicktoVAPanel(View view) {
-        startActivity(new Intent(this, VAPanel.class));
-    }
-
-
 
 
     class GetPersonIdsTask extends AsyncTask<String, String, Person[]> {

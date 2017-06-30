@@ -175,7 +175,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                         AreaSQLite sqLite = new AreaSQLite();
                         int areaId = sqLite.insert(area);
                         area.setId(areaId);
-                        house.getAreas().add(area);
+                        house.addArea(area);
                         areaAdapter.setAreas(house.getAreas());
 
                         return area;
@@ -193,7 +193,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                                 device.setAreaId(areaId);
                                 int deviceId = sqLite.insert(device);
                                 device.setId(deviceId);
-                                house.getDevices().add(device);
+                                house.addDevice(device);
                             }
                         }
                         devicesAdapter.setDevices(house.getDevicesByAreaId(areaId));
@@ -276,7 +276,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                             device.setState("off");
                             int deviceId =sqLite.insert(device);
                             device.setId(deviceId);
-                            house.getDevices().add(device);
+                            house.addDevice(device);
                         }
                         devicesAdapter.setDevices(house.getDevicesByAreaId(currentArea.getId()));
                     }

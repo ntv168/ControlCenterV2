@@ -76,14 +76,6 @@
                 android:src="@drawable/icn_voice"
                 android:tint="@color/nWhite" />
 
-            <ImageButton
-                android:id="@+id/btnVAConfig"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:scaleType="fitCenter"
-                android:src="@drawable/icn_va_config"
-                android:tint="@color/nWhite" />
         </LinearLayout>
     </LinearLayout>
 

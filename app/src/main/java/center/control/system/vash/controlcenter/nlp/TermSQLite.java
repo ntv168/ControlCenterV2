@@ -18,15 +18,19 @@ public class TermSQLite {
 
     public static final String TABLE_TARGET_TERM = "target_term";
     public static final String TABLE_HUMAN_TERM = "human_term";
+    public static final String TABLE_OWNER_TRAIN_TERM = "owner_train_term";
     // Contacts Table Columns names
     private static final String KEY_ID = "id";
     private static final String KEY_CONTENT = "content";
+    private static final String KEY_NAME = "name";
     private static final String KEY_TFIDF_POINT = "tfidfPoint";
     private static final String DETECT_DEVICE_ID = "detectDeviceId";
     private static final String DETECT_AREA_ID = "detectAreaId";
     private static final String DETECT_SCRIPT_ID = "detectScriptId";
     private static final String DETECT_FUNCTION_ID = "detectFunctionId";
     private static final String DETECT_SOCIAL_ID = "detectSocialId";
+    private static final String KEY_TYPE  = "type";
+    private static final String KEY_WORDS = "words";
 
     public static String createTargetTerm(){
         return "CREATE TABLE " + TABLE_TARGET_TERM  + "("
@@ -45,6 +49,27 @@ public class TermSQLite {
                 + DETECT_FUNCTION_ID + " INTEGER , "
                 + DETECT_SOCIAL_ID + " INTEGER , "
                 + KEY_TFIDF_POINT + " REAL "+ ")";
+    }
+
+    public static String createTrainTerm(){
+        return "CREATE TABLE " + TABLE_OWNER_TRAIN_TERM  + "("
+                + KEY_NAME  + " TEXT PRIMARY KEY  ,"
+                + KEY_TYPE + " TEXT , "
+                + KEY_WORDS + " TEXT "+ ")";
+    }
+
+    public int insertOrUpdateTrain(OwnerTrainEntity train) {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, train.getName());
+        values.put(KEY_TYPE, train.getType());
+        values.put(KEY_WORDS, train.getWords());
+
+        // Inserting Row
+        int newId=(int)db.insert(TABLE_OWNER_TRAIN_TERM, null, values);
+        SQLiteManager.getInstance().closeDatabase();
+
+        return newId;
     }
 
 

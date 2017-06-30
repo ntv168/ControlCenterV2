@@ -338,4 +338,12 @@ public class SmartHouse {
                 this.getAreas().remove(i);
         }
     }
+
+    public void addArea(AreaEntity area) {
+        this.areas.add(area);
+    }
+
+    public void addDevice(DeviceEntity device) {
+        this.devices.add(device);
+    }
 }

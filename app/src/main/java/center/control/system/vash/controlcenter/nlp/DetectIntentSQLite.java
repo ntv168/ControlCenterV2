@@ -104,6 +104,30 @@ public class DetectIntentSQLite {
         } else return null;
 
     }
+
+    public static DetectFunctionEntity findFunctionByName(String name) {
+
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT * "
+                + " FROM " + TABLE_FUNCTION_DETECT
+                + " WHERE "+KEY_NAME+" = ? ";
+
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{name});
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            DetectFunctionEntity funct = new DetectFunctionEntity();
+            funct.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+            funct.setFailPattern(cursor.getString(cursor.getColumnIndex(KEY_FAIL_PATTERN)));
+            funct.setSuccessPattern(cursor.getString(cursor.getColumnIndex(KEY_SUCCESS_PATTERN)));
+            funct.setRemindPattern(cursor.getString(cursor.getColumnIndex(KEY_REMIND_PATTERN)));
+            funct.setFunctionName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+            cursor.close();
+            SQLiteManager.getInstance().closeDatabase();
+
+            return funct;
+        } else return null;
+
+    }
     public DetectSocialEntity findSocialById(int id) {
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
@@ -127,7 +151,7 @@ public class DetectIntentSQLite {
 
     }
 
-    public DetectSocialEntity findSocialByName(String name) {
+    public static DetectSocialEntity findSocialByName(String name) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
                 + " FROM " + TABLE_SOCIAL_DETECT

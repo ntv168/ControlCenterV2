@@ -26,6 +26,16 @@ public class DeviceEntity extends TargetObject{
     @SerializedName("areaId")
     private int areaId;
 
+    private double detectScore;
+
+    public double getDetectScore() {
+        return detectScore;
+    }
+
+    public void setDetectScore(double detectScore) {
+        this.detectScore = detectScore;
+    }
+
     Set<String> attributeSet;
 
 

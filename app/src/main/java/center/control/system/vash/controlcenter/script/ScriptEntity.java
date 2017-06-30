@@ -26,6 +26,17 @@ public class ScriptEntity extends TargetObject{
     private String weekDay;
     Set<Integer> weeksDay;
 
+    private double detectScore;
+
+    public double getDetectScore() {
+        return detectScore;
+    }
+
+    public void setDetectScore(double detectScore) {
+        this.detectScore = detectScore;
+    }
+
+
 
     public void setWeeksDay(String weekDay) {
         this.weekDay = weekDay;

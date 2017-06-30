@@ -8,7 +8,6 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -23,11 +22,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -46,39 +43,30 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 import center.control.system.vash.controlcenter.App;
 import center.control.system.vash.controlcenter.MainActivity;
+import center.control.system.vash.controlcenter.PersonalInfoActivity;
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.SettingPanel;
 import center.control.system.vash.controlcenter.area.AreaAdapter;
 import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaAttributeAdapter;
 import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.configuration.CommandEntity;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
 import center.control.system.vash.controlcenter.device.DeviceAdapter;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
-import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.helper.StorageHelper;
-import center.control.system.vash.controlcenter.nlp.ChatAdapter;
 import center.control.system.vash.controlcenter.nlp.CurrentContext;
-import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
+import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
-import center.control.system.vash.controlcenter.nlp.TargetTernEntity;
-import center.control.system.vash.controlcenter.nlp.TermEntity;
-import center.control.system.vash.controlcenter.nlp.TermSQLite;
 import center.control.system.vash.controlcenter.nlp.VoiceUtils;
 import center.control.system.vash.controlcenter.recognition.Facedetect;
 import center.control.system.vash.controlcenter.recognition.ImageHelper;
 
-import center.control.system.vash.controlcenter.script.ScriptEntity;
-import center.control.system.vash.controlcenter.script.ScriptSQLite;
-import center.control.system.vash.controlcenter.server.VolleySingleton;
 import center.control.system.vash.controlcenter.service.ControlMonitorService;
 import center.control.system.vash.controlcenter.service.WebServerService;
 import center.control.system.vash.controlcenter.utils.BotUtils;
@@ -93,7 +81,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     public static final String AREA_ID = "service.area.check.id";
 
     private SharedPreferences sharedPreferences;
-    private String systemId;
+    private String houseId;
     private RecyclerView lstDevice;
     private RecyclerView lstAreaAttribute;
     private Dialog remoteDialog;
@@ -114,10 +102,11 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     protected void onResume() {
         super.onResume();
         sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
-        systemId = sharedPreferences.getString(ConstManager.SYSTEM_ID,"");
-        Log.i(TAG,"system Id " + systemId);
-        if (systemId.equals("")){
+        houseId = sharedPreferences.getString(ConstManager.SYSTEM_ID,"");
+        Log.d(TAG,"house Id " + houseId);
+        if (houseId.equals("")){
             startActivity(new Intent(this,MainActivity.class));
+            finish();
         }
         SmartHouse house = SmartHouse.getInstance();
         if (house.getAreas().size()>0) {
@@ -127,7 +116,10 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             String botRole = sharedPreferences.getString(ConstManager.BOT_ROLE,"");
             String botName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
             String ownerName = sharedPreferences.getString(ConstManager.OWNER_NAME,"");
-            String ownerRole = sharedPreferences.getString(ConstManager.OWNER_ROLE,"ông");
+            String ownerRole = sharedPreferences.getString(ConstManager.OWNER_ROLE,"");
+            if (DetectIntentSQLite.findSocialByName(ConstManager.NOT_UNDERSTD) == null){
+                startActivity(new Intent(this, PersonalInfoActivity.class));
+            }
             SmartHouse.getInstance().setBotOwnerNameRole(botName,botRole,ownerName,ownerRole);
 //            showReply(BotUtils.completeSentence("Xin chào <owner-name>, quán cà phê thông minh xin được phục vụ","",""));
 
@@ -180,10 +172,9 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                 } else if (resultType.equals(ControlMonitorService.DEACTIVATE)){
                     SharedPreferences sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
                     SharedPreferences.Editor edit = sharedPreferences.edit();
-                    SmartHouse.getInstance().removeAllAreaAndItsDevice();
                     edit.putString(ConstManager.SYSTEM_ID,"");
                     edit.commit();
-                    SQLiteManager.getInstance().clearAllData();
+                    Log.d(TAG,"Deeactive sent");
                     startActivity(new Intent(ControlPanel.this, MainActivity.class));
                 } else if (resultType.equals(ControlMonitorService.WAIT)){
                     waitDialog.show();
@@ -292,16 +283,13 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         areaAttributeAdapter = new AreaAttributeAdapter(lstAttribute,this,house.getAreas().size() >0? house.getAreas().get(0).getId(): -1);
         lstAreaAttribute.setAdapter(areaAttributeAdapter);
     }
-    public void clicktoControlPanel(View view) {
-        startActivity(new Intent(this, ControlPanel.class));
-    }
 
     public void clicktoModePanel(View view) {
         startActivity(new Intent(this, ModePanel.class));
     }
 
     public void clicktoSettingPanel(View view) {
-        startActivity(new Intent(this, SettingPanel.class));
+        startActivity(new Intent(this, UserSettingPanel.class));
     }
 
     public void clicktoVAPanel(View view) {
@@ -589,142 +577,10 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         VoiceUtils.speak(sentenceReply);
         Log.d(TAG, "showReply: ----------------" + sentenceReply);
     }
-    private void processFunction(String humanSay, DetectFunctionEntity functionIntent){
-        List<TargetTernEntity> termTargets = TermSQLite.getTargetInSentence(humanSay);
-        if (ConstManager.FUNCTION_FOR_SCRIPT.contains(functionIntent.getFunctionName())){
-            ScriptEntity mode = BotUtils.findBestScript(termTargets);
-            if (mode != null) {
-                BotUtils.implementCommand(functionIntent,null,mode);
-            } else {
-                DetectSocialEntity askWhichMode = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_MODE);
-
-                CurrentContext current = CurrentContext.getInstance();
-                current.setDetectedFunction(functionIntent);
-
-                String replyComplete = BotUtils.completeSentence(askWhichMode.getQuestionPattern(),
-                        BotUtils.getVerbByIntent(functionIntent.getFunctionName()), "");
-                showReply(replyComplete);
-            }
-        } else if (ConstManager.FUNCTION_FOR_DEVICE.contains(functionIntent.getFunctionName())){
-            AreaEntity area = BotUtils.findBestArea(termTargets);
-            String target;
-            if (area != null) {
-                DeviceEntity device = BotUtils.findBestDevice(termTargets,area.getId());
-                if (device == null) {
-                    Log.d(TAG, "Tim thấy không gian " + area.getName() + " mà không tìm thấy thiết bị");
-                    DetectSocialEntity askWhichDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEAREA);
-                    CurrentContext current = CurrentContext.getInstance();
-                    current.setDetectedFunction(functionIntent);
-                    current.setArea(area);
-
-                    target = area.getName();
-                    String replyComplete = BotUtils.completeSentence(askWhichDevice.getQuestionPattern(),
-                            BotUtils.getVerbByIntent(functionIntent.getFunctionName()), target);
-                    showReply(replyComplete);
-                } else {
-                    Log.d(TAG, "Tìm thấy cả hai" + device.getName()+area.getName());
-                    BotUtils.implementCommand(functionIntent,device,null);
-                }
-            } else {
-                DeviceEntity deviceOnly = BotUtils.findBestDevice(termTargets, -1);
-                if (deviceOnly != null) {
-                    Log.d(TAG, "Tim thấy thiet bị ,mà không co không gian " + deviceOnly.getName());
-
-                    CurrentContext current = CurrentContext.getInstance();
-                    current.setDetectedFunction(functionIntent);
-                    current.setDevice(deviceOnly);
-                    current.setSentence(humanSay);
-
-                    area = AreaSQLite.findById(deviceOnly.getAreaId());
-                    target = deviceOnly.getName()+" trong "+area.getName();
-                    String replyComplete = BotUtils.completeSentence(functionIntent.getRemindPattern(), "", target);
-                    showReply(replyComplete);
-                } else {
-                    CurrentContext current = CurrentContext.getInstance();
-                    if (current.getDevice() != null){
-                        BotUtils.implementCommand(functionIntent,current.getDevice(),null);
-                    } else {
-                        String verb = BotUtils.getVerbByIntent(functionIntent.getFunctionName());
-                        DetectSocialEntity askDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEONLY);
-                        String replyComplete = BotUtils.completeSentence(askDevice.getQuestionPattern(), verb, "");
-                        showReply(replyComplete);
-                    }
-                }
-            }
-        } else if (functionIntent.getFunctionName().contains("check")){
-            Log.d(TAG,"check trang thai phong");
-            AreaEntity area = BotUtils.findBestArea(termTargets);
-            if (area != null) {
-                Log.d(TAG,"Thay phong "+area.getName());
-                String resultVal = BotUtils.getAttributeByFunction(functionIntent.getFunctionName(),area);
-                String replyComplete ="";
-                if (resultVal == null){
-                    replyComplete=BotUtils.completeSentence(functionIntent.getFailPattern(), resultVal, area.getName());
-                } else {
-                    replyComplete=BotUtils.completeSentence(functionIntent.getSuccessPattern(), resultVal, area.getName());
-                }
-                showReply(replyComplete);
-                //
-            } else {
-                Log.d(TAG,"Khong tim thay phong");
-                CurrentContext current = CurrentContext.getInstance();
-                current.setDetectedFunction(functionIntent);
-                current.setSentence(humanSay);
-
-                String replyComplete = BotUtils.completeSentence(functionIntent.getRemindPattern(),"","");
-                showReply(replyComplete);
-            }
-        }
-    }
-    private void processSocial(String humanSay, DetectSocialEntity socialIntent){
-        CurrentContext current = CurrentContext.getInstance();
-//        current.setDetectSocial(socialIntent);
-//        showReply("Mục đích "+socialIntent.getName());
-        String replyComplete;
-        String result = "";
-        if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_TIME)){
-            result = BotUtils.getTime();
-        } else if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_DAY)){
-            result = BotUtils.getDay();
-        } else if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_SEX)){
-            result = "gái";
-        } else if (socialIntent.getName().equals(ConstManager.SOCIAL_AGREE)){
-            if (current.getDetectedFunction() != null){
-                processFunction(current.getSentence(),current.getDetectedFunction());
-            }
-        }
-        replyComplete = BotUtils.completeSentence(socialIntent.getReplyPattern(), result, "");
-        showReply(replyComplete);
-    }
-
-    private void botReplyToSentence(String humanSay){
-
-        TermSQLite termSQLite = new TermSQLite();
-        List<TermEntity> terms = termSQLite.getHumanIntentInSentence(humanSay);
-        DetectFunctionEntity functFound = BotUtils.findBestFunctDetected(terms);
-        DetectSocialEntity socialFound = BotUtils.findBestSocialDetected(terms);
-        if (functFound != null && socialFound != null) {
-            if (functFound.getDetectScore()> socialFound.getDetectScore()){
-                processFunction(humanSay,functFound);
-            } else {
-                processSocial(humanSay,socialFound);
-            }
-        } else if (functFound == null && socialFound != null) {
-            processSocial(humanSay, socialFound);
-        }else if (functFound != null && socialFound == null){
-            processFunction(humanSay, functFound);
-        } else {
-            DetectSocialEntity notUnderReply = BotUtils.getSocialByName(ConstManager.NOT_UNDERSTD);
-            String replyComplete = BotUtils.completeSentence(notUnderReply.getQuestionPattern(), "", "");
-            showReply(replyComplete);
-        }
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
         stopService(new Intent(this,ControlMonitorService.class));
-
     }
     private void promptSpeechInput() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -749,7 +605,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     Log.d(TAG,result.get(0));
-                    botReplyToSentence(result.get(0));
+                    showReply(BotUtils.botReplyToSentence(result.get(0)));
                 }
                 break;
             }
