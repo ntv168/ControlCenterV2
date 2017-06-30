@@ -2,41 +2,127 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context="center.control.system.vash.controlcenter.nlp.TrainVAActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="center.control.system.vash.controlcenter.nlp.TrainVAActivity"
-    android:orientation="vertical">
+    android:background="@color/nWhite"
+    android:orientation="vertical"
+    android:weightSum="1">
 
-    <TextView
-        android:id="@+id/textView13"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:layout_height="70dp"
+        android:background="@drawable/background"
+        android:gravity="center"
+        android:padding="15dp"
+        android:weightSum="10">
 
-    <EditText
-        android:id="@+id/txt_sentence"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:text="Name" />
+        <ImageButton
+            android:layout_width="30dp"
+            android:layout_height="20dp"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/icn_back" />
 
-    <RadioGroup
-        android:id="@+id/rdoIntent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <RadioButton
-            android:id="@+id/radioButton"
+        <TextView
+            android:id="@+id/txtBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="RadioButton" />
-    </RadioGroup>
+            android:layout_weight="2"
+            android:paddingLeft="10dp"
+            android:text="Trở về"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_title_back"
+            tools:ignore="RtlSymmetry" />
 
-    <Button
-        android:id="@+id/btnTrain"
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:text="Huấn luyện trợ lý ảo"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/title_font_size"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="đồng ý" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="20dp"
+        android:weightSum="5">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:layout_marginRight="20dp"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="Chức năng mong muốn"
+                android:textColor="@color/nGreen1" />
+            <RadioGroup
+                android:id="@+id/rdoIntent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioButton
+                    android:id="@+id/radioButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="RadioButton"
+                    android:layout_marginBottom="10dp"/>
+            </RadioGroup>
+        </LinearLayout>
+
+        <View
+            android:layout_width="1px"
+            android:layout_height="match_parent"
+            android:background="@color/nLGray" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_weight="3"
+            android:gravity="right"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="Nhập câu của bạn"
+                android:textColor="@color/nGreen1" />
+
+            <EditText
+                android:id="@+id/txt_sentence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:inputType="text"
+                android:text=""
+                android:hint="Nhập câu cần huấn luyện"/>
+
+            <Button
+                android:id="@+id/btnTrain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/login_button"
+                android:text="Thêm"
+                android:textColor="@color/nWhite" />
+
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>
