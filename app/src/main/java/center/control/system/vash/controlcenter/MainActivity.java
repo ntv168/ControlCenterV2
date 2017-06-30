@@ -95,7 +95,6 @@ public class MainActivity extends Activity {
                 .setNegativeButton("Xóa", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
-                        VoiceUtils.speak("Xin chào anh Đại, quán cà phê thông minh xin được phục vụ ạ");
                         dialog.dismiss();
 
                     }
