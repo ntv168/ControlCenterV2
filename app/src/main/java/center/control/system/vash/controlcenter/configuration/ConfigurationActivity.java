@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -25,6 +26,14 @@ public class ConfigurationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.configuration);
         listConfiguration = new ArrayList<>();
+
+        LinearLayout lnBack = (LinearLayout) findViewById(R.id.lnBack);
+        lnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         ConfigurationSQLite configurationSQLite = new ConfigurationSQLite();
         TriggerSQLite triggerSQLite = new TriggerSQLite();
@@ -63,10 +72,6 @@ public class ConfigurationActivity extends AppCompatActivity {
             listConfiguration.add(entity);
             Log.d("--------------", "onCreate: " + listConfiguration.size());
         }
-
-
-
-
 
         ListConfigurationAdapter adapter = new ListConfigurationAdapter(ConfigurationActivity.this,listConfiguration);
         ListView lwConfiguration = (ListView) findViewById(R.id.lsConfig);

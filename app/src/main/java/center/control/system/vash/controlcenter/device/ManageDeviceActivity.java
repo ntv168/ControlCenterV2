@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -77,8 +78,9 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
         LinearLayoutManager verticalLayout = new LinearLayoutManager(this);
         verticalLayout.setOrientation(LinearLayoutManager.VERTICAL);
         lstAreaManage.setLayoutManager(verticalLayout);
-        TextView txtBack = (TextView) findViewById(R.id.txtBack);
-        txtBack.setOnClickListener(new View.OnClickListener() {
+
+        LinearLayout lnBack = (LinearLayout) findViewById(R.id.lnBack);
+        lnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();

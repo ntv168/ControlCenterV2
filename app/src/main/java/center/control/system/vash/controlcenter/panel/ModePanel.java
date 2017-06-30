@@ -183,7 +183,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
     public void onScriptClick(final ScriptEntity scriptEntity) {
         final Dialog dialog = new Dialog(this);
         dialog.setTitle("CHẾ ĐỘ "+scriptEntity.getName());
-        dialog.setContentView(R.layout.diaglog_script_detail);
+        dialog.setContentView(R.layout.dialog_script_detail);
         final GridView weekCheckList = (GridView)dialog.findViewById(R.id.lstWeekDay);
 
         ScriptSQLite sqLite = new ScriptSQLite();

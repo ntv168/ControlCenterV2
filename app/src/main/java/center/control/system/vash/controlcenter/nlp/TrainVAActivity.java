@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
@@ -25,7 +26,14 @@ public class TrainVAActivity extends AppCompatActivity {
         txtSenten = (EditText) findViewById(R.id.txt_sentence);
         final RadioGroup group = (RadioGroup) findViewById(R.id.rdoIntent);
         RadioButton rdoBtn;
-           List<DetectFunctionEntity> functs =DetectIntentSQLite.getAllFunction();
+        LinearLayout lnBack = (LinearLayout) findViewById(R.id.lnBack);
+        lnBack.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               finish();
+           }
+        });
+        List<DetectFunctionEntity> functs =DetectIntentSQLite.getAllFunction();
         for(int i = 0; i < functs.size(); i++) {
             rdoBtn = new RadioButton(this);
             rdoBtn.setText(functs.get(i).getFunctionName());

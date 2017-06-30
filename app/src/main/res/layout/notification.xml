@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="70dp"
@@ -12,29 +13,37 @@
         android:padding="15dp"
         android:weightSum="10">
 
-        <ImageButton
-            android:layout_width="30dp"
-            android:layout_height="20dp"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/icn_back" />
-
-        <TextView
-            android:id="@+id/txtBack"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/lnBack"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:paddingLeft="10dp"
-            android:text="Trở về"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/text_title_back"/>
+            android:layout_weight="2">
+
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icn_back" />
+
+            <TextView
+                android:id="@+id/txtBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="Trở về"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_title_back" />
+        </LinearLayout>
+
 
         <TextView
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="5"
-            android:text="Lịch sử thông báo"
+            android:layout_weight="6"
+            android:text="Thông báo"
             android:textAlignment="center"
             android:textColor="@android:color/white"
             android:textSize="@dimen/title_font_size"
@@ -43,7 +52,7 @@
         <View
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="3" />
+            android:layout_weight="2" />
     </LinearLayout>
 
     <LinearLayout

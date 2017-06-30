@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -39,6 +40,14 @@ public class MapDeviceTriggerActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_configuration);
         LinearLayoutManager verticalLayout = new LinearLayoutManager(this);
+
+        LinearLayout lnBack = (LinearLayout) findViewById(R.id.lnBack);
+        lnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         // RecyclerView for List Trigger
         List<TriggerEntity> listTrigger = triggerSQLite.getAll();
