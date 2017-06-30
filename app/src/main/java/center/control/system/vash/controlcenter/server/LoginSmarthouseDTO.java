@@ -9,9 +9,6 @@ import java.util.UUID;
  * Created by MYNVTSE61526 on 10/06/2017.
  */
 public class LoginSmarthouseDTO {
-    @SerializedName("houseId")
-    @Expose
-    private String houseId;
     @SerializedName("staticAddress")
     @Expose
     private String staticAddress;
@@ -46,13 +43,6 @@ public class LoginSmarthouseDTO {
     @Expose
     private int virtualAssistantTypeId;
 
-    public String getHouseId() {
-        return houseId;
-    }
-
-    public void setHouseId(String houseId) {
-        this.houseId = houseId;
-    }
 
     public String getStaticAddress() {
         return staticAddress;

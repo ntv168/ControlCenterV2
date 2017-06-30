@@ -39,9 +39,18 @@ public class SmartHouse {
     private String botName;
     private String botRole;
     private String ownerName;
+    private String staffCode;
     private String ownerRole;
     private String contractId;
     private int databseVer;
+
+    public String getStaffCode() {
+        return staffCode;
+    }
+
+    public void setStaffCode(String staffCode) {
+        this.staffCode = staffCode;
+    }
 
     public String getContractId() {
         return contractId;

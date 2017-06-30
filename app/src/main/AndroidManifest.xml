@@ -32,7 +32,6 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,13 +40,13 @@
         </activity>
         <activity
             android:name=".panel.ControlPanel"
-            android:screenOrientation="landscape" ></activity>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".panel.ModePanel"
             android:screenOrientation="landscape" />
         <activity
             android:name=".SettingPanel"
-            android:screenOrientation="landscape" ></activity>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".panel.VAPanel"
             android:screenOrientation="landscape" />
@@ -56,6 +55,8 @@
             android:screenOrientation="landscape" />
         <activity android:name=".panel.UserSettingPanel" />
         <activity android:name=".PersonalInfoActivity"></activity>
+        <activity android:name=".nlp.TrainVAActivity"
+            android:screenOrientation="landscape"/>
         <activity
             android:name=".configuration.ConfigurationActivity"
             android:screenOrientation="landscape" />

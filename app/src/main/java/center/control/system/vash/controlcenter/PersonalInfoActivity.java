@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -28,7 +30,10 @@ import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
+import center.control.system.vash.controlcenter.nlp.OwnerTrainEntity;
 import center.control.system.vash.controlcenter.nlp.TermSQLite;
+import center.control.system.vash.controlcenter.nlp.TrainVAActivity;
+import center.control.system.vash.controlcenter.panel.UserSettingPanel;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.server.AssistantTypeDTO;
@@ -97,6 +102,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
             //truong hop bot type khac
         }
 
+
     }
 
     @Override
@@ -117,6 +123,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
         waitDialog.setCancelable(false);
 
         LinearLayout btnSetVA = (LinearLayout) findViewById(R.id.btnSetingVA);
+        LinearLayout btnTrain = (LinearLayout) findViewById(R.id.btnTrainVA);
 
         spinOwnerRole = (Spinner) vaSetDiag.findViewById(R.id.spn_owner_role);
         spinBotRole = (Spinner) vaSetDiag.findViewById(R.id.spn_bot_role);
@@ -133,6 +140,12 @@ public class PersonalInfoActivity extends AppCompatActivity {
             }
         });
 
+        btnTrain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(PersonalInfoActivity.this, TrainVAActivity.class));
+            }
+        });
 
         Button btnLoadBot = (Button)vaSetDiag.findViewById(R.id.btnLoadBot);
         btnLoadBot.setOnClickListener(new View.OnClickListener() {
@@ -158,6 +171,8 @@ public class PersonalInfoActivity extends AppCompatActivity {
                         edit.putString(ConstManager.BOT_NAME,botName);
                         edit.commit();
                         TermSQLite sqLite = new TermSQLite();
+                        List<OwnerTrainEntity> trained = sqLite.getOwnerTrain();
+                        Log.d(TAG,trained.size()+"  trains");
                         DetectIntentSQLite sqlDect = new DetectIntentSQLite();
                         sqLite.clearAll();
                         sqlDect.clearAll();
@@ -196,6 +211,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
         if (botTypeId == -1){
             btnLoadBot.setEnabled(false);
         }
+
     }
     private void refineNickNameTarget(){
         final SmartHouse house = SmartHouse.getInstance();

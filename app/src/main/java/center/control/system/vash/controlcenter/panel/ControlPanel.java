@@ -78,7 +78,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     public static final String AREA_ID = "service.area.check.id";
 
     private SharedPreferences sharedPreferences;
-    private String houseId;
+    private String contractId;
     private RecyclerView lstDevice;
     private RecyclerView lstAreaAttribute;
     private Dialog remoteDialog;
@@ -99,9 +99,9 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     protected void onResume() {
         super.onResume();
         sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
-        houseId = sharedPreferences.getString(ConstManager.SYSTEM_ID,"");
-        Log.d(TAG,"house Id " + houseId);
-        if (houseId.equals("")){
+        contractId = sharedPreferences.getString(ConstManager.CONTRACT_ID,"");
+        Log.d(TAG,"contractId Id " + contractId);
+        if (contractId.length()<2){
             startActivity(new Intent(this,MainActivity.class));
             finish();
         }
@@ -169,7 +169,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                 } else if (resultType.equals(ControlMonitorService.DEACTIVATE)){
                     SharedPreferences sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
                     SharedPreferences.Editor edit = sharedPreferences.edit();
-                    edit.putString(ConstManager.SYSTEM_ID,"");
+                    edit.putString(ConstManager.CONTRACT_ID,"");
                     edit.commit();
                     Log.d(TAG,"Deeactive sent");
                     startActivity(new Intent(ControlPanel.this, MainActivity.class));

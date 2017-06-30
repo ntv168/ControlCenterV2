@@ -375,9 +375,10 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
         final SmartHouse house = SmartHouse.getInstance();
         for (final DeviceEntity device: house.getDevices()){
             if (device.getNickName() == null || device.getNickName().equals("")){
-                editNickNameDiag.setTitle("Tên gọi khác cho thiết bị"+device.getName());
+                editNickNameDiag.setTitle("Tên gọi khác cho thiết bị : "+device.getName());
                 final EditText input = new EditText(ManageDeviceActivity.this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setText(device.getName()+" ");
                 editNickNameDiag.setView(input);
                 editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
