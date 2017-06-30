@@ -26,6 +26,7 @@ public class DeviceSQLite {
     private static final String KEY_TYPE = "type";
     private static final String KEY_AREA = "areaId";
     private static final String KEY_NICKNAME = "nickName";
+    private static final String KEY_TRIGGER_ID = "triggerID";
     private static final String TAG = "Device sql lite";
 
     public static String createTable(){
@@ -37,7 +38,9 @@ public class DeviceSQLite {
                 KEY_STATE + "  TEXT  ,"+
                 KEY_TYPE + "  TEXT  ,"+
                 KEY_NICKNAME + "  TEXT  ,"+
-                KEY_AREA+ "  INTEGER  "+ ")";
+                KEY_AREA+ "  INTEGER  ,"+
+                KEY_TRIGGER_ID + " INTEGER" +
+                ")";
     }
 
     public int insert(DeviceEntity device) {
@@ -71,7 +74,7 @@ public class DeviceSQLite {
 
         cursor.close();
         SQLiteManager.getInstance().closeDatabase();
-
+        Log.d(TAG, "getAll: --------" + result.size());
         return result;
     }
     public static DeviceEntity findById(int id){
@@ -93,6 +96,29 @@ public class DeviceSQLite {
 
     }
 
+    public static List<DeviceEntity> getDevicesByTriggerId(int id){
+        List<DeviceEntity> result = new ArrayList<>();
+
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT * "
+                + " FROM " + TABLE_DEVICE
+                + " WHERE "+KEY_TRIGGER_ID+" = ?";
+
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(id)});
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                DeviceEntity deviceEntity = getByCursor(cursor);
+                result.add(deviceEntity);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        SQLiteManager.getInstance().closeDatabase();
+        Log.d(TAG, "getDevicesByTriggerId: --------" + result.size());
+        return result;
+
+    }
+
     public void delete( ) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         db.delete(TABLE_DEVICE,null,null);
@@ -107,6 +133,7 @@ public class DeviceSQLite {
         values.put(KEY_STATE, device.getState());
         values.put(KEY_AREA, device.getAreaId());
         values.put(KEY_NICKNAME, device.getNickName());
+        values.put(KEY_TRIGGER_ID, device.getTriggerId());
         return values;
     }
     private static DeviceEntity getByCursor(Cursor cursor){
@@ -119,12 +146,14 @@ public class DeviceSQLite {
         deviceEntity.setAreaId(cursor.getInt(cursor.getColumnIndex(KEY_AREA)));
         deviceEntity.setState(cursor.getString(cursor.getColumnIndex(KEY_STATE)));
         deviceEntity.setNickName(cursor.getString(cursor.getColumnIndex(KEY_NICKNAME)));
+        deviceEntity.setTriggerId(cursor.getInt(cursor.getColumnIndex(KEY_TRIGGER_ID)));
         return deviceEntity;
     }
 
     public static void upById(int id, DeviceEntity device) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         db.update(TABLE_DEVICE, createContent(device), KEY_ID + " = "+id, null);
+        Log.d(TAG, "upById: ----------------- " );
         SQLiteManager.getInstance().closeDatabase();
     }
 

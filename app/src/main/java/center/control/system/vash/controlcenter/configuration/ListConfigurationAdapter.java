@@ -2,11 +2,6 @@ package center.control.system.vash.controlcenter.configuration;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.res.Configuration;
-import android.nfc.Tag;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,13 +10,16 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.zip.Inflater;
 
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.command.CommandEntity;
+import center.control.system.vash.controlcenter.command.CommandSQLite;
+import center.control.system.vash.controlcenter.command.ListCommandAdapter;
+import center.control.system.vash.controlcenter.trigger.ListTriggersAdapter;
+import center.control.system.vash.controlcenter.trigger.TriggerEntity;
+import center.control.system.vash.controlcenter.trigger.TriggerSQLite;
 
 
 /**
@@ -51,10 +49,13 @@ public class ListConfigurationAdapter extends ArrayAdapter<ConfigurationEntity> 
         }
         // Lookup view for data population
         TextView txtName = (TextView) convertView.findViewById(R.id.config_name);
+        TextView txtNo = (TextView) convertView.findViewById(R.id.config_no);
+
         Button btnCommand = (Button) convertView.findViewById(R.id.btnCommands);
         Button btnTrigger = (Button) convertView.findViewById(R.id.btnTrigger);
         // Populate the data into the template view using the data object
         txtName.setText(entity.getName());
+        txtNo.setText(entity.getId() + "");
 
         btnCommand.setOnClickListener(new View.OnClickListener() {
             @Override

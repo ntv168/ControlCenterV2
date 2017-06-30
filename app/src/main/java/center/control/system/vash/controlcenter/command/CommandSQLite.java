@@ -1,4 +1,4 @@
-package center.control.system.vash.controlcenter.configuration;
+package center.control.system.vash.controlcenter.command;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -8,7 +8,6 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
@@ -72,6 +71,14 @@ public class CommandSQLite {
         SQLiteManager.getInstance().closeDatabase();
 
         return result;
+    }
+
+    public void cleardata() {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMMAND);
+        db.execSQL(createCommand());
+        SQLiteManager.getInstance().closeDatabase();
+
     }
 
     static CommandEntity cursorToEnt(Cursor cursor){

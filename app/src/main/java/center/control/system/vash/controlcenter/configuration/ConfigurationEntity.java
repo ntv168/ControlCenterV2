@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+import center.control.system.vash.controlcenter.command.CommandEntity;
+
 /**
  * Created by Thuans on 6/23/2017.
  */

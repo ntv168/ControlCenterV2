@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
 
-import center.control.system.vash.controlcenter.configuration.CommandEntity;
+import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 

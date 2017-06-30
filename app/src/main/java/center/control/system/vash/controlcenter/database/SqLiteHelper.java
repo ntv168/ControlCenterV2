@@ -1,16 +1,14 @@
 package center.control.system.vash.controlcenter.database;
 
-import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import center.control.system.vash.controlcenter.App;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
-import center.control.system.vash.controlcenter.configuration.CommandSQLite;
-import center.control.system.vash.controlcenter.configuration.ConfigurationEntity;
+import center.control.system.vash.controlcenter.command.CommandSQLite;
 import center.control.system.vash.controlcenter.configuration.ConfigurationSQLite;
-import center.control.system.vash.controlcenter.configuration.TriggerSQLite;
+import center.control.system.vash.controlcenter.trigger.TriggerSQLite;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;

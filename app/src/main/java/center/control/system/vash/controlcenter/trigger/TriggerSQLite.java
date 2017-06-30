@@ -1,4 +1,4 @@
-package center.control.system.vash.controlcenter.configuration;
+package center.control.system.vash.controlcenter.trigger;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -28,7 +28,7 @@ public class TriggerSQLite {
     public static String createTriggerConfigution(){
         return "CREATE TABLE " + TABLE_TRIGGER  + "("
                 + KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + KEY_NAME+ "  TEXT, "
+                + KEY_NAME+ "  TEXT,"
                 + KEY_CONFIG_ID + " INTEGER"
                 + ")";
     }
@@ -91,6 +91,14 @@ public class TriggerSQLite {
 
     }
 
+    public void cleardata() {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRIGGER);
+        db.execSQL(createTriggerConfigution());
+        SQLiteManager.getInstance().closeDatabase();
+
+    }
+
     static TriggerEntity cursorToEnt(Cursor cursor){
         TriggerEntity trigger = new TriggerEntity();
         trigger.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
@@ -99,4 +107,6 @@ public class TriggerSQLite {
 
         return trigger;
     }
+
+
 }

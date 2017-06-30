@@ -8,7 +8,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import center.control.system.vash.controlcenter.configuration.CommandEntity;
+import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
 
 /**

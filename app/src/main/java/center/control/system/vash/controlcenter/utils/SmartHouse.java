@@ -12,7 +12,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
-import center.control.system.vash.controlcenter.configuration.CommandEntity;
+import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.configuration.ConfigurationEntity;
 import center.control.system.vash.controlcenter.configuration.ConfigurationSQLite;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
@@ -20,6 +20,8 @@ import center.control.system.vash.controlcenter.device.DeviceSQLite;
 
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
+import center.control.system.vash.controlcenter.sensor.SensorEntity;
+import center.control.system.vash.controlcenter.sensor.SensorSQLite;
 
 /**
  * Created by Thuans on 5/27/2017.
@@ -31,6 +33,8 @@ public class SmartHouse {
     private BlockingQueue<CommandEntity> ownerCommand;
     private List<AreaEntity> areas;
     private List<DeviceEntity> devices;
+    private List<SensorEntity> sensors;
+    private SensorSQLite sensorSQLite;
     private List<ScriptEntity> scripts;
     private String botName;
     private String botRole;
@@ -115,12 +119,17 @@ public class SmartHouse {
                         String[] val = ele[i].split(":");
                          if (val[0].equals(AreaEntity.attrivutesValues[0])){
                             area.setSafety(val[1]);
+                             sensorSQLite.insertSensor("cảm biến an ninh ở" + area.getName(),area.getId());
+
                         } else if (val[0].equals(AreaEntity.attrivutesValues[1])){
                             area.setLight(val[1]);
+                             sensorSQLite.insertSensor("Cảm biến ánh sáng ở" + area.getName(),area.getId());
                         } else if (val[0].equals(AreaEntity.attrivutesValues[2])){
                             area.setTemperature(val[1]);
+                             sensorSQLite.insertSensor("Cảm biến nhiệt độ ở" + area.getName(),area.getId());
                         }else if (val[0].equals(AreaEntity.attrivutesValues[3])){
                             area.setSound(val[1]);
+                             sensorSQLite.insertSensor("Cảm biến âm thanh ở" + area.getName(),area.getId());
                         }
                     }
                 }
@@ -160,6 +169,10 @@ public class SmartHouse {
         return scripts;
     }
 
+    public List<SensorEntity> getSensors() {
+        return sensors;
+    }
+
     public List<DeviceEntity> getDevices() {
         return devices;
     }
@@ -188,6 +201,17 @@ public class SmartHouse {
 //            Log.d(TAG,device.getAreaId()+"  id");
             if (device.getAreaId() == id){
                 result.add(device);
+            }
+        }
+        return result;
+    }
+
+    public List<SensorEntity> getSensorByAreaId(int id) {
+        List<SensorEntity> result = new ArrayList<>();
+        for (SensorEntity sensor : this.getSensors()){
+//            Log.d(TAG,device.getAreaId()+"  id");
+            if (sensor.getAreaId() == id){
+                result.add(sensor);
             }
         }
         return result;
@@ -345,5 +369,9 @@ public class SmartHouse {
 
     public void addDevice(DeviceEntity device) {
         this.devices.add(device);
+    }
+
+    public void addSensor(SensorEntity sensor) {
+        this.sensors.add(sensor);
     }
 }

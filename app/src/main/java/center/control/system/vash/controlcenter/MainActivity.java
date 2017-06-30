@@ -65,9 +65,8 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Log.d(TAG,contractId+"");
-                if (contractId!= null &&
-                        txtpassword.getText().toString().length()>5 &&
-                        contractId.contains(txtpassword.getText().toString())){
+                if (txtpassword.getText().toString().equals("admin") &&
+                        txtusername.getText().toString().equals("admin")){
                     startActivity(new Intent(MainActivity.this,SettingPanel.class));
                     finish();
                 } else {

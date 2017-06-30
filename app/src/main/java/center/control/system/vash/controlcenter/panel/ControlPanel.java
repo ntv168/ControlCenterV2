@@ -49,20 +49,17 @@ import center.control.system.vash.controlcenter.App;
 import center.control.system.vash.controlcenter.MainActivity;
 import center.control.system.vash.controlcenter.PersonalInfoActivity;
 import center.control.system.vash.controlcenter.R;
-import center.control.system.vash.controlcenter.SettingPanel;
 import center.control.system.vash.controlcenter.area.AreaAdapter;
 import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaAttributeAdapter;
 import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.configuration.CommandEntity;
-import center.control.system.vash.controlcenter.database.SQLiteManager;
+import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.device.DeviceAdapter;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.helper.StorageHelper;
 import center.control.system.vash.controlcenter.nlp.CurrentContext;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
-import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
 import center.control.system.vash.controlcenter.nlp.VoiceUtils;
 import center.control.system.vash.controlcenter.recognition.Facedetect;
 import center.control.system.vash.controlcenter.recognition.ImageHelper;
@@ -183,13 +180,13 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                     int result = intent.getIntExtra(AREA_ID, -1);
                     CurrentContext current = CurrentContext.getInstance();
                     if (result == ControlMonitorService.SUCCESS){
-                        showReply(BotUtils.completeSentence(
-                                current.getDetectedFunction().getSuccessPattern(),"",current.getDevice().getName()));
+//                        showReply(BotUtils.completeSentence(
+//                                current.getDetectedFunction().getSuccessPattern(),"",current.getDevice().getName()));
                         SmartHouse house = SmartHouse.getInstance();
                         deviceAdapter.updateHouseDevice(house.getDevicesInAreaAttribute(currentArea.getId(),currentAttrib));
                     } else if (result == ControlMonitorService.FAIL){
-                        showReply(BotUtils.completeSentence(
-                                current.getDetectedFunction().getFailPattern(),"",current.getDevice().getName()));
+//                        showReply(BotUtils.completeSentence(
+//                                current.getDetectedFunction().getFailPattern(),"",current.getDevice().getName()));
                     }
                 } else if (resultType.equals(ControlMonitorService.MONITOR)) {
                     int areaId = intent.getIntExtra(AREA_ID, -1);

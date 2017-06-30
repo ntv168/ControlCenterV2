@@ -1,7 +1,6 @@
-package center.control.system.vash.controlcenter.configuration;
+package center.control.system.vash.controlcenter.trigger;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,44 +10,43 @@ import android.widget.TextView;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.trigger.TriggerEntity;
 
 /**
  * Created by Sam on 6/27/2017.
  */
 
-public class ListCommandAdapter extends ArrayAdapter<CommandEntity> {
-    List<CommandEntity> commandEntityList;
+public class ListTriggersAdapter extends ArrayAdapter<TriggerEntity> {
+    List<TriggerEntity> triggerEntities;
 
-    public ListCommandAdapter(Context context, List<CommandEntity> items) {
+    public ListTriggersAdapter(Context context, List<TriggerEntity> items) {
         super(context, 0);
-        this.commandEntityList = items;
+        this.triggerEntities = items;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
-        CommandEntity command = commandEntityList.get(position);
+        TriggerEntity trigger = triggerEntities.get(position);
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.scenario_item, parent, false);
+            convertView = layoutInflater.inflate(R.layout.condition_item, parent, false);
         }
         // Lookup view for data population
-        TextView txtName = (TextView) convertView.findViewById(R.id.txtDeviceName);
-
+        TextView txtName = (TextView) convertView.findViewById(R.id.txtConditionName);
 
         // Populate the data into the template view using the data object
-        txtName.setText(command.getDeviceName());
+        txtName.setText(trigger.getName());
 
-        Log.d("---------", "getView: " + command.getDeviceName());
         // Return the completed view to render on screen
         return convertView;
     }
 
     @Override
     public int getCount() {
-        return commandEntityList.size();
+        return triggerEntities.size();
     }
 
     public long getItemId(int position) {
