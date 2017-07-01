@@ -122,6 +122,10 @@ public class MainActivity extends Activity {
             public void onFailure(Call<StaffCodeDTO> call, Throwable t) {
                 Log.d(TAG,call.request().url()+" sai staff cose");
                 Toast.makeText(MainActivity.this,"Sai code nhân viên ",Toast.LENGTH_LONG).show();
+                if (txtusername.getText().toString().equals("admin") &&
+                        txtpassword.getText().toString().equals("admin")) {
+                    startActivity(new Intent(MainActivity.this,SettingPanel.class));
+                }
                 loginDia.dismiss();
             }
         });

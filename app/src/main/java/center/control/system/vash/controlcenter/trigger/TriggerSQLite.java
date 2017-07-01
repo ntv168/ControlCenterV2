@@ -68,7 +68,32 @@ public class TriggerSQLite {
         return result;
     }
 
-    public TriggerEntity findById(int id){
+    public static List<TriggerEntity> getTriggerByConfigId(int configId){
+        List<TriggerEntity> result = new ArrayList<>();
+
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT * "
+                + " FROM " + TABLE_TRIGGER
+                + " WHERE "+KEY_CONFIG_ID+" = ? ";
+
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(configId)});
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                TriggerEntity triggerEntity = cursorToEnt(cursor);
+                Log.d(TAG, triggerEntity.getId()+"");
+                result.add(triggerEntity);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        SQLiteManager.getInstance().closeDatabase();
+
+        return result;
+    }
+
+
+    public static TriggerEntity findById(int id){
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "

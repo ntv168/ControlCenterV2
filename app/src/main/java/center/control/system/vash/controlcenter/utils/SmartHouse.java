@@ -2,11 +2,13 @@ package center.control.system.vash.controlcenter.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -22,6 +24,7 @@ import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.sensor.SensorEntity;
 import center.control.system.vash.controlcenter.sensor.SensorSQLite;
+import center.control.system.vash.controlcenter.trigger.TriggerCheckList;
 
 /**
  * Created by Thuans on 5/27/2017.
@@ -43,6 +46,7 @@ public class SmartHouse {
     private String ownerRole;
     private String contractId;
     private int databseVer;
+    TriggerCheckList checkList;
 
     public String getStaffCode() {
         return staffCode;
@@ -85,6 +89,7 @@ public class SmartHouse {
                     houseInstance.setDevices(DeviceSQLite.getAll());
                     houseInstance.setScripts(ScriptSQLite.getAll());
                     houseInstance.setConfigurations(ConfigurationSQLite.getAll());
+                    houseInstance.setSensors(SensorSQLite.getAll());
                 }
             }
 
@@ -128,17 +133,13 @@ public class SmartHouse {
                         String[] val = ele[i].split(":");
                          if (val[0].equals(AreaEntity.attrivutesValues[0])){
                             area.setSafety(val[1]);
-                             sensorSQLite.insertSensor("cảm biến an ninh ở" + area.getName(),area.getId());
-
                         } else if (val[0].equals(AreaEntity.attrivutesValues[1])){
                             area.setLight(val[1]);
-                             sensorSQLite.insertSensor("Cảm biến ánh sáng ở" + area.getName(),area.getId());
                         } else if (val[0].equals(AreaEntity.attrivutesValues[2])){
                             area.setTemperature(val[1]);
-                             sensorSQLite.insertSensor("Cảm biến nhiệt độ ở" + area.getName(),area.getId());
+                             new checkConfiguration(areaId,val[1]).execute(val[0]);
                         }else if (val[0].equals(AreaEntity.attrivutesValues[3])){
                             area.setSound(val[1]);
-                             sensorSQLite.insertSensor("Cảm biến âm thanh ở" + area.getName(),area.getId());
                         }
                     }
                 }
@@ -191,6 +192,9 @@ public class SmartHouse {
     }
 
 
+    public void setSensors(List<SensorEntity> sensors) {
+        this.sensors = sensors;
+    }
 
     public void setDevices(List<DeviceEntity> devices) {
         this.devices = devices;
@@ -215,11 +219,33 @@ public class SmartHouse {
         return result;
     }
 
+    public List<DeviceEntity> getDeviceswithoutTrigger(int id, int triggerId) {
+        List<DeviceEntity> result = new ArrayList<>();
+        for (DeviceEntity device : this.getDevices()){
+//            Log.d(TAG,device.getAreaId()+"  id");
+            if (device.getAreaId() == id && device.getTriggerId() != triggerId){
+                result.add(device);
+            }
+        }
+        return result;
+    }
+
     public List<SensorEntity> getSensorByAreaId(int id) {
         List<SensorEntity> result = new ArrayList<>();
         for (SensorEntity sensor : this.getSensors()){
 //            Log.d(TAG,device.getAreaId()+"  id");
-            if (sensor.getAreaId() == id){
+            if (sensor.getAreaId() == id ){
+                result.add(sensor);
+            }
+        }
+        return result;
+    }
+
+    public List<SensorEntity> getSensorWithoutTriggerByAreaId(int id, int triggerid) {
+        List<SensorEntity> result = new ArrayList<>();
+        for (SensorEntity sensor : this.getSensors()){
+//            Log.d(TAG,device.getAreaId()+"  id");
+            if (sensor.getAreaId() == id && sensor.getTriggerId() != triggerid){
                 result.add(sensor);
             }
         }
@@ -341,6 +367,33 @@ public class SmartHouse {
             if (this.getScripts().get(i).getId() == id){
                 this.getScripts().set(i,mode);
             }
+        }
+    }
+
+    class checkConfiguration extends AsyncTask<String, String, Boolean> {
+        String value;
+        int areaId;
+
+        checkConfiguration(int areaId, String value)
+        {
+            this.areaId = areaId;
+            this.value = value;
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            checkList.getInstance(areaId,params[0], value);
+            return true;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+
         }
     }
 

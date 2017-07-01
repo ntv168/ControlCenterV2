@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.database.SQLiteManager;
+import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 
 /**
@@ -21,7 +22,7 @@ public class SensorSQLite {
     private static final String KEY_ID = "id";
     private static final String KEY_NAME = "name";
     private static final String KEY_AREA_ID = "areaId";
-    private static final String KEY_TRIGGER_ID = ScriptSQLite.KEY_CONFIG_ID;
+    private static final String KEY_ATTRIBUTE = "attribute";
     private static final String TAG = "sensor SQLite";
 
 
@@ -29,20 +30,15 @@ public class SensorSQLite {
         return "CREATE TABLE " + TABLE_SENSOR  + "("
                 + KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + KEY_NAME+ "  TEXT,"
-                + KEY_TRIGGER_ID + " INTEGER,"
-                + KEY_AREA_ID + " INTEGER"
+                + KEY_AREA_ID + " INTEGER,"
+                + KEY_ATTRIBUTE + " TEXT"
                 + ")";
     }
 
-    public int insertSensor(String name, int areaId) {
+    public int insertSensor(SensorEntity sensor) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_NAME, name);
-        values.put(KEY_TRIGGER_ID, 0);
-        values.put(KEY_AREA_ID, areaId);
-
         // Inserting Row
-        int newId  = (int) db.insert(TABLE_SENSOR, null, values);
+        int newId  = (int) db.insert(TABLE_SENSOR, null, createContent(sensor));
         SQLiteManager.getInstance().closeDatabase();
 
         return newId;
@@ -70,21 +66,20 @@ public class SensorSQLite {
         return result;
     }
 
-    public SensorEntity findById(int id){
+    public static SensorEntity findByAttribute(int areaid, String attribute){
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
                 + " FROM " + TABLE_SENSOR
-                + " WHERE "+KEY_ID+" = ? ";
+                + " WHERE "+KEY_AREA_ID+" = ? AND" + KEY_ATTRIBUTE + "= ?";
 
-        Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(areaid),attribute});
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
 
             SensorEntity sensor = new SensorEntity();
             sensor.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
             sensor.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-            sensor.setTriggerId(cursor.getInt(cursor.getColumnIndex(KEY_TRIGGER_ID)));
             sensor.setAreaId(cursor.getInt(cursor.getColumnIndex(KEY_AREA_ID)));
             cursor.close();
             SQLiteManager.getInstance().closeDatabase();
@@ -92,6 +87,18 @@ public class SensorSQLite {
             return sensor;
         } else return null;
 
+    }
+
+    public static void upById(int id, SensorEntity sensor) {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, sensor.getName());
+        values.put(KEY_AREA_ID, sensor.getAreaId());
+
+        db.update(TABLE_SENSOR, values, KEY_ID + " = "+id, null);
+        Log.d(TAG, "upById: ----------------- " );
+        SQLiteManager.getInstance().closeDatabase();
     }
 
     public void cleardata() {
@@ -102,12 +109,19 @@ public class SensorSQLite {
 
     }
 
+    private static ContentValues createContent(SensorEntity sensor){
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, sensor.getName());
+        values.put(KEY_AREA_ID, sensor.getAreaId());
+        return values;
+    }
+
     static SensorEntity cursorToEnt(Cursor cursor){
         SensorEntity sensor = new SensorEntity();
         sensor.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
         sensor.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-        sensor.setTriggerId(cursor.getInt(cursor.getColumnIndex(KEY_TRIGGER_ID)));
         sensor.setAreaId(cursor.getInt(cursor.getColumnIndex(KEY_AREA_ID)));
+        sensor.setAttribute(cursor.getString(cursor.getColumnIndex(KEY_ATTRIBUTE)));
 
         return sensor;
     }

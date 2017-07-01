@@ -30,6 +30,7 @@ public class ConfigurationActivity extends AppCompatActivity {
         TriggerSQLite triggerSQLite = new TriggerSQLite();
         CommandSQLite commandSQLite = new CommandSQLite();
 
+
         triggerSQLite.cleardata();
         configurationSQLite.cleardata();
         commandSQLite.cleardata();
@@ -77,5 +78,9 @@ public class ConfigurationActivity extends AppCompatActivity {
 
     public void clicktoMapTrigger(View view) {
         startActivity(new Intent(ConfigurationActivity.this,MapDeviceTriggerActivity.class));
+    }
+
+    public void back(View view) {
+        finish();
     }
 }
