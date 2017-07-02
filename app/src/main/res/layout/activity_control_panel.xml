@@ -14,73 +14,119 @@
         android:layout_height="match_parent"
         android:layout_margin="20dp"
         android:layout_weight="8"
-        android:background="@drawable/background_content"
         android:orientation="vertical"
-        android:weightSum="10">
+        android:weightSum="1">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/lstAreaName"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/background_content"
+            android:gravity="left|center"
+            android:orientation="horizontal"
+            android:padding="0dp"
+            android:weightSum="10">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icn_user" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="10"
+                android:text="Nguyễn Văn Thế Mỹ"
+                android:textAllCaps="true"
+                android:textColor="@color/nWhite"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="20dp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icn_mode" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@drawable/background_home_area" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="3"
-            android:orientation="horizontal"
+            android:background="@drawable/background_content"
+            android:orientation="vertical"
             android:weightSum="10">
 
-            <ImageView
-                android:id="@+id/imageView3"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_weight="0.5"
-                android:padding="10dp"
-                android:src="@drawable/txt_trangthai" />
-
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/lstAreaAttribute"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="9.5"
-                android:padding="10dp" />
+                android:id="@+id/lstAreaName"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/background_home_area" />
 
-        </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="3"
+                android:orientation="horizontal"
+                android:weightSum="10">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:background="#80FFFFFF"
-            android:paddingBottom="5px"
-            android:paddingTop="5px" />
+                <ImageView
+                    android:id="@+id/imageView3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.5"
+                    android:padding="10dp"
+                    android:src="@drawable/txt_trangthai" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="5.8"
-            android:orientation="horizontal"
-            android:weightSum="10">
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/lstAreaAttribute"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="9.5"
+                    android:padding="10dp" />
 
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_weight="0.5"
-                android:padding="10dp"
-                android:src="@drawable/txt_thietbidieukhien" />
+            </LinearLayout>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/lstDevice"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="9.5"
-                android:padding="10dp" />
+            <View
+                android:id="@+id/view2"
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="#80FFFFFF"
+                android:paddingBottom="5px"
+                android:paddingTop="5px" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="6"
+                android:orientation="horizontal"
+                android:weightSum="10">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.5"
+                    android:padding="10dp"
+                    android:src="@drawable/txt_thietbidieukhien" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/lstDevice"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="9.5"
+                    android:padding="10dp" />
+
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
