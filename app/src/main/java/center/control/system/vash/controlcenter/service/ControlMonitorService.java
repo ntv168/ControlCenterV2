@@ -55,6 +55,7 @@ public class ControlMonitorService extends Service {
         intent.putExtra(ControlPanel.AREA_ID, areaId);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
+
     public void sendControl(final DeviceEntity deviceEntity, final String status){
         if (SmartHouse.getAreaById(deviceEntity.getAreaId()) != null) {
             sendResult(WAIT,-1);
@@ -152,7 +153,8 @@ public class ControlMonitorService extends Service {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                String response =  "security:có người lạ,light:phòng sáng,tempurature:12,sound:to,runningDevice:";
+                String response =  "security:có người lạ,light:phòng sáng,tempurature:12,sound:to";
+                Log.d(TAG,response);
                 SmartHouse.getInstance().updateSensorArea(area.getId(),response);
                 sendResult(MONITOR,area.getId());
             }

@@ -16,10 +16,14 @@ import android.widget.Toast;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.device.TriggerDeviceEntity;
+import center.control.system.vash.controlcenter.device.TriggerDeviceSQLite;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.device.ListDevicesTriggerAdapter;
+import center.control.system.vash.controlcenter.sensor.ListSensorAdapter;
 import center.control.system.vash.controlcenter.sensor.SensorEntity;
+import center.control.system.vash.controlcenter.sensor.SensorSQLite;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 public class MapDeviceTriggerActivity extends AppCompatActivity implements
@@ -27,13 +31,17 @@ public class MapDeviceTriggerActivity extends AppCompatActivity implements
 
     private AlertDialog.Builder selectDeviceDiag;
     private AlertDialog.Builder selectAreaDiag;
-    private AlertDialog.Builder selectSensorDiag;
     private int triggerId = 1;
     List<DeviceEntity> listDevices;
+    List<SensorEntity> listSensors;
     DeviceSQLite deviceSQLite = new DeviceSQLite();
     SmartHouse house;
     TriggerSQLite triggerSQLite = new TriggerSQLite();
-    ListDevicesTriggerAdapter deviceAdapter;
+    SensorSQLite sensorSQLite = new SensorSQLite();
+    TriggerDeviceSQLite triggerdevicesSQLite = new TriggerDeviceSQLite();
+
+    ListSensorAdapter sensorAdapter;
+    Boolean isDevice = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +58,7 @@ public class MapDeviceTriggerActivity extends AppCompatActivity implements
         });
 
         // RecyclerView for List Trigger
-        List<TriggerEntity> listTrigger = triggerSQLite.getAll();
+        final List<TriggerEntity> listTrigger = triggerSQLite.getAll();
 
         RecyclerView lstAreaManage = (RecyclerView) findViewById(R.id.listItemLeft);
         lstAreaManage.setHasFixedSize(true);
@@ -58,20 +66,18 @@ public class MapDeviceTriggerActivity extends AppCompatActivity implements
         verticalLayout.setOrientation(LinearLayoutManager.VERTICAL);
         lstAreaManage.setLayoutManager(verticalLayout);
 
-        RecyclerViewTriggerAdapter triggerAdapter = new RecyclerViewTriggerAdapter(listTrigger, this);
+        final RecyclerViewTriggerAdapter triggerAdapter = new RecyclerViewTriggerAdapter(listTrigger, this);
         RecyclerView rwTrigger = (RecyclerView) findViewById(R.id.listItemLeft);
         rwTrigger.setAdapter(triggerAdapter);
 
         // RecyclerView for List Device Trigger
 
-        listDevices = deviceSQLite.getDevicesByTriggerId(triggerId);
-        Toast.makeText(MapDeviceTriggerActivity.this, listDevices.size() + "", Toast.LENGTH_SHORT).show();
 
-        final ListView lstDevices = (ListView) findViewById(R.id.listItemCenter);
 
-        deviceAdapter = new ListDevicesTriggerAdapter(MapDeviceTriggerActivity.this, listDevices);
-        lstDevices.setAdapter(deviceAdapter);
-
+        List<TriggerDeviceEntity> listDevice = triggerdevicesSQLite.getDevicesByTriggerandTypeId(triggerId,1);
+        loadListDevicebyTriggerId(triggerId,listDevice);
+        List<TriggerDeviceEntity> listSensor = triggerdevicesSQLite.getDevicesByTriggerandTypeId(triggerId,2);
+        loadListSensorbyTriggerId(triggerId,listSensor);
 
         house = SmartHouse.getInstance();
 
@@ -101,94 +107,120 @@ public class MapDeviceTriggerActivity extends AppCompatActivity implements
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 int areaId = house.getAreas().get(which).getId();
-                final List<DeviceEntity> listDevice = house.getDevicesByAreaId(areaId);
-                ArrayAdapter<String> devNames = new ArrayAdapter<String>(MapDeviceTriggerActivity.this,android.R.layout.select_dialog_singlechoice);
 
-                for (DeviceEntity device : listDevice){
+                if (isDevice) {
+                    final List<DeviceEntity> listDevice = house.getDeviceswithoutTrigger(areaId,triggerId);
+                    ArrayAdapter<String> devNames = new ArrayAdapter<String>(MapDeviceTriggerActivity.this,android.R.layout.select_dialog_singlechoice);
+
+                    for (DeviceEntity device : listDevice){
                         devNames.add(device.getName());
+                        Log.d("---------", "Trigger Id: " + device.getTriggerId());
+                    }
+                    selectDeviceDiag.setAdapter(devNames,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    listDevice.get(which).setTriggerId(triggerId);
+                                    TriggerDeviceEntity entity = new TriggerDeviceEntity();
+                                    entity.setName(listDevice.get(which).getName());
+                                    entity.setDeviceId(listDevice.get(which).getId());
+                                    entity.setTriggerId(triggerId);
+                                    entity.setType(1);
+                                    entity.setValue("mở");
+                                    triggerdevicesSQLite.insert(entity);
+
+                                    List<TriggerDeviceEntity> list = triggerdevicesSQLite.getDevicesByTriggerandTypeId(triggerId,1);
+                                    loadListDevicebyTriggerId(triggerId,list);
+
+                                    Log.d("----------", "onClick: " + listDevice.get(which).getName() + "---" + listDevice.get(which).getTriggerId());
+
+                                    dialog.dismiss();
+                                }
+                            });
+                    selectDeviceDiag.show();
+
+                } else {
+                    final List<SensorEntity> listSensor = house.getSensorWithoutTriggerByAreaId(areaId,triggerId);
+                    ArrayAdapter<String> senNames = new ArrayAdapter<String>(MapDeviceTriggerActivity.this,android.R.layout.select_dialog_singlechoice);
+
+                    for (SensorEntity sensor : listSensor){
+                        senNames.add(sensor.getName());
+                    }
+                    selectDeviceDiag.setAdapter(senNames,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    listSensor.get(which).setTriggerId(triggerId);
+                                    TriggerDeviceEntity entity = new TriggerDeviceEntity();
+                                    entity.setName(listSensor.get(which).getName());
+                                    entity.setDeviceId(listSensor.get(which).getId());
+                                    entity.setTriggerId(triggerId);
+                                    entity.setType(2);
+                                    entity.setValue("nóng hơn 20 độ");
+                                    triggerdevicesSQLite.insert(entity);
+                                Log.d("----------", "onClick: " + listSensor.get(which).getName() + "---" + listSensor.get(which).getTriggerId());
+//
+
+                                    List<TriggerDeviceEntity> list = triggerdevicesSQLite.getDevicesByTriggerandTypeId(triggerId,2);
+                                    loadListSensorbyTriggerId(triggerId,list);
+
+                                    dialog.dismiss();
+                                }
+                            });
+                    selectDeviceDiag.show();
                 }
-                selectDeviceDiag.setAdapter(devNames,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
 
-                                listDevice.get(which).setTriggerId(triggerId);
-                                deviceSQLite.upById(listDevice.get(which).getId(), listDevice.get(which));
-                                Log.d("----------", "onClick: " + listDevice.get(which).getName() + "---" + listDevice.get(which).getTriggerId());
-
-                                listDevices = deviceSQLite.getAll();
-                                deviceAdapter = new ListDevicesTriggerAdapter(MapDeviceTriggerActivity.this, listDevices);
-                                lstDevices.setAdapter(deviceAdapter);
-                                Toast.makeText(MapDeviceTriggerActivity.this, listDevices.get(0).getTriggerId() + "", Toast.LENGTH_SHORT).show();
-                                dialog.dismiss();
-                            }
-                        });
-                selectDeviceDiag.show();
-            }
-        });
-
-        //----------------Dialog for add new sensor
-        selectSensorDiag = new AlertDialog.Builder(MapDeviceTriggerActivity.this);
-        selectSensorDiag.setIcon(R.drawable.add);
-        selectSensorDiag.setTitle("Chọn cảm biến:");
-        selectSensorDiag.setNegativeButton("Quay lại", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        selectSensorDiag.setNegativeButton("Quay lại", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
             }
         });
 
         //--------------Adapter for select area
-        selectAreaDiag.setAdapter(house.getAreaNameAdapter(this), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                int areaId = house.getAreas().get(which).getId();
-                final List<SensorEntity> listSensor = house.getSensorByAreaId(areaId);
-                ArrayAdapter<String> senNames = new ArrayAdapter<String>(MapDeviceTriggerActivity.this,android.R.layout.select_dialog_singlechoice);
-
-                for (SensorEntity sensor : listSensor){
-                    senNames.add(sensor.getName());
-                }
-                selectDeviceDiag.setAdapter(senNames,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                listSensor.get(which).setTriggerId(triggerId);
-//                                .upById(listSensor.get(which).getId(), listDevice.get(which));
-//                                Log.d("----------", "onClick: " + listDevice.get(which).getName() + "---" + listDevice.get(which).getTriggerId());
-//
-//                                listDevices = deviceSQLite.getAll();
-//                                deviceAdapter = new ListDevicesTriggerAdapter(MapDeviceTriggerActivity.this, listDevices);
-//                                lstDevices.setAdapter(deviceAdapter);
-//                                Toast.makeText(MapDeviceTriggerActivity.this, listDevices.get(0).getTriggerId() + "", Toast.LENGTH_SHORT).show();
-                                dialog.dismiss();
-                            }
-                        });
-                selectDeviceDiag.show();
-            }
-        });
-
 
         Log.d("-------------------", "onClick: " + "-----------" );
     }
 
     @Override
     public void onTriggerClick(TriggerEntity triggerEntity) {
-        Toast.makeText(this, "" + triggerEntity.getId(), Toast.LENGTH_SHORT).show();
-        triggerId = triggerEntity.getId();
 
+        this.triggerId = triggerEntity.getId();
+
+        List<TriggerDeviceEntity> listDevice = triggerdevicesSQLite.getDevicesByTriggerandTypeId(triggerId,1);
+        loadListDevicebyTriggerId(triggerId,listDevice);
+        List<TriggerDeviceEntity> listSensor = triggerdevicesSQLite.getDevicesByTriggerandTypeId(triggerId,2);
+        loadListSensorbyTriggerId(triggerId,listSensor);
+        Toast.makeText(this, "" + triggerEntity.getId(), Toast.LENGTH_SHORT).show();
     }
 
 
 
-    public void onClicktoArea(View view) {
+    public void addDevicetoTrigger(View view) {
+        isDevice = true;
         selectAreaDiag.show();
     }
+
+    public void addSensortoTrigger(View view) {
+        isDevice = false;
+        selectAreaDiag.show();
+    }
+
+    public void back(View view) {
+        finish();
+    }
+
+    public void loadListDevicebyTriggerId(int triggerId, List<TriggerDeviceEntity> list) {
+        final ListView lstDevices = (ListView) findViewById(R.id.listItemCenter);
+
+        ListDevicesTriggerAdapter deviceAdapter = new ListDevicesTriggerAdapter(MapDeviceTriggerActivity.this, list);
+        lstDevices.setAdapter(deviceAdapter);
+    }
+
+    public void loadListSensorbyTriggerId(int triggerId, List<TriggerDeviceEntity> list) {
+
+        final ListView lstDevices = (ListView) findViewById(R.id.listItemRight);
+
+        ListDevicesTriggerAdapter deviceAdapter = new ListDevicesTriggerAdapter(MapDeviceTriggerActivity.this, list);
+        lstDevices.setAdapter(deviceAdapter);
+    }
+
 }

@@ -51,6 +51,8 @@ import center.control.system.vash.controlcenter.area.ListAreaAdapter;
 import center.control.system.vash.controlcenter.panel.VAPanel;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
+import center.control.system.vash.controlcenter.sensor.SensorEntity;
+import center.control.system.vash.controlcenter.sensor.SensorSQLite;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
@@ -151,10 +153,21 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                                     txtErr.setText("Không kết nối được thiết bị");
                                     if (url.equals("http://1.1.1.1:80/get")) {
                                         String encodedResp = "đèn bàn=db";
+                                        String encodedResp1 = "máy chiếu=db";
+                                        String encodedResp2 = "máy lạnh=db";
                                         currentArea = saveArea(areaName.getText().toString(),
                                                 areaNickName.getText().toString(),
                                                 ipArea.getText().toString());
                                         insertDeviceByPort(encodedResp, currentArea.getId());
+                                        insertDeviceByPort(encodedResp1, currentArea.getId());
+                                        insertDeviceByPort(encodedResp2, currentArea.getId());
+
+                                        String sensor = "Cảm biến âm thanh";
+                                        insertSensor(sensor,currentArea.getId(), AreaEntity.attrivutesValues[3]);
+                                        String sensor1 = "Cảm biến nhiệt độ";
+                                        insertSensor(sensor1,currentArea.getId(),AreaEntity.attrivutesValues[2]);
+                                        String sensor2 = "Cảm biến  ánh sáng";
+                                        insertSensor(sensor2,currentArea.getId(), AreaEntity.attrivutesValues[1]);
                                         progressDialog.dismiss();
                                         dialog.dismiss();
                                     } else
@@ -180,6 +193,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                         house.addArea(area);
                         areaAdapter.setAreas(house.getAreas());
 
+
                         return area;
                     }
 
@@ -199,6 +213,18 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                             }
                         }
                         devicesAdapter.setDevices(house.getDevicesByAreaId(areaId));
+                    }
+
+                    private void insertSensor(String name, int areaId, String typeSensor) {
+                        SensorSQLite sensorSQLite = new SensorSQLite();
+
+                        SensorEntity entity = new SensorEntity();
+                        entity.setName(name);
+                        entity.setAreaId(areaId);
+                        entity.setAttribute(typeSensor);
+                        int sensorId = sensorSQLite.insertSensor(entity);
+                        entity.setId(sensorId);
+                        house.addSensor(entity);
                     }
                 });
 

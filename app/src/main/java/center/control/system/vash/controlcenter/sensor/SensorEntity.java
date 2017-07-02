@@ -9,8 +9,9 @@ public class SensorEntity {
     private String name;
     private int areaId;
     private int triggerId;
+    private String attribute;
 
-    SensorEntity() {
+    public SensorEntity() {
 
     }
 
@@ -44,5 +45,13 @@ public class SensorEntity {
 
     public void setTriggerId(int configId) {
         this.triggerId = configId;
+    }
+
+    public String getAttribute() {
+        return attribute;
+    }
+
+    public void setAttribute(String attribute) {
+        this.attribute = attribute;
     }
 }

@@ -1,4 +1,4 @@
-package center.control.system.vash.controlcenter.device;
+package center.control.system.vash.controlcenter.configuration;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -16,20 +16,18 @@ import center.control.system.vash.controlcenter.device.DeviceEntity;
  * Created by Sam on 6/29/2017.
  */
 
-public class ListDevicesTriggerAdapter extends ArrayAdapter<TriggerDeviceEntity> {
-    List<TriggerDeviceEntity> deviceEntities;
+public class ListDevicesTriggerAdapter extends ArrayAdapter<DeviceEntity> {
+    List<DeviceEntity> deviceEntities;
 
-    public ListDevicesTriggerAdapter(Context context, List<TriggerDeviceEntity> items) {
+    public ListDevicesTriggerAdapter(Context context, List<DeviceEntity> items) {
         super(context, 0);
         this.deviceEntities = items;
     }
 
-
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
-        TriggerDeviceEntity trigger = deviceEntities.get(position);
+        DeviceEntity trigger = deviceEntities.get(position);
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {

@@ -8,6 +8,8 @@ import center.control.system.vash.controlcenter.App;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.command.CommandSQLite;
 import center.control.system.vash.controlcenter.configuration.ConfigurationSQLite;
+import center.control.system.vash.controlcenter.device.TriggerDeviceSQLite;
+import center.control.system.vash.controlcenter.sensor.SensorSQLite;
 import center.control.system.vash.controlcenter.trigger.TriggerSQLite;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
@@ -48,6 +50,8 @@ public class SqLiteHelper extends SQLiteOpenHelper {
         db.execSQL(ConfigurationSQLite.createConfiguration());
         db.execSQL(CommandSQLite.createCommand());
         db.execSQL(TriggerSQLite.createTriggerConfigution());
+        db.execSQL(SensorSQLite.createSensor());
+        db.execSQL(TriggerDeviceSQLite.createTable());
 
     }
 
@@ -70,6 +74,8 @@ public class SqLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + ConfigurationSQLite.TABLE_CONFIGURATION);
         db.execSQL("DROP TABLE IF EXISTS " + CommandSQLite.TABLE_COMMAND);
         db.execSQL("DROP TABLE IF EXISTS " + TriggerSQLite.TABLE_TRIGGER);
+        db.execSQL("DROP TABLE IF EXISTS " + SensorSQLite.TABLE_SENSOR);
+        db.execSQL("DROP TABLE IF EXISTS " + TriggerDeviceSQLite.TABLE_DEVICE);
 
         onCreate(db);
     }
