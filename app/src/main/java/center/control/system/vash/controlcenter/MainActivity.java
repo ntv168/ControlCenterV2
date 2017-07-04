@@ -35,8 +35,6 @@ public class MainActivity extends Activity {
     SharedPreferences sharedPreferences;
     private String username;
     private String password;
-    private String houseId;
-    private String contractId;
     private ProgressDialog loginDia;
     EditText txtusername;
     EditText txtpassword;
@@ -94,9 +92,7 @@ public class MainActivity extends Activity {
                 })
                 .setNegativeButton("Xóa", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
                         dialog.dismiss();
-
                     }
                 });
         modHost.show();
@@ -110,8 +106,8 @@ public class MainActivity extends Activity {
         loginStaffApi.staffLogin(stff).enqueue(new Callback<StaffCodeDTO>() {
             @Override
             public void onResponse(Call<StaffCodeDTO> call, Response<StaffCodeDTO> response) {
-                Log.d(TAG,call.request().url()+" sai staff cose "+response.body().getMessage());
-                if (response.body()!= null && response.body().getMessage().equals("success")){
+                Log.d(TAG,call.request().url()+"");
+                if (response.body()!=null && response.body().getMessage()!= null && response.body().getMessage().equals("success")){
                     startActivity(new Intent(MainActivity.this,SettingPanel.class));
                 }else {
                     Toast.makeText(MainActivity.this,"Sai code nhân viên ",Toast.LENGTH_LONG).show();
@@ -162,7 +158,7 @@ public class MainActivity extends Activity {
                     edit.putString(ConstManager.BOT_NAME,response.body().getVirtualAssistantName());
                     edit.putString(ConstManager.BOT_TYPE,response.body().getVirtualAssistantType());
                     edit.putInt(ConstManager.BOT_TYPE_ID,response.body().getVirtualAssistantTypeId());
-                    SmartHouse.getInstance().setContractId(contractId);
+                    SmartHouse.getInstance().setContractId(response.body().getContractId());
                     edit.commit();
                     Log.d(TAG,response.body().getVirtualAssistantType());
                     startActivity( new Intent(MainActivity.this, ControlPanel.class));

@@ -8,6 +8,7 @@ import center.control.system.vash.controlcenter.App;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.command.CommandSQLite;
 import center.control.system.vash.controlcenter.configuration.ConfigurationSQLite;
+import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
 import center.control.system.vash.controlcenter.device.TriggerDeviceSQLite;
 import center.control.system.vash.controlcenter.sensor.SensorSQLite;
 import center.control.system.vash.controlcenter.trigger.TriggerSQLite;
@@ -22,7 +23,7 @@ import center.control.system.vash.controlcenter.nlp.TermSQLite;
 
 public class SqLiteHelper extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 9;
 
     private static final String DATABASE_NAME = "ControlCenter";
 
@@ -52,6 +53,8 @@ public class SqLiteHelper extends SQLiteOpenHelper {
         db.execSQL(TriggerSQLite.createTriggerConfigution());
         db.execSQL(SensorSQLite.createSensor());
         db.execSQL(TriggerDeviceSQLite.createTable());
+        db.execSQL(StateConfigurationSQL.createEvent());
+        db.execSQL(StateConfigurationSQL.createState());
 
     }
 
@@ -69,6 +72,9 @@ public class SqLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TermSQLite.TABLE_OWNER_TRAIN_TERM);
         db.execSQL("DROP TABLE IF EXISTS " + DetectIntentSQLite.TABLE_FUNCTION_DETECT);
         db.execSQL("DROP TABLE IF EXISTS " + DetectIntentSQLite.TABLE_SOCIAL_DETECT);
+//StateConfig
+        db.execSQL("DROP TABLE IF EXISTS " + StateConfigurationSQL.TABLE_EVENT);
+        db.execSQL("DROP TABLE IF EXISTS " + StateConfigurationSQL.TABLE_STATE);
 
         //Configuration
         db.execSQL("DROP TABLE IF EXISTS " + ConfigurationSQLite.TABLE_CONFIGURATION);

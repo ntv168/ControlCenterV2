@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 import center.control.system.vash.controlcenter.configuration.ConfigurationActivity;
+import center.control.system.vash.controlcenter.configuration.SetConfigActivity;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.helper.StorageHelper;
@@ -88,7 +89,7 @@ public class SettingPanel extends AppCompatActivity {
         btnSetConfig.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(SettingPanel.this, ConfigurationActivity.class));
+                startActivity(new Intent(SettingPanel.this, SetConfigActivity.class));
             }
         });
 

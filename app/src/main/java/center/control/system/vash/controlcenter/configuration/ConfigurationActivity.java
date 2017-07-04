@@ -27,13 +27,13 @@ public class ConfigurationActivity extends AppCompatActivity {
         setContentView(R.layout.configuration);
         listConfiguration = new ArrayList<>();
 
-        LinearLayout lnBack = (LinearLayout) findViewById(R.id.lnBack);
-        lnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+//        LinearLayout lnBack = (LinearLayout) findViewById(R.id.lnBack);
+//        lnBack.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+//            }
+//        });
 
         ConfigurationSQLite configurationSQLite = new ConfigurationSQLite();
         TriggerSQLite triggerSQLite = new TriggerSQLite();

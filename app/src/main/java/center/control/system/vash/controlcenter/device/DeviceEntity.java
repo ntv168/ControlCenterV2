@@ -13,7 +13,7 @@ import java.util.Set;
 public class DeviceEntity extends TargetObject{
     public static final String [] types = new  String[]{"light","bell","door","fan","camera","tivi","airCondition","cooker","curtain"};
     public static final String [] typeNames = new  String[]{"đèn","chuông","cửa","quạt","camera","ti-vi","máy lạnh","nồi cơm","rèm cửa"};
-    public static final String remoteTypes = new  String("tivi,airCondition");
+    public static final String remoteTypes = new  String("airCondition");
 
     @SerializedName("port")
     private String port;

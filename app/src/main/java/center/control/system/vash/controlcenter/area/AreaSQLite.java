@@ -23,7 +23,7 @@ public class AreaSQLite {
     private static final String KEY_SAFE = "safety";
     private static final String KEY_NICKNAME = "nickName";
     private static final String KEY_ELECT_USING = "electricUsing";
-    private static final String KEY_SOUND = "sound";
+    private static final String KEY_DETECT = "sound";
     private static final String KEY_ADDRESS = "connectAddress";
     private static final String KEY_NAME = "name";
     private static final String TAG = "Area Sqlite";
@@ -38,7 +38,7 @@ public class AreaSQLite {
                 KEY_SAFE + "  TEXT  ,"+
                 KEY_NICKNAME + "  TEXT  ,"+
                 KEY_ELECT_USING + "  TEXT  ,"+
-                KEY_SOUND + "  TEXT  "+ ")";
+                KEY_DETECT + "  TEXT  "+ ")";
     }
 
 
@@ -52,7 +52,7 @@ public class AreaSQLite {
         values.put(KEY_SAFE, area.getSafety());
         values.put(KEY_NICKNAME, area.getNickName());
         values.put(KEY_ELECT_USING, area.getElectricUsing());
-        values.put(KEY_SOUND, area.getSound());
+        values.put(KEY_DETECT, area.getDetect());
 
         // Inserting Row
         int newId  = (int) db.insert(TABLE_AREA, null, values);
@@ -102,16 +102,7 @@ public class AreaSQLite {
         Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(id)});
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
-            AreaEntity area = new AreaEntity();
-            area.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
-            area.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-            area.setConnectAddress(cursor.getString(cursor.getColumnIndex(KEY_ADDRESS)));
-            area.setElectricUsing(cursor.getString(cursor.getColumnIndex(KEY_ELECT_USING)));
-            area.setSafety(cursor.getString(cursor.getColumnIndex(KEY_SAFE)));
-            area.setLight(cursor.getString(cursor.getColumnIndex(KEY_LIGHT)));
-            area.setTemperature(cursor.getString(cursor.getColumnIndex(KEY_TEMP)));
-            area.setNickName(cursor.getString(cursor.getColumnIndex(KEY_NICKNAME)));
-            area.setSound(cursor.getString(cursor.getColumnIndex(KEY_SOUND)));
+            AreaEntity area = cursorToEnt(cursor);
             cursor.close();
             SQLiteManager.getInstance().closeDatabase();
 
@@ -140,7 +131,7 @@ public class AreaSQLite {
         area.setLight(cursor.getString(cursor.getColumnIndex(KEY_LIGHT)));
         area.setTemperature(cursor.getString(cursor.getColumnIndex(KEY_TEMP)));
         area.setNickName(cursor.getString(cursor.getColumnIndex(KEY_NICKNAME)));
-        area.setSound(cursor.getString(cursor.getColumnIndex(KEY_SOUND)));
+        area.setDetect(cursor.getString(cursor.getColumnIndex(KEY_DETECT)));
         return area;
     }
 }

@@ -25,16 +25,22 @@ import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.command.CommandEntity;
+import center.control.system.vash.controlcenter.nlp.CurrentContext;
+import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
+import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.script.ListDeviceInScriptAdapter;
 import center.control.system.vash.controlcenter.script.ListScriptAdapter;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
+import center.control.system.vash.controlcenter.utils.BotUtils;
+import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 public class ModePanel extends AppCompatActivity implements ListScriptAdapter.OnAdapterItemClickListener{
@@ -290,8 +296,22 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
 
     @Override
     public void onLongScriptClick(ScriptEntity scriptEntity) {
+        Toast.makeText(this,"Chưa code khúc này",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void activaScript(ScriptEntity item) {
+        DetectFunctionEntity funct = DetectIntentSQLite.findFunctionByName(ConstManager.FUNCTION_START_MODE);
+        CurrentContext.getInstance().setDetectedFunction(funct);
+        CurrentContext.getInstance().setScript(item);
+        BotUtils.implementCommand(funct,null,item);
+        Log.d(TAG,"Script acted");
+    }
+
+    public void clicktoModePanel(View view) {
 
     }
+
     public void showTimePickerDialog()
     {
         TimePickerDialog.OnTimeSetListener callback=new TimePickerDialog.OnTimeSetListener() {

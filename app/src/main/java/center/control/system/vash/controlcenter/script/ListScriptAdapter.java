@@ -2,6 +2,7 @@ package center.control.system.vash.controlcenter.script;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ public class ListScriptAdapter extends RecyclerView.Adapter<ListScriptAdapter.Vi
 
     private List<ScriptEntity> scriptEntities;
     private  OnAdapterItemClickListener mListener;
+    private int focusedItem = 0;
 
     public void addScrip(ScriptEntity script) {
         scriptEntities.add(script);
@@ -25,6 +27,7 @@ public class ListScriptAdapter extends RecyclerView.Adapter<ListScriptAdapter.Vi
     public ListScriptAdapter(List<ScriptEntity> items, OnAdapterItemClickListener listener) {
         scriptEntities= items;
         mListener = listener;
+        focusedItem = -1;
     }
 
     @Override
@@ -35,10 +38,14 @@ public class ListScriptAdapter extends RecyclerView.Adapter<ListScriptAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder,final int position) {
         holder.item = scriptEntities.get(position);
         holder.name.setText(holder.item.getName());
-
+        if (position == focusedItem){
+            holder.btnActive.setEnabled(false);
+        } else {
+            holder.btnActive.setEnabled(true);
+        }
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,6 +61,16 @@ public class ListScriptAdapter extends RecyclerView.Adapter<ListScriptAdapter.Vi
                     mListener.onLongScriptClick(holder.item);
                 }
                 return true;
+            }
+        });
+        holder.btnActive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (null != mListener) {
+                    mListener.activaScript(holder.item);
+                }
+                focusedItem = position;
+                notifyDataSetChanged();
             }
         });
     }
@@ -91,5 +108,7 @@ public class ListScriptAdapter extends RecyclerView.Adapter<ListScriptAdapter.Vi
         // TODO: Update argument type and name
         public void onScriptClick(ScriptEntity scriptEntity);
         public void onLongScriptClick(ScriptEntity scriptEntity);
+
+        public void activaScript(ScriptEntity item);
     }
 }

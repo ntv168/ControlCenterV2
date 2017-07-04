@@ -16,7 +16,6 @@ public class TFIDFIntent {
             allCount += (Integer) pair.getValue();
         }
         int termCount = wordCout.get(term);
-        System.out.println(termCount +"   "+ allCount);
         return termCount / allCount;
     }
 

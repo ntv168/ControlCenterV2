@@ -20,6 +20,7 @@ import center.control.system.vash.controlcenter.nlp.CurrentContext;
 import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
+import center.control.system.vash.controlcenter.nlp.OwnerTrainEntity;
 import center.control.system.vash.controlcenter.nlp.TargetTernEntity;
 import center.control.system.vash.controlcenter.nlp.TermEntity;
 import center.control.system.vash.controlcenter.nlp.TermSQLite;
@@ -32,7 +33,7 @@ import center.control.system.vash.controlcenter.script.ScriptSQLite;
  */
 
 public class BotUtils {
-    private static String TAG = "Bot utillss";
+    private static String TAG = "Bot utills nè::::";
     private static String BOT_NAME = "<bot-name>";
     private static String BOT_ROLE = "<bot-role>";
     private static String OWNER_NAME = "<owner-name>";
@@ -172,8 +173,15 @@ public class BotUtils {
                 DetectSocialEntity soc = getSocialByName(ConstManager.NOT_LEARN_YET);
                 if (soc.getQuestionPattern() == null) {
                     Log.e(TAG, "not learn yet không có câu question");
+
                 } else {
-                    notLearnSentence = completeSentence(soc.getQuestionPattern(), "", "");
+                    notLearnSentence = soc.getQuestionPattern();
+                    notLearnSentence = notLearnSentence.replaceAll(BOT_NAME, house.getBotName());
+                    notLearnSentence = notLearnSentence.replaceAll(BOT_ROLE, house.getBotRole());
+                    notLearnSentence = notLearnSentence.replaceAll(OWNER_NAME, house.getOwnerName());
+                    notLearnSentence = notLearnSentence.replaceAll(OWNER_ROLE, house.getOwnerRole());
+                    notLearnSentence = notLearnSentence.replaceAll(RESULT_VALUE, resultValue);
+                    notLearnSentence = notLearnSentence.replaceAll(TARGET_OBJECT, targetObject);
                 }
             }
             return notLearnSentence;
@@ -185,8 +193,8 @@ public class BotUtils {
             result = result.replaceAll(RESULT_VALUE, resultValue);
             result = result.replaceAll(TARGET_OBJECT, targetObject);
 
-            Log.d(TAG, result);
-            return result;
+            Log.d(TAG, result.trim());
+            return result.trim();
         }
     }
     public static DetectSocialEntity getSocialByName(String name){
@@ -280,22 +288,7 @@ public class BotUtils {
 
         return maxTfidf;
     }
-    public static String getTime(){
-        Date time = new Date();
-        Log.d(TAG,time.toString());
-        String result = "";
-        result += time.getHours()+" giờ "+time.getMinutes()+" phút ";
-        return result;
-    }
-    public static String getDay(){
-        Calendar c = Calendar.getInstance();
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        int month = c.get(Calendar.MONTH)+1;
-        String result = "";
-//        Log.d(TAG,time.getMonth()+ " "+time.getYear()+" "+time.getDate()+" "+time.getDay());
-        result += " ngày "+day+" tháng "+month+" ";
-        return result;
-    }
+
     public void saveFunctionTFIDFTerm(Map<String,Map<String,Integer>> trainingSetMap) {
 
         Map<String,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
@@ -313,14 +306,14 @@ public class BotUtils {
                 String term = (String) termPair.getKey();
                 double termTfidf =1.0;
                 termTfidf = TFIDFIntent.createTfIdf(cloneForCalculate, term, functionName);
-                Log.d(TAG, termTfidf + "   " + term + "  "+functionName);
 
                 TermEntity termEnt = new TermEntity();
                 termEnt.setDetectFunctionId(functId);
                 termEnt.setDetectSocialId(-1);
                 termEnt.setTfidfPoint(termTfidf);
-                termEnt.setContent(" "+term+" ");
+                termEnt.setContent(" "+term.trim()+" ");
                 sqLite.insertHumanTerm(termEnt);
+                Log.d(TAG, termTfidf + "   " + term + "  "+functionName+" - "+functId);
             }
         }
     }
@@ -341,14 +334,14 @@ public class BotUtils {
                 String term = (String) termPair.getKey();
                 double termTfidf =1.0;
                 termTfidf = TFIDFIntent.createTfIdf(cloneForCalculate, term, socialName);
-                Log.d(TAG, termTfidf + "   " + term + "  "+socialName);
 
                 TermEntity termEnt = new TermEntity();
                 termEnt.setDetectFunctionId(-1);
                 termEnt.setDetectSocialId(socId);
                 termEnt.setTfidfPoint(termTfidf);
-                termEnt.setContent(" "+term+" ");
+                termEnt.setContent(" "+term.trim()+" ");
                 sqLite.insertHumanTerm(termEnt);
+                Log.d(TAG, termTfidf + "   " + term + "  "+socialName+" "+socId);
             }
         }
     }
@@ -450,19 +443,7 @@ public class BotUtils {
         }
     }
 
-    public static String getVerbByIntent(String functionName) {
-        switch (functionName){
-            case ConstManager.FUNCTION_TURN_ON:
-                return "bật";
-            case ConstManager.FUNCTION_TURN_OFF:
-                return "tắt";
-            case ConstManager.FUNCTION_INC_TEMP:
-                return "tăng nhiệt độ";
-            case ConstManager.FUNCTION_DEC_TEMP:
-                return "giảm nhiệt độ";
-        }
-        return "";
-    }
+
     public static void implementCommand(DetectFunctionEntity functionIntent, DeviceEntity device, ScriptEntity mode){
         CommandEntity cmd = new CommandEntity();
         List<CommandEntity> cmds = new ArrayList<>();
@@ -507,124 +488,139 @@ public class BotUtils {
         }
         if (cmds.size()>0){
             for (CommandEntity cm : cmds){
-
-                SmartHouse.getInstance().addCommand(cmd);
+                SmartHouse.getInstance().addCommand(cm);
             }
         }
     }
 
     public static String getAttributeByFunction(String functionName, AreaEntity area) {
         switch (functionName){
-            case "checkPerson":
-                return area.getPersonDetect();
             case "checkSecurity":
                 return area.getSafety();
             case "checkLight":
                 return area.getLight();
             case "checkTemperature":
                 return area.getTemperature();
-            case "checkSound":
-                return area.getSound();
+            case "checkPerson":
+                return area.getDetect();
             case "checkElectricUsing":
                 return area.getElectricUsing();
         }
         return null;
     }
-    public static String botReplyToSentence(String humanSay){
+    public static String processDeviceOnly(DetectFunctionEntity functionIntent, List<TargetTernEntity> termTargets){
+        CurrentContext current = CurrentContext.getInstance();
+        DeviceEntity deviceOnly = BotUtils.findBestDevice(termTargets, -1);
+        if (deviceOnly != null) {
+            Log.d(TAG, "Tim thấy thiet bị  thôi " + deviceOnly.getName());
+            current.setDevice(deviceOnly);
+            current.setScript(null);
 
-        TermSQLite termSQLite = new TermSQLite();
-        List<TermEntity> terms = termSQLite.getHumanIntentInSentence(humanSay);
-        DetectFunctionEntity functFound = BotUtils.findBestFunctDetected(terms);
-        DetectSocialEntity socialFound = BotUtils.findBestSocialDetected(terms);
-        if (functFound != null && socialFound != null) {
-            double functionTfidf = functFound.getDetectScore();
-            List<TargetTernEntity> termTargets = TermSQLite.getTargetInSentence(humanSay);
-            functionTfidf += BotUtils.findBestArreaTfidf(termTargets)+ BotUtils.findBestDeviceTfidf(termTargets)
-                    +BotUtils.findBestScriptTfidf(termTargets);
-            Log.d(TAG,"funct point: "+functionTfidf+ " soc point "+socialFound.getDetectScore());
-            if (functionTfidf > socialFound.getDetectScore()){
-               return   processFunction(humanSay,functFound);
+            AreaEntity area = AreaSQLite.findById(deviceOnly.getAreaId());
+            String target = deviceOnly.getName() + " trong " + area.getName();
+            current.setArea(area);
+            return BotUtils.completeSentence(functionIntent.getRemindPattern(), "", target);
+        } else {
+            Log.d(TAG, "Không thấy gì hết ngoài " + functionIntent.getFunctionName());
+            DetectSocialEntity askDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEONLY);
+            return BotUtils.completeSentence(askDevice.getQuestionPattern(),
+                    ConstManager.getVerbByIntent(functionIntent.getFunctionName()), "");
+        }
+    }
+    public static String processDeviceInArea(DetectFunctionEntity functionIntent, List<TargetTernEntity> termTargets){
+        CurrentContext current = CurrentContext.getInstance();
+        if (current.getArea() != null){
+            DeviceEntity device = BotUtils.findBestDevice(termTargets,current.getArea().getId());
+            if (device == null) {
+                Log.d(TAG, "Tim thấy không gian " + current.getArea().getName() + " mà không tìm thấy thiết bị");
+                DetectSocialEntity askWhichDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEAREA);
+                current.setDetectSocial(askWhichDevice);
+
+                return BotUtils.completeSentence(askWhichDevice.getQuestionPattern(),
+                        ConstManager.getVerbByIntent(functionIntent.getFunctionName()), current.getArea().getName());
             } else {
-                return  processSocial(humanSay,socialFound);
+                Log.d(TAG, "Tìm thấy cả hai" + device.getName()+current.getArea().getName());
+                current.setScript(null);
+                current.setDevice(device);
+                BotUtils.implementCommand(functionIntent,device,null);
             }
-        } else if (functFound == null && socialFound != null) {
-            processSocial(humanSay, socialFound);
-        }else if (functFound != null && socialFound == null){
-            processFunction(humanSay, functFound);
         } else {
             DetectSocialEntity notUnderReply = BotUtils.getSocialByName(ConstManager.NOT_UNDERSTD);
             return BotUtils.completeSentence(notUnderReply.getQuestionPattern(), "", "");
         }
         return "";
     }
-    private static String processFunction(String humanSay, DetectFunctionEntity functionIntent){
+    public static String botReplyToSentence(String humanSay){
+        humanSay = " "+humanSay+" ";
+        TermSQLite termSQLite = new TermSQLite();
         List<TargetTernEntity> termTargets = TermSQLite.getTargetInSentence(humanSay);
-        if (ConstManager.FUNCTION_FOR_SCRIPT.contains(functionIntent.getFunctionName())){
-            ScriptEntity mode = BotUtils.findBestScript(termTargets);
-            if (mode != null) {
-//                BotUtils.implementCommand(functionIntent,null,mode);
-                CurrentContext.getInstance().renew();
+        DetectSocialEntity currentSocial = CurrentContext.getInstance().getDetectSocial();
+        if (currentSocial!= null && currentSocial.getName().equals(ConstManager.SOCIAL_ASK_DEVICEAREA)){
+            return processDeviceInArea(CurrentContext.getInstance().getDetectedFunction(),termTargets);
+        } else if (currentSocial!= null && currentSocial.getName().equals(ConstManager.SOCIAL_ASK_DEVICEONLY)){
+            return processDeviceOnly(CurrentContext.getInstance().getDetectedFunction(),termTargets);
+        } else if (currentSocial!= null && currentSocial.getName().equals(ConstManager.SOCIAL_ASK_MODE)){
+            return processMode(CurrentContext.getInstance().getDetectedFunction(),termTargets);
+        } else {
+            List<TermEntity> terms = termSQLite.getHumanIntentInSentence(humanSay);
+//        Log.d(TAG,termSQLite.getAllTerms().size()+" s");
+            DetectFunctionEntity functFound = BotUtils.findBestFunctDetected(terms);
+            DetectSocialEntity socialFound = BotUtils.findBestSocialDetected(terms);
+            if (functFound != null && socialFound != null) {
+                double functionTfidf = functFound.getDetectScore();
+                functionTfidf += BotUtils.findBestArreaTfidf(termTargets) + BotUtils.findBestDeviceTfidf(termTargets)
+                        + BotUtils.findBestScriptTfidf(termTargets);
+                Log.d(TAG, "funct point: " + functionTfidf + " soc point " + socialFound.getDetectScore());
+                if (functionTfidf > socialFound.getDetectScore()) {
+                    return processFunction(termTargets, functFound);
+                } else {
+                    return processSocial(humanSay, socialFound);
+                }
+            } else if (functFound == null && socialFound != null) {
+                return processSocial(humanSay, socialFound);
+            } else if (functFound != null && socialFound == null) {
+                return processFunction(termTargets, functFound);
             } else {
-                DetectSocialEntity askWhichMode = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_MODE);
-
-                CurrentContext current = CurrentContext.getInstance();
-                current.setDetectedFunction(functionIntent);
-
-                return BotUtils.completeSentence(askWhichMode.getQuestionPattern(),
-                        BotUtils.getVerbByIntent(functionIntent.getFunctionName()), "");
-
+                DetectSocialEntity notUnderReply = BotUtils.getSocialByName(ConstManager.NOT_UNDERSTD);
+                return BotUtils.completeSentence(notUnderReply.getQuestionPattern(), "", "");
             }
+        }
+    }
+    private static String processMode(DetectFunctionEntity functionIntent,List<TargetTernEntity> termTargets){
+        CurrentContext current = CurrentContext.getInstance();
+        ScriptEntity mode = BotUtils.findBestScript(termTargets);
+        if (mode != null) {
+            Log.d(TAG,"Tim thay mode "+mode.getName());
+            current.setScript(mode);
+            current.setDevice(null);
+            BotUtils.implementCommand(functionIntent,null,mode);
+            Log.d(TAG,"Xác nhận "+ConstManager.getVerbByIntent(functionIntent.getFunctionName()+" chế độ "+mode.getName()));
+            return "Xác nhận "+ConstManager.getVerbByIntent(functionIntent.getFunctionName()+" chế độ "+mode.getName());
+        } else {
+            Log.d(TAG,"LKhong thay mode ");
+            DetectSocialEntity askWhichMode = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_MODE);
+            return BotUtils.completeSentence(askWhichMode.getQuestionPattern(),
+                    ConstManager.getVerbByIntent(functionIntent.getFunctionName()), "");
+        }
+    }
+    private static String processFunction(List<TargetTernEntity> termTargets, DetectFunctionEntity functionIntent){
+        CurrentContext current = CurrentContext.getInstance();
+        current.setDetectedFunction(functionIntent);
+        current.setDetectSocial(null);
+        if (ConstManager.FUNCTION_FOR_SCRIPT.contains(functionIntent.getFunctionName())){
+            return processMode(functionIntent,termTargets);
         } else if (ConstManager.FUNCTION_FOR_DEVICE.contains(functionIntent.getFunctionName())){
-            AreaEntity area = BotUtils.findBestArea(termTargets);
-            String target;
-            if (area != null) {
-                DeviceEntity device = BotUtils.findBestDevice(termTargets,area.getId());
-                if (device == null) {
-                    Log.d(TAG, "Tim thấy không gian " + area.getName() + " mà không tìm thấy thiết bị");
-                    DetectSocialEntity askWhichDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEAREA);
-                    CurrentContext current = CurrentContext.getInstance();
-                    current.setDetectedFunction(functionIntent);
-                    current.setArea(area);
-
-                    target = area.getName();
-                    return BotUtils.completeSentence(askWhichDevice.getQuestionPattern(),
-                            BotUtils.getVerbByIntent(functionIntent.getFunctionName()), target);
-                } else {
-                    Log.d(TAG, "Tìm thấy cả hai" + device.getName()+area.getName());
-//                    BotUtils.implementCommand(functionIntent,device,null);
-                    CurrentContext.getInstance().renew();
-                }
+            AreaEntity findArea = BotUtils.findBestArea(termTargets);
+            current.setArea(findArea);
+            if (findArea !=null) {
+                return  processDeviceInArea(functionIntent, termTargets);
             } else {
-                DeviceEntity deviceOnly = BotUtils.findBestDevice(termTargets, -1);
-                if (deviceOnly != null) {
-                    Log.d(TAG, "Tim thấy thiet bị ,mà không co không gian " + deviceOnly.getName());
-
-                    CurrentContext current = CurrentContext.getInstance();
-                    current.setDetectedFunction(functionIntent);
-                    current.setDevice(deviceOnly);
-                    current.setSentence(humanSay);
-
-                    area = AreaSQLite.findById(deviceOnly.getAreaId());
-                    target = deviceOnly.getName()+" trong "+area.getName();
-                    return BotUtils.completeSentence(functionIntent.getRemindPattern(), "", target);
-
-                } else {
-                    CurrentContext current = CurrentContext.getInstance();
-                    if (current.getDevice() != null){
-//                        BotUtils.implementCommand(functionIntent,current.getDevice(),null);
-                        current.renew();
-                    } else {
-                        String verb = BotUtils.getVerbByIntent(functionIntent.getFunctionName());
-                        DetectSocialEntity askDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEONLY);
-                        return BotUtils.completeSentence(askDevice.getQuestionPattern(), verb, "");
-                    }
-                }
+                return processDeviceOnly(functionIntent,termTargets);
             }
         } else if (functionIntent.getFunctionName().contains("check")){
-            Log.d(TAG,"check trang thai phong");
             AreaEntity area = BotUtils.findBestArea(termTargets);
             if (area != null) {
-                Log.d(TAG,"Thay phong "+area.getName());
+                Log.d(TAG,"Thay phong de check"+area.getName());
                 String resultVal = BotUtils.getAttributeByFunction(functionIntent.getFunctionName(),area);
                 String replyComplete ="";
                 if (resultVal == null){
@@ -636,47 +632,54 @@ public class BotUtils {
                 //
             } else {
                 Log.d(TAG,"Khong tim thay phong");
-                CurrentContext current = CurrentContext.getInstance();
-                current.setDetectedFunction(functionIntent);
-                current.setSentence(humanSay);
-
-                String replyComplete = BotUtils.completeSentence(functionIntent.getRemindPattern(),"","");
-                return replyComplete;
+                return BotUtils.completeSentence(functionIntent.getRemindPattern(),"","");
             }
         }
         return "";
     }
     private static String processSocial(String humanSay, DetectSocialEntity socialIntent){
         CurrentContext current = CurrentContext.getInstance();
-//        current.setDetectSocial(socialIntent);
-//        showReply("Mục đích "+socialIntent.getName());
-        String replyComplete;
+        current.setDetectSocial(socialIntent);
         String result = "";
         if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_TIME)){
-            result = BotUtils.getTime();
+            result = ConstManager.getTime();
         } else if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_DAY)){
-            result = BotUtils.getDay();
+            result = ConstManager.getDay();
         } else if (socialIntent.getName().equals(ConstManager.SOCIAL_WHAT_SEX)){
-            result = "gái";
+            result = "phụ nữ";
         } else if (socialIntent.getName().equals(ConstManager.SOCIAL_AGREE)){
-            if (current.getDetectedFunction() != null){
-                processFunction(current.getSentence(),current.getDetectedFunction());
+            if (current.getDetectedFunction() != null ){
+                if (current.getDevice() != null) {
+                    BotUtils.implementCommand(current.getDetectedFunction(), current.getDevice(), null);
+                    return "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getFunctionName() +
+                            " " + current.getDevice().getName()+" trong "+current.getArea().getName());
+                } else  if (current.getScript() != null) {
+                    BotUtils.implementCommand(current.getDetectedFunction(), null, current.getScript());
+                    return "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getFunctionName() +
+                            " chế độ " + current.getScript().getName());
+                }
+            } else {
+                DetectSocialEntity notUnderReply = BotUtils.getSocialByName(ConstManager.NOT_UNDERSTD);
+                return BotUtils.completeSentence(notUnderReply.getQuestionPattern(), "", "");
             }
         }
         return BotUtils.completeSentence(socialIntent.getReplyPattern(), result, "");
-
     }
-//    public static IntentLearned getIntentById(int id){
-//        IntentLearnedSQLite intentLearnedSQLite = new IntentLearnedSQLite();
-//        IntentLearned reply = intentLearnedSQLite.findReplyById(id);
-//        if (reply == null){
-//            Log.e(TAG,"Không tìm thấy intent để speakkkkkk " + id);
-//        }
-//        return reply;
-//    }
-//
-//    public static DetectIntent findDetectByFunction(String functionName) {
-//        DetectIntentSQLite detectIntentSQLite = new DetectIntentSQLite();
-//        return detectIntentSQLite.findByName(functionName);
-//    }
+    public static Map<String,Map<String,Integer>> updateFuncts(List<OwnerTrainEntity> trained, Map<String, Map<String, Integer>> functionMap) {
+        for (OwnerTrainEntity train : trained){
+            String []words = train.getWords().split("( )+");
+            Map<String,Integer> currentCount = functionMap.get(train.getName());
+            if (currentCount != null) {
+                for (int i = 0; i < words.length; i++) {
+                    Integer currWordCout = currentCount.get(words[i]);
+                    currentCount.put(words[i], (currWordCout != null) ? currWordCout + 1 : 1);
+                }
+                functionMap.put(train.getName(), currentCount);
+            }else {
+                Log.d(TAG, "Owner dạy ngu quá");
+            }
+        }
+        return functionMap;
+    }
+
 }

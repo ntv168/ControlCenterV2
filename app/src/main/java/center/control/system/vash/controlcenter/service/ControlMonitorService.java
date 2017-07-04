@@ -24,6 +24,7 @@ import java.util.TimerTask;
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
+import center.control.system.vash.controlcenter.nlp.CurrentContext;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
 
 import center.control.system.vash.controlcenter.utils.ConstManager;
@@ -73,7 +74,9 @@ public class ControlMonitorService extends Service {
                                 house.updateDeviceStateById(deviceEntity.getId(),status);
                                 Log.d(TAG,deviceEntity.getName()+ " với lệnh: " + status);
                             }
-                            sendResult(CONTROL,SUCCESS);
+                            if (CurrentContext.getInstance().finishCurrentScript(deviceEntity.getId())) {
+                                sendResult(CONTROL, SUCCESS);
+                            }
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -85,7 +88,8 @@ public class ControlMonitorService extends Service {
 //                        house.updateDeviceStateById(deviceEntity.getId(),status);
 //                        Log.d(TAG,deviceEntity.getName()+ " với lệnh: " + status);
 //                    }
-                    sendResult(CONTROL,SUCCESS);
+
+                    sendResult(CONTROL,FAIL);
                 }
             });
             control.setRetryPolicy(new DefaultRetryPolicy(1000,0,1f));
@@ -108,17 +112,7 @@ public class ControlMonitorService extends Service {
                     if (smartHouse.getContractId() == null){
                         sendResult(DEACTIVATE,-1);
                         return;
-                    }
-                    if (smartHouse.getOwnerCommand().size() == 0){
-                        for (AreaEntity area: smartHouse.getAreas()){
-                            if (area.isHasCamera() && areaChecked) {
-                                checkCamera(area);
-                            } else if (!areaChecked) {
-                                checkArea(area);
-                            }
-                        }
-                        areaChecked = !areaChecked;
-                    } else {
+                    } else if (smartHouse.getOwnerCommand().size() > 0){
                         CommandEntity command = smartHouse.getOwnerCommand().take();
                         DeviceEntity device = smartHouse.getDeviceById(command.getDeviceId());
                         if (device != null) {
@@ -126,6 +120,17 @@ public class ControlMonitorService extends Service {
                         } else {
                             Log.d(TAG," null cmnr với lệnh: " + command.getDeviceState());
                         }
+                    } else {
+
+                        for (AreaEntity area: smartHouse.getAreas()){
+                            if (area.isHasCamera() && areaChecked) {
+                                checkCamera(area);
+                            } else if (!areaChecked) {
+                                checkArea(area);
+                            }
+                        }
+
+                        areaChecked = !areaChecked;
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -172,7 +177,8 @@ public class ControlMonitorService extends Service {
                     public void onResponse(String response) {
                         Log.d(TAG, response.length()+"");
                         if (response.trim().equals(NOBODY)) {
-                            SmartHouse.getInstance().updateSensorArea(area.getId(), "security:Không thấy ai cả");
+                            area.setDetect(AreaEntity.NOBODY);
+                            SmartHouse.getInstance().updateAreaById(area.getId(),area);
                             sendResult(MONITOR, area.getId());
                             return;
                         }else if (response.trim().equals(NOT_SUPPORT)) {

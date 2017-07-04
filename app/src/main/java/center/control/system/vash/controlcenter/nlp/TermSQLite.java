@@ -67,7 +67,8 @@ public class TermSQLite {
         Cursor cursor = db.rawQuery(selectQuery,  new String[]{train.getName()});
         if (cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
-            values.put(KEY_CONTENT, train.getWords()+" "+cursor.getString(cursor.getColumnIndex(KEY_WORDS)));
+            values.put(KEY_WORDS, train.getWords()+" "+cursor.getString(cursor.getColumnIndex(KEY_WORDS)));
+
             db.update(TABLE_OWNER_TRAIN_TERM, values, KEY_NAME + " = "+train.getName(), null);
             return train.getName();
         } else {
@@ -209,4 +210,30 @@ public class TermSQLite {
         SQLiteManager.getInstance().closeDatabase();
     }
 
+    public List<TermEntity> getAllTerms() {
+        List<TermEntity> result = new ArrayList<>();
+
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT * "
+                + " FROM " + TABLE_HUMAN_TERM;
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{});
+        if (cursor.moveToFirst()) {
+            do {
+                TermEntity term = new TermEntity();
+                term.setContent(cursor.getString(cursor.getColumnIndex(KEY_CONTENT)));
+                term.setTfidfPoint(cursor.getDouble(cursor.getColumnIndex(KEY_TFIDF_POINT)));
+                term.setDetectSocialId(cursor.getInt(cursor.getColumnIndex(DETECT_SOCIAL_ID)));
+                term.setDetectFunctionId(cursor.getInt(cursor.getColumnIndex(DETECT_FUNCTION_ID)));
+
+
+                Log.d(TABLE_HUMAN_TERM, "-"+term.getContent()+"-");
+                result.add(term);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        SQLiteManager.getInstance().closeDatabase();
+
+        return result;
+    }
 }

@@ -17,7 +17,7 @@ public class VolleySingleton {
 
     public static final int CHECK_AREA_TIMEOUT = 2000;
     public static final int CHECK_CAMERA_TIMEOUT = 3000;
-    public static  String SERVER_HOST = "https://1ee2d28d.ngrok.io/";
+    public static  String SERVER_HOST = "https://11522599.ngrok.io/";
     private static VolleySingleton mInstance;
     private RequestQueue mRequestQueue;
     private static Context context;

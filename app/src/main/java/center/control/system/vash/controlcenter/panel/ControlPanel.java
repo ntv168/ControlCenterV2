@@ -54,6 +54,7 @@ import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaAttributeAdapter;
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.command.CommandEntity;
+import center.control.system.vash.controlcenter.configuration.EventEntity;
 import center.control.system.vash.controlcenter.device.DeviceAdapter;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
@@ -109,6 +110,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         if (house.getAreas().size()>0) {
             currentArea = house.getAreas().get(0);
             currentAttrib = AreaEntity.attrivutesValues[0];
+            areaAttributeAdapter.updateAttribute(currentArea.generateValueArr(),currentArea.getId());
             startService(new Intent(this, ControlMonitorService.class));
             String botRole = sharedPreferences.getString(ConstManager.BOT_ROLE,"");
             String botName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
@@ -121,7 +123,8 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
 //            showReply(BotUtils.completeSentence("Xin chào <owner-name>, quán cà phê thông minh xin được phục vụ","",""));
 
         } else {
-            startActivity(new Intent(this,ManageDeviceActivity.class));
+            Toast.makeText(this,"Nhân viên chưa cấu hình thiết bị",Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this,MainActivity.class));
         }
 
     }
@@ -174,25 +177,29 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                     Log.d(TAG,"Deeactive sent");
                     startActivity(new Intent(ControlPanel.this, MainActivity.class));
                 } else if (resultType.equals(ControlMonitorService.WAIT)){
-                    waitDialog.show();
+                    if (!waitDialog.isShowing()) {
+                        waitDialog.show();
+                    }
                 } else if (resultType.equals(ControlMonitorService.CONTROL)){
                     waitDialog.dismiss();
                     int result = intent.getIntExtra(AREA_ID, -1);
                     CurrentContext current = CurrentContext.getInstance();
+                    String target = current.getDevice()!=null?current.getDevice().getName():current.getScript().getName();
                     if (result == ControlMonitorService.SUCCESS){
-//                        showReply(BotUtils.completeSentence(
-//                                current.getDetectedFunction().getSuccessPattern(),"",current.getDevice().getName()));
+                        showReply(BotUtils.completeSentence(
+                                current.getDetectedFunction().getSuccessPattern(),"",target));
                         SmartHouse house = SmartHouse.getInstance();
                         deviceAdapter.updateHouseDevice(house.getDevicesInAreaAttribute(currentArea.getId(),currentAttrib));
                     } else if (result == ControlMonitorService.FAIL){
-//                        showReply(BotUtils.completeSentence(
-//                                current.getDetectedFunction().getFailPattern(),"",current.getDevice().getName()));
+                        showReply(BotUtils.completeSentence(
+                                current.getDetectedFunction().getFailPattern(),"",target));
                     }
                 } else if (resultType.equals(ControlMonitorService.MONITOR)) {
                     int areaId = intent.getIntExtra(AREA_ID, -1);
                     if ( currentArea!=null && areaId == currentArea.getId()) {
                         areaAttributeAdapter.updateAttribute(SmartHouse.getAreaById(areaId).generateValueArr(),areaId);
                     }
+                    checkConfiguration(areaId);
                 } else if (resultType.equals(ControlMonitorService.CAMERA)){
                     int areaId = intent.getIntExtra(AREA_ID,-1);
                     if ( currentArea!=null && areaId == currentArea.getId()) {
@@ -281,6 +288,14 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         lstAreaAttribute.setAdapter(areaAttributeAdapter);
     }
 
+    private void checkConfiguration(int areaId) {
+        for (EventEntity ev : SmartHouse.getInstance().getCurrentState().getEvents()){
+            if (ev.getAreaId() == areaId){
+                
+            }
+        }
+    }
+
     public void clicktoModePanel(View view) {
         startActivity(new Intent(this, ModePanel.class));
     }
@@ -290,7 +305,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     }
 
     public void clicktoVAPanel(View view) {
-        startActivity(new Intent(this, VAPanel.class));
+        promptSpeechInput();
     }
 
 
@@ -430,7 +445,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
 
                 if (result.length == 0) {
                     detecting= false;
-                    setInfo("No faces detected!");
+                    setInfo(AreaEntity.NOBODY);
                 } else {
                     detecting= true;
 
@@ -450,7 +465,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                         Log.d("-------", "identify: facezise" + faceIds.size());
                     } else {
                         // Not detectingor person group exists.
-                        setInfo("Please select an image and create a person group first.");
+                        setInfo(AreaEntity.DETECT_NOT_AVAILABLE);
                     }
                 }
             } else {
@@ -524,10 +539,9 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
             // Set the information about the detection result.
             if (result != null) {
 
-                String message = "Dù Vàng xin chào ";
+                String message = AreaEntity.DETECT_AQUAINTANCE +" ";
                 Boolean hasAqua = false;
                 int stranger = 0;
-
                 for (IdentifyResult identifyResult: result) {
                     if (identifyResult.candidates.size() > 0) {
                         if (identifyResult.candidates.get(0).confidence > 0.65) {
@@ -544,10 +558,11 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                         stranger++;
                     }
                 }
-                if (hasAqua) {
-                    message += " trở lại quán ạ";
-                } if (!hasAqua) {
-                    message = "Dù Vàng xin chào anh chị. Có " + stranger + " khách đến quán ạ";
+//                if (hasAqua) {
+//                    message += " trở lại quán ạ";
+//                }
+                if (!hasAqua) {
+                    message = AreaEntity.DETECT_STRANGE;
                 }
 
                 showReply(message);
@@ -558,8 +573,13 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
 
     }
 
+    public void clicktoControlPanel(View v){
 
+    }
     private void setInfo(String info) {
+        currentArea = SmartHouse.getAreaById(currentArea.getId());
+        currentArea.setDetect(info);
+        SmartHouse.getInstance().updateAreaById(currentArea.getId(),currentArea);
         TextView txtResult = (TextView) cameraDialog.findViewById(R.id.txtFaceResult);
         txtResult.setOnClickListener(new View.OnClickListener() {
             @Override

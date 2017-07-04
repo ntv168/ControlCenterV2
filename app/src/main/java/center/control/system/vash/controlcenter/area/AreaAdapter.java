@@ -29,7 +29,6 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaHolder> {
     public AreaAdapter(List<AreaEntity> areaEntities, AreaClickListener listener) {
         this.areaEntities = areaEntities;
         this.listener = listener;
-        focusedItem = -1;
     }
 
     @Override

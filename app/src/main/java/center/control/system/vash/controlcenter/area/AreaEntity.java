@@ -15,10 +15,18 @@ import center.control.system.vash.controlcenter.utils.SmartHouse;
  */
 
 public class AreaEntity extends TargetObject{
-    public  static final String[] attrivutes = {"An ninh","Ánh sáng","Nhiệt độ","Âm thanh", "Thiết bị sử dụng điện"};
-    public  static final String[] attrivutesValues = {"security","light","temperature","sound","runningDevice"};
+    public  static final String[] attrivutes = {"An ninh","Ánh sáng","Nhiệt độ","Camera", "Thiết bị sử dụng điện"};
+    public  static final String[] attrivutesValues = {"sec","lig","tem","cam","elec"};
     public  static final int[] attributeIcon = {R.drawable.shield,R.drawable.light,
             R.drawable.temp,R.drawable.music,R.drawable.electric};
+    public static final String DETECT_STRANGE = "str";
+    public static final String DETECT_NOT_AVAILABLE = "noAvai";
+    public static final String NOBODY = "nob";
+    public static final String DETECT_AQUAINTANCE = "aqa";
+    public static final String DOOR_OPEN = "do";
+    public static final String DOOR_CLOSE = "dc";
+    public static final String TEMP_WARM = "w";
+    public static final String TEMP_COLD = "c";
 
     @SerializedName("temperature")
     private String temperature;
@@ -28,14 +36,21 @@ public class AreaEntity extends TargetObject{
     private String safety;
     @SerializedName("electricUsing")
     private String electricUsing;
-    @SerializedName("sound")
-    private String sound;
+    @SerializedName("detect")
+    private String detect;
     @SerializedName("connectAddress")
     private String connectAddress;
-    private String personDetect;
     private Bitmap imageBitmap;
     private boolean hasCamera = true;
     private double detectScore;
+
+    public String getDetect() {
+        return detect;
+    }
+
+    public void setDetect(String detect) {
+        this.detect = detect;
+    }
 
     public double getDetectScore() {
         return detectScore;
@@ -43,14 +58,6 @@ public class AreaEntity extends TargetObject{
 
     public void setDetectScore(double detectScore) {
         this.detectScore = detectScore;
-    }
-
-    public String getPersonDetect() {
-        return personDetect;
-    }
-
-    public void setPersonDetect(String personDetect) {
-        this.personDetect = personDetect;
     }
 
     public boolean isHasCamera() {
@@ -108,14 +115,6 @@ public class AreaEntity extends TargetObject{
         this.electricUsing = electricUsing;
     }
 
-    public String getSound() {
-        return sound;
-    }
-
-    public void setSound(String sound) {
-        this.sound = sound;
-    }
-
     public String getConnectAddress() {
         return connectAddress;
     }
@@ -138,7 +137,7 @@ public class AreaEntity extends TargetObject{
                 this.getSafety(),
                 this.getLight(),
                 this.getTemperature(),
-                this.getSound(),
+                this.getDetect(),
                 this.getElectricUsing()
         };
         return result;
@@ -148,7 +147,7 @@ public class AreaEntity extends TargetObject{
                 this.getSafety()+";"+
                 this.getTemperature()+";"+
                 this.getLight()+";"+
-                this.getSound()+";"+
+                this.getDetect()+";"+
                 this.getElectricUsing());
         return result;
     }

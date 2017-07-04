@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:weightSum="5"
+    tools:context="center.control.system.vash.controlcenter.configuration.SetConfigActivity">
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:orientation="vertical"
+        android:paddingRight="20dp"
+        android:animateLayoutChanges="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_weight="1"
+                android:text="Lệnh kích hoạt"
+                android:textAllCaps="true"
+                android:textColor="@color/nWhite"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnAddCommand"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@drawable/background_home_sensor"
+                android:elevation="1dp"
+                android:gravity="center_vertical|center_horizontal|center"
+                android:text="+"
+                android:textColor="@color/nGreen1"
+                android:textSize="30sp" />
+
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/btnSelectState"
+            android:layout_width="match_parent"
+            android:layout_height="77dp"
+            android:background="@drawable/background_home_sensor"
+            android:elevation="1dp"
+            android:gravity="center_vertical|center_horizontal|center"
+            android:text="Chọn trạng thái"
+            android:textColor="@color/nGreen1"
+            android:textSize="30sp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@id/listItemLeft"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:orientation="vertical"
+        android:paddingLeft="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Chế độ chạy hôm nay"
+                android:textAllCaps="true"
+                android:textColor="@color/nWhite"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listItemRight"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+
+</LinearLayout>

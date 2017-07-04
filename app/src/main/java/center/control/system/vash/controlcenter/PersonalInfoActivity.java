@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.Map;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
@@ -80,7 +81,6 @@ public class PersonalInfoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME,MODE_PRIVATE);
         botType = sharedPreferences.getString(ConstManager.BOT_TYPE,"");
         botRole = sharedPreferences.getString(ConstManager.BOT_ROLE,"");
         if (botType.length() < 2){
@@ -110,6 +110,14 @@ public class PersonalInfoActivity extends AppCompatActivity {
             //truong hop bot type khac
         }
 
+        // Get House Owner and Contract Info
+        txtHouseOwnerName.setText(sharedPreferences.getString(ConstManager.OWNER_NAME,""));
+        txtHouseOwnerID.setText(sharedPreferences.getString(ConstManager.OWNER_CMND,""));
+        txtHouseOwnerPhone.setText(sharedPreferences.getString(ConstManager.OWNER_TEL,""));
+//        txtContractType.setText(sharedPreferences.getString(ConstManager.OWNE,""));
+        txtHouseAddress.setText(sharedPreferences.getString(ConstManager.OWNER_ADD,""));
+        txtContractID.setText(sharedPreferences.getString(ConstManager.CONTRACT_ID,""));
+        txtActiveDay.setText(sharedPreferences.getString(ConstManager.ACTIVE_DAY,""));
 
     }
 
@@ -117,6 +125,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.personal);
+        sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME,MODE_PRIVATE);
 
         LinearLayout lnBack = (LinearLayout) findViewById(R.id.lnBack);
         lnBack.setOnClickListener(new View.OnClickListener() {
@@ -131,17 +140,9 @@ public class PersonalInfoActivity extends AppCompatActivity {
         txtHouseOwnerPhone = (TextView) findViewById(R.id.txtHouseOwnerPhone);
         txtContractType = (TextView) findViewById(R.id.txtContractType);
         txtHouseAddress = (TextView) findViewById(R.id.txtHouseAddress);
-        txtContractID = (TextView) findViewById(R.id.txtContractType);
+        txtContractID = (TextView) findViewById(R.id.txtContractID);
         txtActiveDay = (TextView) findViewById(R.id.txtActiveDay);
 
-        // Get House Owner and Contract Info
-        txtHouseOwnerName.setText(sharedPreferences.getString(ConstManager.OWNER_NAME,""));
-        txtHouseOwnerID.setText(sharedPreferences.getString(ConstManager.OWNER_CMND,""));
-        txtHouseOwnerPhone.setText(sharedPreferences.getString(ConstManager.OWNER_TEL,""));
-//        txtContractType.setText(sharedPreferences.getString(ConstManager.OWNE,""));
-        txtHouseAddress.setText(sharedPreferences.getString(ConstManager.OWNER_ADD,""));
-        txtContractID.setText(sharedPreferences.getString(ConstManager.CONTRACT_ID,""));
-        txtActiveDay.setText(sharedPreferences.getString(ConstManager.ACTIVE_DAY,""));
 
         final Dialog vaSetDiag = new Dialog(this);
         vaSetDiag.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -176,7 +177,15 @@ public class PersonalInfoActivity extends AppCompatActivity {
         btnTrain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(PersonalInfoActivity.this, TrainVAActivity.class));
+                if (DetectIntentSQLite.getAllFunction().size()>0) {
+                    startActivity(new Intent(PersonalInfoActivity.this, TrainVAActivity.class));
+                } else {
+                    ((TextView)vaSetDiag.findViewById(R.id.txtBotName)).setText(botName);
+                    ((TextView)vaSetDiag.findViewById(R.id.txtBotType)).setText(botType);
+                    editOwnerName = (EditText) vaSetDiag.findViewById(R.id.txtOwnerName);
+                    editOwnerName.setText(ownerName);
+                    vaSetDiag.show();
+                }
             }
         });
 
@@ -206,6 +215,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
                         TermSQLite sqLite = new TermSQLite();
                         List<OwnerTrainEntity> trained = sqLite.getOwnerTrain();
                         Log.d(TAG,trained.size()+"  trains");
+                        Map<String,Map<String,Integer>> updatedFunct = BotUtils.updateFuncts(trained,response.body().getFunctionMap());
                         DetectIntentSQLite sqlDect = new DetectIntentSQLite();
                         sqLite.clearAll();
                         sqlDect.clearAll();
@@ -224,17 +234,19 @@ public class PersonalInfoActivity extends AppCompatActivity {
                         }
                         SmartHouse house = SmartHouse.getInstance();
                         BotUtils bot = new BotUtils();
-                        bot.saveFunctionTFIDFTerm(response.body().getFunctionMap());
+                        bot.saveFunctionTFIDFTerm(updatedFunct);
                         bot.saveSocialTFIDFTerm(response.body().getSocialMap());
                         bot.saveDeviceTFIDFTerm(house.getDevices());
                         bot.saveAreaTFIDFTerm(house.getAreas());
                         bot.saveScriptTFIDFTerm(house.getScripts());
                         waitDialog.dismiss();
+                        Toast.makeText(PersonalInfoActivity.this,"Tải dữ liệu trợ lý "+botName+" thành công",Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onFailure(Call<BotDataCentralDTO> call, Throwable t) {
                         Log.d(TAG,"down load bot data failed");
+                        Toast.makeText(PersonalInfoActivity.this,"Tải dữ liệu trợ lý "+botName+" thất bại",Toast.LENGTH_SHORT).show();
                         waitDialog.dismiss();
                     }
                 });

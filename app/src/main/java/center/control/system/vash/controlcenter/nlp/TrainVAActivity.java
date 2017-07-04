@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -18,7 +19,9 @@ public class TrainVAActivity extends AppCompatActivity {
     private static final String TAG = "Train trợ lý :::";
     private EditText txtSenten;
     private RadioGroup rdoGr;
-       @Override
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_train_va);
@@ -37,20 +40,28 @@ public class TrainVAActivity extends AppCompatActivity {
         for(int i = 0; i < functs.size(); i++) {
             rdoBtn = new RadioButton(this);
             rdoBtn.setText(functs.get(i).getFunctionName());
+            rdoBtn.setTextSize(18);
             group.addView(rdoBtn);
         }
         btnTrain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                OwnerTrainEntity train = new OwnerTrainEntity();
-                int selectedId = group.getCheckedRadioButtonId();
+                if (txtSenten.getText().toString().length()>0) {
+                    OwnerTrainEntity train = new OwnerTrainEntity();
+                    int selectedId = group.getCheckedRadioButtonId();
 
-                RadioButton selectedRdo = (RadioButton) findViewById(selectedId);
+                    RadioButton selectedRdo = (RadioButton) findViewById(selectedId);
 
-                train.setName(selectedRdo.getText().toString());
-                train.setWords(txtSenten.getText().toString());
-                Log.d(TAG,train.getName()+ "   "+train.getWords());
-//                TermSQLite.insertOrUpdateTrain()
+                    train.setName(selectedRdo.getText().toString());
+                    train.setWords(txtSenten.getText().toString());
+                    train.setType("function");
+                    Log.d(TAG, train.getName() + "   " + train.getWords());
+                    TermSQLite.insertOrUpdateTrain(train);
+                    txtSenten.setText("");
+                    Toast.makeText(TrainVAActivity.this,"Dạy thành công",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(TrainVAActivity.this,"Vui lòng nhập câu",Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

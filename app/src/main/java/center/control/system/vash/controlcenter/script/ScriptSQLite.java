@@ -31,6 +31,7 @@ public class ScriptSQLite {
     public static final String KEY_CONFIG_ID = "configuration_id";
     public static final String KEY_DEVICE_ID = "device_id";
     public static final String KEY_DEVICE_STATE = "device_state";
+    private static final String KEY_STATE_ID = "state_id";
 
     public static String createScriptTable(){
         return "CREATE TABLE " + TABLE_SCRIPT  + "("
@@ -45,6 +46,7 @@ public class ScriptSQLite {
         return "CREATE TABLE " + TABLE_SCRIPT_DEVICE  + "("
                 + KEY_GROUP_ID  + " INTEGER ,"
                 + KEY_CONFIG_ID  + " INTEGER ,"
+                + KEY_STATE_ID + " INTEGER , "
                 +  KEY_DEVICE_ID+ "  INTEGER  ," +
                 KEY_DEVICE_STATE + "  TEXT  ,"+
                 "PRIMARY KEY ("+KEY_DEVICE_ID+","+ KEY_GROUP_ID+")" +

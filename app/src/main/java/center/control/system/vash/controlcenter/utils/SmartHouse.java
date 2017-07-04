@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,9 @@ import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.configuration.ConfigurationEntity;
 import center.control.system.vash.controlcenter.configuration.ConfigurationSQLite;
+import center.control.system.vash.controlcenter.configuration.SetConfigActivity;
+import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
+import center.control.system.vash.controlcenter.configuration.StateEntity;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
 
@@ -37,8 +41,9 @@ public class SmartHouse {
     private List<AreaEntity> areas;
     private List<DeviceEntity> devices;
     private List<SensorEntity> sensors;
-    private SensorSQLite sensorSQLite;
     private List<ScriptEntity> scripts;
+    private List<StateEntity> states;
+
     private String botName;
     private String botRole;
     private String ownerName;
@@ -46,6 +51,33 @@ public class SmartHouse {
     private String ownerRole;
     private String contractId;
     private int databseVer;
+    private StateEntity currentState;
+
+    public void setStates(List<StateEntity> states) {
+        this.states = states;
+        for (StateEntity stat: this.states){
+            String[] nextEvId = stat.getNextEvIds().split(",");
+            for (int i=0; i<nextEvId.length; i++){
+                if (nextEvId[i].length() >0){
+                    stat.addEvent(StateConfigurationSQL.findEventById(
+                            Integer.parseInt(nextEvId[i])));
+                }
+            }
+        }
+    }
+
+    public List<StateEntity> getStates() {
+        return states;
+    }
+
+    public void setCurrentState(StateEntity currentState) {
+        this.currentState = currentState;
+    }
+
+    public StateEntity getCurrentState() {
+        return currentState;
+    }
+
     TriggerCheckList checkList;
 
     public String getStaffCode() {
@@ -125,11 +157,12 @@ public class SmartHouse {
     }
 
     public void updateSensorArea(int areaId, String response) {
+        SensorSQLite sensorSQLite = new SensorSQLite();
         for (AreaEntity area: this.getAreas()){
             if (area.getId() == areaId){
                 String[] ele = response.split(",");
                 for (int i = 0; i< ele.length; i++){
-                     if (ele[i].length()>1){
+                    if (ele[i].length()>1){
                         String[] val = ele[i].split(":");
                          if (val[0].equals(AreaEntity.attrivutesValues[0])){
                             area.setSafety(val[1]);
@@ -137,9 +170,7 @@ public class SmartHouse {
                             area.setLight(val[1]);
                         } else if (val[0].equals(AreaEntity.attrivutesValues[2])){
                             area.setTemperature(val[1]);
-                             new checkConfiguration(areaId,val[1]).execute(val[0]);
-                        }else if (val[0].equals(AreaEntity.attrivutesValues[3])){
-                            area.setSound(val[1]);
+//                             new checkConfiguration(areaId,val[1]).execute(val[0]);
                         }
                     }
                 }
@@ -370,32 +401,32 @@ public class SmartHouse {
         }
     }
 
-    class checkConfiguration extends AsyncTask<String, String, Boolean> {
-        String value;
-        int areaId;
-
-        checkConfiguration(int areaId, String value)
-        {
-            this.areaId = areaId;
-            this.value = value;
-        }
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            checkList.getInstance(areaId,params[0], value);
-            return true;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-
-        }
-    }
+//    class checkConfiguration extends AsyncTask<String, String, Boolean> {
+//        String value;
+//        int areaId;
+//
+//        checkConfiguration(int areaId, String value)
+//        {
+//            this.areaId = areaId;
+//            this.value = value;
+//        }
+//
+//        @Override
+//        protected Boolean doInBackground(String... params) {
+//            checkList.getInstance(areaId,params[0], value);
+//            return true;
+//        }
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Boolean result) {
+//
+//        }
+//    }
 
     public String getBotName() {
         return botName;
@@ -435,5 +466,13 @@ public class SmartHouse {
 
     public void addSensor(SensorEntity sensor) {
         this.sensors.add(sensor);
+    }
+
+    public ListAdapter getStateAdapter(Context ctx) {
+        ArrayAdapter<String> stateNameAdapter = new ArrayAdapter<String>(ctx, android.R.layout.select_dialog_singlechoice);
+        for (StateEntity state: states){
+            stateNameAdapter.add(state.getName());
+        }
+        return stateNameAdapter;
     }
 }

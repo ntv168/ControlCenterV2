@@ -1,5 +1,10 @@
 package center.control.system.vash.controlcenter.utils;
 
+import android.util.Log;
+
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by Thuans on 6/6/2017.
  */
@@ -44,4 +49,38 @@ public class ConstManager {
     public static final String FUNCTION_START_MODE = "startMode";
     public static final String FUNCTION_STOP_MODE = "stopMode";
     public static final int SERVICE_PERIOD = 4000;
+    public static final int PRIORITY_MAX = 100;
+    public static final int DURING_MAX = 1000;
+
+    public static String getTime(){
+        Date time = new Date();
+        String result = "";
+        result += time.getHours()+" giờ "+time.getMinutes()+" phút ";
+        return result;
+    }
+    public static String getDay(){
+        Calendar c = Calendar.getInstance();
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int month = c.get(Calendar.MONTH)+1;
+        String result = "";
+        result += " ngày "+day+" tháng "+month+" ";
+        return result;
+    }
+    public static String getVerbByIntent(String functionName) {
+        switch (functionName){
+            case FUNCTION_TURN_ON:
+                return "bật";
+            case FUNCTION_START_MODE:
+                return "bật";
+            case FUNCTION_TURN_OFF:
+                return "tắt";
+            case FUNCTION_STOP_MODE:
+                return "tắt";
+            case FUNCTION_INC_TEMP:
+                return "tăng nhiệt độ";
+            case FUNCTION_DEC_TEMP:
+                return "giảm nhiệt độ";
+        }
+        return "";
+    }
 }

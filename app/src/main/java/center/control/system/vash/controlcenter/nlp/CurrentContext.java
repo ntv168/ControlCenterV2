@@ -1,9 +1,16 @@
 package center.control.system.vash.controlcenter.nlp;
 
+import android.util.Log;
+
+import java.util.List;
+
 import center.control.system.vash.controlcenter.area.AreaEntity;
+import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.TargetObject;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
+import center.control.system.vash.controlcenter.script.ScriptSQLite;
+import center.control.system.vash.controlcenter.utils.ConstManager;
 
 /**
  * Created by Thuans on 5/2/2017.
@@ -18,6 +25,15 @@ public class CurrentContext {
     private DeviceEntity device;
     private ScriptEntity script;
     private String sentence;
+    private long lastConnect;
+
+    public long getLastConnect() {
+        return lastConnect;
+    }
+
+    public static void setInstance(CurrentContext instance) {
+        CurrentContext.instance = instance;
+    }
 
     public void setSentence(String sentence) {
         this.sentence = sentence;
@@ -96,5 +112,16 @@ public class CurrentContext {
         this.device = null;
         this.script = null;
         this.sentence = null;
+    }
+
+    public boolean finishCurrentScript(int devId) {
+        if (ConstManager.FUNCTION_FOR_SCRIPT.contains(detectedFunction.getFunctionName())){
+            List<CommandEntity> cmds  = ScriptSQLite.getCommandByScriptId(script.getId());
+            if (cmds.size()>0) {
+                Log.d("Context", cmds.get(cmds.size() - 1).getDeviceName() + "");
+                if (cmds.get(cmds.size() - 1).getDeviceId() == devId) return true;
+                else return false;
+            } else return true;
+        } else return true;
     }
 }
