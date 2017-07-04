@@ -30,6 +30,7 @@ public class StateConfigurationSQL {
     private static final String KEY_DELAY = "delay";
     private static final String KEY_NAME = "name";
     private static final String KEY_NOTIFY = "notify";
+    private static final String KEY_NEXT_EVENT = "next_events";
     private static final String KEY_PRIORITY = "priority";
     private static final String KEY_DURING = "during";
     private static final String KEY_SEN_NAME = "sensor_name";
@@ -42,6 +43,7 @@ public class StateConfigurationSQL {
                 + KEY_ID  + " INTEGER PRIMARY KEY ,"
                 + KEY_DELAY + "  INTEGER    , "
                 + KEY_NAME + " TEXT , "
+                + KEY_NEXT_EVENT + " TEXT , "
                 + KEY_DURING + " INTEGER , "
                 + KEY_NOTIFY + " TEXT  ) ";
     }
@@ -76,6 +78,7 @@ public class StateConfigurationSQL {
         values.put(KEY_ID, state.getId());
         values.put(KEY_NAME, state.getName());
         values.put(KEY_DURING, state.getDuringSec());
+        values.put(KEY_NEXT_EVENT, state.getNextEvIds());
         values.put(KEY_DELAY, state.getDelaySec());
         values.put(KEY_NOTIFY, state.getNoticePattern());
 
@@ -145,6 +148,7 @@ public class StateConfigurationSQL {
         state.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
         state.setDelaySec(cursor.getInt(cursor.getColumnIndex(KEY_DELAY)));
         state.setDuringSec(cursor.getInt(cursor.getColumnIndex(KEY_DURING)));
+        state.setNextEvIds(cursor.getString(cursor.getColumnIndex(KEY_NEXT_EVENT)));
         state.setNoticePattern(cursor.getString(cursor.getColumnIndex(KEY_NOTIFY)));
         return state;
     }

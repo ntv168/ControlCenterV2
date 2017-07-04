@@ -61,7 +61,7 @@
             android:textSize="30sp" />
 
         <android.support.v7.widget.RecyclerView
-            android:id="@id/listItemLeft"
+            android:id="@+id/lstCmd"
             android:layout_width="match_parent"
             android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
 
@@ -94,9 +94,15 @@
 
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/listItemRight"
+            android:id="@+id/lstEvent"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+            android:layout_height="514dp"></android.support.v7.widget.RecyclerView>
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Button" />
     </LinearLayout>
 
 </LinearLayout>

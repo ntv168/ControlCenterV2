@@ -56,11 +56,13 @@ public class SmartHouse {
     public void setStates(List<StateEntity> states) {
         this.states = states;
         for (StateEntity stat: this.states){
-            String[] nextEvId = stat.getNextEvIds().split(",");
-            for (int i=0; i<nextEvId.length; i++){
-                if (nextEvId[i].length() >0){
-                    stat.addEvent(StateConfigurationSQL.findEventById(
-                            Integer.parseInt(nextEvId[i])));
+            if (stat.getNextEvIds() != null) {
+                String[] nextEvId = stat.getNextEvIds().split(",");
+                for (int i = 0; i < nextEvId.length; i++) {
+                    if (nextEvId[i].length() > 0) {
+                        stat.addEvent(StateConfigurationSQL.findEventById(
+                                Integer.parseInt(nextEvId[i])));
+                    }
                 }
             }
         }
@@ -468,11 +470,13 @@ public class SmartHouse {
         this.sensors.add(sensor);
     }
 
-    public ListAdapter getStateAdapter(Context ctx) {
-        ArrayAdapter<String> stateNameAdapter = new ArrayAdapter<String>(ctx, android.R.layout.select_dialog_singlechoice);
-        for (StateEntity state: states){
-            stateNameAdapter.add(state.getName());
+
+    public List<CommandEntity> getCommandInState(int id) {
+        for (StateEntity stat: this.states){
+            if (stat.getId() == id){
+                return stat.getCommands();
+            }
         }
-        return stateNameAdapter;
+        return new ArrayList<CommandEntity>();
     }
 }

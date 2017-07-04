@@ -15,15 +15,16 @@ import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 
-public class ListDeviceInScriptAdapter extends RecyclerView.Adapter<ListDeviceInScriptAdapter.ViewHolder> {
+public class CommandAdapter extends RecyclerView.Adapter<CommandAdapter.ViewHolder> {
 
     private List<CommandEntity> scriptDeviceEntities;
+
 
     public List<CommandEntity> getScriptDeviceEntities() {
         return scriptDeviceEntities;
     }
 
-    public ListDeviceInScriptAdapter(List<CommandEntity> scriptDevices) {
+    public CommandAdapter(List<CommandEntity> scriptDevices) {
         scriptDeviceEntities= scriptDevices;
     }
 

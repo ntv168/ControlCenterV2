@@ -35,7 +35,7 @@ import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.nlp.CurrentContext;
 import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
-import center.control.system.vash.controlcenter.script.ListDeviceInScriptAdapter;
+import center.control.system.vash.controlcenter.script.CommandAdapter;
 import center.control.system.vash.controlcenter.script.ListScriptAdapter;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
@@ -46,7 +46,7 @@ import center.control.system.vash.controlcenter.utils.SmartHouse;
 public class ModePanel extends AppCompatActivity implements ListScriptAdapter.OnAdapterItemClickListener{
     private static final String TAG = "Mode panel ----";
     private ListScriptAdapter scriptAdapter;
-    private ListDeviceInScriptAdapter listDeviceInScriptAdapter;
+    private CommandAdapter commandAdapter;
     private RecyclerView lstScriptDevice;
     private AlertDialog.Builder selectDeviceDiag;
     private AlertDialog.Builder selectAreaDiag;
@@ -112,7 +112,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         newScript.get(which).setDeviceState("on");
-                        listDeviceInScriptAdapter.addScripDev(newScript.get(which));
+                        commandAdapter.addScripDev(newScript.get(which));
                         dialog.dismiss();
                     }
                 });
@@ -133,8 +133,8 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
                 LinearLayoutManager verticalLayout = new LinearLayoutManager(getApplicationContext());
                 verticalLayout.setOrientation(LinearLayoutManager.VERTICAL);
                 lstScriptDevice.setLayoutManager(verticalLayout);
-                listDeviceInScriptAdapter = new ListDeviceInScriptAdapter(scriptDeviceEntities);
-                lstScriptDevice.setAdapter(listDeviceInScriptAdapter);
+                commandAdapter = new CommandAdapter(scriptDeviceEntities);
+                lstScriptDevice.setAdapter(commandAdapter);
 
                 Button btnAddDevice = (Button) dialog.findViewById(R.id.btnAddDeviceScript);
                 btnAddDevice.setOnClickListener(new View.OnClickListener() {
@@ -152,7 +152,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
                         script.setNickName(scriptNickName.getText().toString());
                         script.setHour(-1);
                         script.setMinute(-1);
-                        List<CommandEntity> listCommmand = listDeviceInScriptAdapter.getScriptDeviceEntities();
+                        List<CommandEntity> listCommmand = commandAdapter.getScriptDeviceEntities();
                         Log.d(TAG,listCommmand.size()+" ");
                         ScriptSQLite.insertScript(script,listCommmand);
                         scriptAdapter.addScrip(script);
@@ -200,8 +200,8 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
         verticalLayout.setOrientation(LinearLayoutManager.VERTICAL);
         lstScriptDevice.setLayoutManager(verticalLayout);
         Log.d(TAG,"Script id  "+scriptEntity.getId());
-        listDeviceInScriptAdapter = new ListDeviceInScriptAdapter(sqLite.getCommandByScriptId(scriptEntity.getId()));
-        lstScriptDevice.setAdapter(listDeviceInScriptAdapter);
+        commandAdapter = new CommandAdapter(sqLite.getCommandByScriptId(scriptEntity.getId()));
+        lstScriptDevice.setAdapter(commandAdapter);
 
         Button btnAddDevice = (Button) dialog.findViewById(R.id.btnAddDeviceScript);
         btnAddDevice.setOnClickListener(new View.OnClickListener() {
@@ -225,7 +225,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
                 String time[] = txtTimeSch.getText().toString().split(":");
                 scriptEntity.setHour(Integer.parseInt(time[0]));
                 scriptEntity.setMinute(Integer.parseInt(time[1]));
-                List<CommandEntity> listCommmand = listDeviceInScriptAdapter.getScriptDeviceEntities();
+                List<CommandEntity> listCommmand = commandAdapter.getScriptDeviceEntities();
                 ScriptSQLite.upById(scriptEntity.getId(),scriptEntity,listCommmand);
                 scriptAdapter.setScriptEntities(ScriptSQLite.getAll());
                 dialog.dismiss();

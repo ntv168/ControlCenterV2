@@ -64,6 +64,14 @@ public class ScriptSQLite {
         }
         SQLiteManager.getInstance().closeDatabase();
     }
+    public static void insertStateCommand(int stateId, List<CommandEntity> command) {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        for (CommandEntity device : command){
+            db.insert(TABLE_SCRIPT_DEVICE, null, scriptDeviceToCV(
+                    new CommandEntity(stateId,device.getDeviceId(),device.getDeviceState())));
+        }
+        SQLiteManager.getInstance().closeDatabase();
+    }
     private static ContentValues scriptDeviceToCV(CommandEntity sde){
         ContentValues values;
         values = new ContentValues();
@@ -145,6 +153,7 @@ public class ScriptSQLite {
                 CommandEntity cmd = new CommandEntity();
                 cmd.setDeviceId(cursor.getInt(cursor.getColumnIndex(KEY_DEVICE_ID)));
                 cmd.setGroupId(cursor.getInt(cursor.getColumnIndex(KEY_GROUP_ID)));
+                cmd.setStateId(cursor.getInt(cursor.getColumnIndex(KEY_STATE_ID)));
                 cmd.setConfigurationId(cursor.getInt(cursor.getColumnIndex(KEY_CONFIG_ID)));
                 cmd.setDeviceState(cursor.getString(cursor.getColumnIndex(KEY_DEVICE_STATE)));
                 commands.add(cmd);
