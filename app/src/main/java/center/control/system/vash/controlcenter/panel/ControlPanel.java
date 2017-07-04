@@ -663,7 +663,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
         if (voiceCommands[0].contains(" ơi")) {
             stopListening();
-            showReply(BotUtils.completeSentence("Xin chào, trợ lý ảo sẵn sàng phục vụ","",""));
+            showReply(BotUtils.completeSentence("Dạ , <bot-role> nghe","",""));
         } else {
             restartListeningService();
         }
