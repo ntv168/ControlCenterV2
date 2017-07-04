@@ -1,6 +1,7 @@
 package center.control.system.vash.controlcenter.panel;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -8,11 +9,13 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,6 +26,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
@@ -70,9 +74,11 @@ import center.control.system.vash.controlcenter.service.WebServerService;
 import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
+import center.control.system.vash.controlcenter.voice.ListeningActivity;
+import center.control.system.vash.controlcenter.voice.VoiceRecognitionListener;
 
-public class ControlPanel extends Activity implements AreaAttributeAdapter.AttributeClickListener,
-        AreaAdapter.AreaClickListener,DeviceAdapter.DeviceItemClickListener{
+public class ControlPanel extends ListeningActivity implements AreaAttributeAdapter.AttributeClickListener,
+        AreaAdapter.AreaClickListener,DeviceAdapter.DeviceItemClickListener {
     private static final String TAG = "Control Panel";
     public static final String CONTROL_FILTER_RECEIVER = "control filter receiver";
     public static final String ACTION_TYPE = "control action type receiver";
@@ -95,6 +101,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     private boolean detecting;
     private String mPersonGroupId;
     private ProgressDialog waitDialog;
+    private int flagpromt = 1;
 
     @Override
     protected void onResume() {
@@ -120,17 +127,22 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                 startActivity(new Intent(this, PersonalInfoActivity.class));
             }
             SmartHouse.getInstance().setBotOwnerNameRole(botName,botRole,ownerName,ownerRole);
-//            showReply(BotUtils.completeSentence("Xin chào <owner-name>, quán cà phê thông minh xin được phục vụ","",""));
+
 
         } else {
             Toast.makeText(this,"Nhân viên chưa cấu hình thiết bị",Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this,MainActivity.class));
         }
 
+        context = getApplicationContext(); // Needs to be set
+        VoiceRecognitionListener.getInstance().setListener(this); // Here we set the current listener
+        startListening(); // starts listening
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Start voice running continuously
+
         setContentView(R.layout.activity_control_panel);
         waitDialog = new ProgressDialog(this);
         waitDialog.setTitle("Vui lòng đợi");
@@ -186,13 +198,17 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
                     CurrentContext current = CurrentContext.getInstance();
                     String target = current.getDevice()!=null?current.getDevice().getName():current.getScript().getName();
                     if (result == ControlMonitorService.SUCCESS){
+                        flagpromt = 3;
                         showReply(BotUtils.completeSentence(
                                 current.getDetectedFunction().getSuccessPattern(),"",target));
                         SmartHouse house = SmartHouse.getInstance();
                         deviceAdapter.updateHouseDevice(house.getDevicesInAreaAttribute(currentArea.getId(),currentAttrib));
+
                     } else if (result == ControlMonitorService.FAIL){
+                        flagpromt = 3;
                         showReply(BotUtils.completeSentence(
                                 current.getDetectedFunction().getFailPattern(),"",target));
+
                     }
                 } else if (resultType.equals(ControlMonitorService.MONITOR)) {
                     int areaId = intent.getIntExtra(AREA_ID, -1);
@@ -590,9 +606,19 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         txtResult.setText(info);
     }
 
-    private  void showReply(String sentenceReply){
-        VoiceUtils.speak(sentenceReply);
+    private void showReply(String sentenceReply){
+        if (flagpromt < 3 && !sentenceReply.equals("") && !sentenceReply.equals("xác nhận")) {
+            VoiceUtils.speak(sentenceReply);
+            promptSpeechInput();
+            flagpromt +=1;
+        } else {
+            flagpromt = 1;
+            VoiceUtils.speak(sentenceReply);
+        }
+
         Log.d(TAG, "showReply: ----------------" + sentenceReply);
+
+        Toast.makeText(context, sentenceReply, Toast.LENGTH_SHORT).show();
     }
     @Override
     protected void onPause() {
@@ -600,6 +626,7 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
         stopService(new Intent(this,ControlMonitorService.class));
     }
     private void promptSpeechInput() {
+
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -613,12 +640,10 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         Log.d(TAG,requestCode+"--" );
         switch (requestCode) {
             case VAPanel.REQ_CODE_SPEECH_INPUT: {
                 if (resultCode == -1 && null != data) {
-
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     Log.d(TAG,result.get(0));
@@ -629,24 +654,31 @@ public class ControlPanel extends Activity implements AreaAttributeAdapter.Attri
 
         }
     }
+
+    //Progress for voice running continuously
     @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        int action = event.getAction();
-        int keyCode = event.getKeyCode();
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_VOLUME_UP:
-                if (action == KeyEvent.ACTION_DOWN) {
-                    promptSpeechInput();
-                }
-                return true;
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
-                if (action == KeyEvent.ACTION_DOWN) {
-                    //TODO
-                }
-                return true;
-            default:
-                return super.dispatchKeyEvent(event);
+    public void processVoiceCommands(String... voiceCommands) {
+
+        Log.d("-----------", "processVoiceCommands: "+ voiceCommands[0].toString());
+
+        if (voiceCommands[0].contains(" ơi")) {
+            stopListening();
+            showReply(BotUtils.completeSentence("Xin chào, trợ lý ảo sẵn sàng phục vụ","",""));
+        } else {
+            restartListeningService();
         }
+
+        Toast.makeText(this, voiceCommands[0], Toast.LENGTH_SHORT).show();
+
+
+    }
+
+    public void muteAll(){
+
+    }
+
+    public void unMuteAll() {
+
     }
 
 

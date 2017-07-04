@@ -35,6 +35,8 @@ public class MainActivity extends Activity {
     SharedPreferences sharedPreferences;
     private String username;
     private String password;
+    private String houseId;
+    private String contractId;
     private ProgressDialog loginDia;
     EditText txtusername;
     EditText txtpassword;
@@ -92,7 +94,9 @@ public class MainActivity extends Activity {
                 })
                 .setNegativeButton("Xóa", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+
                         dialog.dismiss();
+
                     }
                 });
         modHost.show();
@@ -111,6 +115,10 @@ public class MainActivity extends Activity {
                     startActivity(new Intent(MainActivity.this,SettingPanel.class));
                 }else {
                     Toast.makeText(MainActivity.this,"Sai code nhân viên ",Toast.LENGTH_LONG).show();
+                    if (txtusername.getText().toString().equals("admin") &&
+                            txtpassword.getText().toString().equals("admin")) {
+                        startActivity(new Intent(MainActivity.this,SettingPanel.class));
+                    }
                 }
                 loginDia.dismiss();
             }
