@@ -57,7 +57,7 @@ public class HttpResponseThread extends Thread {
             os = socket.getOutputStream();
             if (request != null ) {
                 Log.d(TAG,"req:  " +request);
-//                request = request.split(" ")[1];
+                request = request.split(" ")[1];
                 SmartHouse house = SmartHouse.getInstance();
                 if (request.contains(AREA_REQ)){
                     for (AreaEntity area : house.getAreas()){

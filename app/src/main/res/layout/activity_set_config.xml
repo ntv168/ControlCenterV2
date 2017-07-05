@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_weight="1"
-                android:text="Lệnh kích hoạt"
+                android:text="Trạng thái và lệnh kích hoạt"
                 android:textAllCaps="true"
                 android:textColor="@color/nWhite"
                 android:textSize="28sp"
@@ -84,7 +84,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Chế độ chạy hôm nay"
+                android:text="Điều kiện chuyển trạng thái"
                 android:textAllCaps="true"
                 android:textColor="@color/nWhite"
                 android:textSize="28sp"

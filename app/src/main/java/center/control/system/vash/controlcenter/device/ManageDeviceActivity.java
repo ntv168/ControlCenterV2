@@ -151,28 +151,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                                 public void onErrorResponse(VolleyError error) {
 
                                     txtErr.setText("Không kết nối được thiết bị");
-                                    if (url.equals("http://1.1.1.1:80/get")) {
-                                        String encodedResp = "đèn bàn=db";
-                                        String encodedResp1 = "máy chiếu=db";
-                                        String encodedResp2 = "máy lạnh=db";
-                                        currentArea = saveArea(areaName.getText().toString(),
-                                                areaNickName.getText().toString(),
-                                                ipArea.getText().toString());
-                                        insertDeviceByPort(encodedResp, currentArea.getId());
-                                        insertDeviceByPort(encodedResp1, currentArea.getId());
-                                        insertDeviceByPort(encodedResp2, currentArea.getId());
-
-                                        String sensor = "Cảm biến âm thanh";
-                                        insertSensor(sensor,currentArea.getId(), AreaEntity.attrivutesValues[3]);
-                                        String sensor1 = "Cảm biến nhiệt độ";
-                                        insertSensor(sensor1,currentArea.getId(),AreaEntity.attrivutesValues[2]);
-                                        String sensor2 = "Cảm biến  ánh sáng";
-                                        insertSensor(sensor2,currentArea.getId(), AreaEntity.attrivutesValues[1]);
                                         progressDialog.dismiss();
-                                        dialog.dismiss();
-                                    } else
-                                        progressDialog.dismiss();
-                                    refineNickNameTarget();
                                 }
                             });
                             VolleySingleton.getInstance(ManageDeviceActivity.this).addToRequestQueue(connectAreaIP);
@@ -207,6 +186,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                                 device.setPort(ele[1]);
                                 device.setName(ele[0]);
                                 device.setAreaId(areaId);
+                                device.setState("off");
                                 int deviceId = sqLite.insert(device);
                                 device.setId(deviceId);
                                 house.addDevice(device);
@@ -360,7 +340,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
             public void onClick(View v) {
                 if (txtNickName.getText().length()>2) {
                     SparseBooleanArray checkedType = attCheckList.getCheckedItemPositions();
-                    String attributeType = "";
+                    String attributeType = AreaEntity.attrivutesValues[4];
                     for (int i = 0; i < attCheckList.getCount(); i++) {
                         if (checkedType.get(i)) {
                             attributeType += AreaEntity.attrivutesValues[i] + ',';
@@ -378,6 +358,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                     DeviceSQLite.upById(currentDevice.getId(), currentDevice);
                     devicesAdapter.setDevices(house.getDevicesByAreaId(currentArea.getId()));
                     deviceDialog.dismiss();
+                    refineNickNameTarget();
                 } else {
                     txtErr.setText("Tên phụ phải nhiều hơn 2 ký tự");
                 }
@@ -415,10 +396,12 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
 //                        DeviceSQLite.upById(device.getId(),device);
 //                        house.updateDeviceById(device.getId(),device);
 //                        dialog.dismiss();
+//                        refineNickNameTarget();
 //                    }
 //                });
 //                editNickNameDiag.show();
                 this.onDeviceClick(device);
+                return;
             }
         }
     }

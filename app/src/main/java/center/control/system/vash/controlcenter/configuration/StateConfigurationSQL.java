@@ -37,6 +37,7 @@ public class StateConfigurationSQL {
     private static final String KEY_SEN_VAL = "sensor_value";
     private static final String KEY_AREA_ID = "area_id";
     private static final String KEY_NEXT_STATE = "state_id";
+    private static final String TAG = "state SQLite";
 
     public static String createState(){
         return "CREATE TABLE " + TABLE_STATE  + "("
@@ -63,7 +64,7 @@ public class StateConfigurationSQL {
             ContentValues values = new ContentValues();
             values.put(KEY_ID, event.getId());
             values.put(KEY_AREA_ID, event.getAreaId());
-            values.put(KEY_SEN_NAME, event.getSenValue());
+            values.put(KEY_SEN_NAME, event.getSenName());
             values.put(KEY_PRIORITY, event.getPriority());
             values.put(KEY_SEN_VAL, event.getSenValue());
             values.put(KEY_NEXT_STATE, event.getNextStateId());
@@ -119,6 +120,7 @@ public class StateConfigurationSQL {
         event.setNextStateId(cursor.getInt(cursor.getColumnIndex(KEY_NEXT_STATE)));
         event.setPriority(cursor.getInt(cursor.getColumnIndex(KEY_PRIORITY)));
         event.setAreaId(cursor.getInt(cursor.getColumnIndex(KEY_AREA_ID)));
+        Log.d(TAG,event.getAreaId()+"  s");
 
         return event;
     }
@@ -151,5 +153,14 @@ public class StateConfigurationSQL {
         state.setNextEvIds(cursor.getString(cursor.getColumnIndex(KEY_NEXT_EVENT)));
         state.setNoticePattern(cursor.getString(cursor.getColumnIndex(KEY_NOTIFY)));
         return state;
+    }
+
+    public static void updateEventById(int id, EventEntity event) {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(KEY_AREA_ID,event.getAreaId());
+        Log.d(TAG,event.getAreaId()+"  ida " + id);
+        db.update(TABLE_EVENT, cv, KEY_ID + " = "+id, null);
+        SQLiteManager.getInstance().closeDatabase();
     }
 }

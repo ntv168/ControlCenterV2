@@ -1,62 +1,29 @@
 package center.control.system.vash.controlcenter.panel;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import center.control.system.vash.controlcenter.PersonalInfoActivity;
 import center.control.system.vash.controlcenter.R;
-import center.control.system.vash.controlcenter.SettingPanel;
-import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.area.AreaSQLite;
-import center.control.system.vash.controlcenter.device.DeviceEntity;
-import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.nlp.ChatAdapter;
-import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
-import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
-import center.control.system.vash.controlcenter.nlp.TermSQLite;
-import center.control.system.vash.controlcenter.nlp.VoiceUtils;
-import center.control.system.vash.controlcenter.script.ScriptEntity;
-import center.control.system.vash.controlcenter.script.ScriptSQLite;
-import center.control.system.vash.controlcenter.server.AssistantTypeDTO;
-import center.control.system.vash.controlcenter.server.BotDataCentralDTO;
-import center.control.system.vash.controlcenter.server.CloudApi;
-import center.control.system.vash.controlcenter.server.FunctionIntentDTO;
-import center.control.system.vash.controlcenter.server.RetroFitSingleton;
-import center.control.system.vash.controlcenter.server.SocialIntentDTO;
+import center.control.system.vash.controlcenter.voice.VoiceUtils;
 import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
-import center.control.system.vash.controlcenter.utils.SmartHouse;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class VAPanel extends AppCompatActivity {
     private static final String TAG = "VAPanel em đây";

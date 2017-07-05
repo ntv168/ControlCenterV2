@@ -25,11 +25,19 @@ public class AreaEntity extends TargetObject{
     public static final String DETECT_AQUAINTANCE = "aqa";
     public static final String DOOR_OPEN = "do";
     public static final String DOOR_CLOSE = "dc";
-    public static final String TEMP_WARM = "w";
-    public static final String TEMP_COLD = "c";
+    public static final String TEMP_BURN = "bu";
+    public static final String TEMP_WARM = "wm";
+    public static final String TEMP_COLD = "co";
+    private static final double BURN_TEMP_RANGE = 40.0;
+    private static final double HOT_TEMP_RANGE = 35.0;
+    private static final double FRESH_TEMP_RANGE = 27.0;
+    private static final String TEMP_FRESH = "fr";
+    private static final double COLD_TEMP_RANGE = 16.0;
+    private static final String TEMP_FREEZE = "fz";
 
     @SerializedName("temperature")
     private String temperature;
+    private double tempAmout;
     @SerializedName("light")
     private String light;
     @SerializedName("safety")
@@ -45,6 +53,9 @@ public class AreaEntity extends TargetObject{
     private double detectScore;
 
     public String getDetect() {
+        if (detect == null || detect.equals(NOBODY)){
+            return "Không có ai";
+        }
         return detect;
     }
 
@@ -78,7 +89,20 @@ public class AreaEntity extends TargetObject{
     }
 
     public void setTemperature(String temperature) {
-        this.temperature = temperature;
+        if (temperature!=null) {
+            this.tempAmout = Double.parseDouble(temperature);
+            if (tempAmout >= BURN_TEMP_RANGE) {
+                this.temperature = TEMP_BURN;
+            } else if (tempAmout >= HOT_TEMP_RANGE) {
+                this.temperature = TEMP_WARM;
+            } else if (tempAmout >= FRESH_TEMP_RANGE) {
+                this.temperature = TEMP_FRESH;
+            } else if (tempAmout >= COLD_TEMP_RANGE) {
+                this.temperature = TEMP_COLD;
+            } else {
+                this.temperature = TEMP_FREEZE;
+            }
+        }
     }
 
     public String getLight() {
@@ -133,20 +157,107 @@ public class AreaEntity extends TargetObject{
     }
 
     public String[] generateValueArr(){
+        String safetyRes = "Không khả dụng";
+        if (this.getSafety()!= null) {
+            switch (this.getSafety()) {
+                case DOOR_CLOSE:
+                    safetyRes = "Đã đóng cửa";
+                    break;
+                case DOOR_OPEN:
+                    safetyRes = "Có cửa mở";
+                    break;
+            }
+        }
+        String temperat = "Không khả dụng";
+        if (this.getTemperature()!=null) {
+            switch (this.getTemperature()) {
+                case TEMP_BURN:
+                    temperat = "Cảnh báo có cháy";
+                    break;
+                case TEMP_COLD:
+                    temperat = "Lạnh";
+                    break;
+                case TEMP_FREEZE:
+                    temperat = "Đóng băng";
+                    break;
+                case TEMP_WARM:
+                    temperat = "Ấm áp";
+                    break;
+                case TEMP_FRESH:
+                    temperat = "Mát mẻ";
+                    break;
+            }
+        }
+        temperat += " ("+this.tempAmout+")";
+        int lightin = 0;
+        for (DeviceEntity dev : SmartHouse.getInstance().getDevicesByAreaId(getId())){
+            if (dev.getAttributeType()!= null && dev.getAttributeType().contains(attrivutesValues[1])) {
+                if (dev.getState().equals("on") ||
+                        dev.getState().equals("open")) {
+                    lightin++;
+                }
+            }
+        }
+        String lighting = "Có "+ lightin + " đèn bật";
+
         String[] result = new String[]{
-                this.getSafety(),
-                this.getLight(),
-                this.getTemperature(),
+                safetyRes,
+                lighting,
+                temperat,
                 this.getDetect(),
                 this.getElectricUsing()
         };
         return result;
     }
     public String generateAttributeForApi(){
+        String safetyRes = "Không khả dụng";
+        if (this.getSafety()!= null) {
+            switch (this.getSafety()) {
+                case DOOR_CLOSE:
+                    safetyRes = "Đã đóng cửa";
+                    break;
+                case DOOR_OPEN:
+                    safetyRes = "Có cửa mở";
+                    break;
+            }
+        }
+        String temperat = "Không khả dụng";
+        if (this.getTemperature()!=null) {
+            switch (this.getTemperature()) {
+                case TEMP_BURN:
+                    temperat = "Cảnh báo có cháy";
+                    break;
+                case TEMP_COLD:
+                    temperat = "Lạnh";
+                    break;
+                case TEMP_FREEZE:
+                    temperat = "Đóng băng";
+                    break;
+                case TEMP_WARM:
+                    temperat = "Ấm áp";
+                    break;
+                case TEMP_FRESH:
+                    temperat = "Mát mẻ";
+                    break;
+            }
+        }
+        temperat += " ("+this.tempAmout+")";
+        int lightin = 0;
+        for (DeviceEntity dev : SmartHouse.getInstance().getDevicesByAreaId(getId())){
+            if (dev.getAttributeType()!= null && dev.getAttributeType().contains(attrivutesValues[1])) {
+                if (dev.getState().equals("on") ||
+                        dev.getState().equals("open")) {
+                    lightin++;
+                }
+            }
+        }
+        String lighting = "Có "+ lightin + " đèn bật";
+
+
         String result = new String(
-                this.getSafety()+";"+
-                this.getTemperature()+";"+
-                this.getLight()+";"+
+                safetyRes+";"+
+                        lighting+";"+
+                        temperat+";"+
                 this.getDetect()+";"+
                 this.getElectricUsing());
         return result;

@@ -18,6 +18,7 @@ import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.configuration.ConfigurationEntity;
 import center.control.system.vash.controlcenter.configuration.ConfigurationSQLite;
+import center.control.system.vash.controlcenter.configuration.EventEntity;
 import center.control.system.vash.controlcenter.configuration.SetConfigActivity;
 import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
 import center.control.system.vash.controlcenter.configuration.StateEntity;
@@ -124,6 +125,8 @@ public class SmartHouse {
                     houseInstance.setScripts(ScriptSQLite.getAll());
                     houseInstance.setConfigurations(ConfigurationSQLite.getAll());
                     houseInstance.setSensors(SensorSQLite.getAll());
+                    houseInstance.setStates(StateConfigurationSQL.getAll());
+                    SmartHouse.getInstance().setCurrentState(houseInstance.getStateById(ConstManager.DEFAULT_STATE_ID));
                 }
             }
 
@@ -173,6 +176,8 @@ public class SmartHouse {
                         } else if (val[0].equals(AreaEntity.attrivutesValues[2])){
                             area.setTemperature(val[1]);
 //                             new checkConfiguration(areaId,val[1]).execute(val[0]);
+                        } else if (getDeviceByPort(val[0]) != -1){
+                             devices.get(getDeviceByPort(val[0])).setState(val[1]);
                         }
                     }
                 }
@@ -180,6 +185,16 @@ public class SmartHouse {
             }
         }
     }
+
+    private int getDeviceByPort(String s) {
+        for (int i = 0 ; i<this.devices.size();i++){
+            if (devices.get(i).getPort().equals(s)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public void removeCameraArea(int areaId){
         for (AreaEntity area: this.getAreas()) {
             if (area.getId() == areaId) {
@@ -244,7 +259,6 @@ public class SmartHouse {
     public List<DeviceEntity> getDevicesByAreaId(int id) {
         List<DeviceEntity> result = new ArrayList<>();
         for (DeviceEntity device : this.getDevices()){
-//            Log.d(TAG,device.getAreaId()+"  id");
             if (device.getAreaId() == id){
                 result.add(device);
             }
@@ -324,6 +338,7 @@ public class SmartHouse {
                 sde.setDeviceName(deviceEntity.getName());
                 sde.setGroupId(areaId);
                 sde.setDeviceId(deviceEntity.getId());
+                sde.setDeviceState("on");
                 areaNameAdapter.add(sde);
             }
         }
@@ -463,6 +478,7 @@ public class SmartHouse {
     }
 
     public void addDevice(DeviceEntity device) {
+
         this.devices.add(device);
     }
 
@@ -478,5 +494,35 @@ public class SmartHouse {
             }
         }
         return new ArrayList<CommandEntity>();
+    }
+
+    public StateEntity getStateById(int id) {
+        for (StateEntity stat: this.states){
+            if (stat.getId() == id){
+                return stat;
+            }
+        }
+        Log.d(TAG," Bug not dfound state "+id);
+        return new StateEntity();
+    }
+
+
+    public void updateStateById(int id, List<CommandEntity> listCommmand, List<EventEntity> eventEntities) {
+        for (StateEntity stat: this.states){
+            if (stat.getId() == id){
+                stat.setCommands(listCommmand);
+                stat.setEvents(eventEntities);
+                return;
+            }
+        }
+        Log.d(TAG," Bug not dfound state "+id);
+    }
+    private long stateChangedTime = -1;
+    public void setStateChangedTime(long time) {
+        this.stateChangedTime = time;
+    }
+
+    public long getStateChangedTime() {
+        return stateChangedTime;
     }
 }

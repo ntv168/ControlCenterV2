@@ -59,7 +59,7 @@
         <activity android:name=".nlp.TrainVAActivity"
             android:screenOrientation="landscape"/>
         <activity
-            android:name=".configuration.ConfigurationActivity"
+            android:name=".configuration.SetConfigActivity"
             android:screenOrientation="landscape" />
         <activity android:name=".trigger.MapDeviceTriggerActivity"
             android:screenOrientation="landscape"></activity>

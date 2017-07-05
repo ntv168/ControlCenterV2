@@ -1,7 +1,6 @@
-package center.control.system.vash.controlcenter.nlp;
+package center.control.system.vash.controlcenter.voice;
 
 import android.content.Context;
-import android.media.AudioManager;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
@@ -15,7 +14,7 @@ public class VoiceUtils {
     private static VoiceUtils singleton;
     private String content;
     private TextToSpeech tts;
-    public static synchronized void initializeInstance(final Context context) {
+    public static synchronized void initializeInstance(final Context context, final TextToSpeech.OnUtteranceCompletedListener listener) {
         if (singleton == null) {
             singleton = new VoiceUtils();
             singleton.tts = new TextToSpeech(context,
@@ -24,6 +23,8 @@ public class VoiceUtils {
                         public void onInit(int status) {
                             if(status == TextToSpeech.SUCCESS) {
                                 singleton.tts.setLanguage(new Locale("vi","VN"));
+                                singleton.tts.setOnUtteranceCompletedListener(listener);
+                                listener.onUtteranceCompleted("done config");
                                 Log.d("VOICEUTILSSSS","ok");
                             }else {
                                 Log.d("VOICEUTILSSSS","Khong noi duoc roi");

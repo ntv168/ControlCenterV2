@@ -18,19 +18,30 @@ import com.microsoft.projectoxford.face.contract.Person;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.configuration.ConfigurationActivity;
+import center.control.system.vash.controlcenter.configuration.EventEntity;
 import center.control.system.vash.controlcenter.configuration.SetConfigActivity;
+import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
+import center.control.system.vash.controlcenter.configuration.StateEntity;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.helper.StorageHelper;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
 import center.control.system.vash.controlcenter.panel.ModePanel;
 import center.control.system.vash.controlcenter.panel.VAPanel;
+import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 public class SettingPanel extends AppCompatActivity {
     private static final String TAG = "Setting Panel";
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +103,7 @@ public class SettingPanel extends AppCompatActivity {
                 startActivity(new Intent(SettingPanel.this, SetConfigActivity.class));
             }
         });
-
-
     }
-
 
     class GetPersonIdsTask extends AsyncTask<String, String, Person[]> {
 
@@ -131,11 +139,12 @@ public class SettingPanel extends AppCompatActivity {
         @Override
         protected void onPostExecute(Person[] result) {
             String message = "";
-            Log.d(TAG,result.length+"");
+            Log.d(TAG,result.length+" S");
             if (result != null) {
                 for (Person person : result) {
                     try {
                         String name = URLDecoder.decode(person.name, "UTF-8");
+                        Log.d(TAG,person.personId.toString()+"  "+name+"  "+ groupid);
                         StorageHelper.setPersonName(person.personId.toString(), name, groupid, SettingPanel.this);
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();

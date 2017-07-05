@@ -92,7 +92,6 @@ public class StateEntity {
 
     public void addEvent(EventEntity... evs) {
         for (EventEntity ev: evs){
-            Log.d("STATEEE Envti",ev.getSenName());
             this.events.add(ev);
         }
     }

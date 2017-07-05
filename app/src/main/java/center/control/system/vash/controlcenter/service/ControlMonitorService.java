@@ -18,11 +18,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.command.CommandEntity;
+import center.control.system.vash.controlcenter.configuration.EventEntity;
+import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.nlp.CurrentContext;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
@@ -49,6 +52,7 @@ public class ControlMonitorService extends Service {
     private static Timer repeatScheduler;
     private LocalBroadcastManager broadcaster;
     private boolean areaChecked = false;
+    public static String CHANGE_STATE = "state.change";
 
     public void sendResult(String message, int areaId) {
         Intent intent = new Intent(ControlPanel.CONTROL_FILTER_RECEIVER);
@@ -56,9 +60,9 @@ public class ControlMonitorService extends Service {
         intent.putExtra(ControlPanel.AREA_ID, areaId);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
-
     public void sendControl(final DeviceEntity deviceEntity, final String status){
-        if (SmartHouse.getAreaById(deviceEntity.getAreaId()) != null) {
+        if (SmartHouse.getAreaById(deviceEntity.getAreaId()) != null
+                && !deviceEntity.getState().equals(status)) {
             sendResult(WAIT,-1);
             String url = "http://" + SmartHouse.getAreaById(deviceEntity.getAreaId()).getConnectAddress().trim()
                     + "/" + deviceEntity.getPort().trim() + "/" + status.trim();
@@ -96,7 +100,7 @@ public class ControlMonitorService extends Service {
 
             VolleySingleton.getInstance(this).addToRequestQueue(control);
         }
-    };
+    }
     @Override
     public void onCreate() {
         super.onCreate();
@@ -112,7 +116,8 @@ public class ControlMonitorService extends Service {
                     if (smartHouse.getContractId() == null){
                         sendResult(DEACTIVATE,-1);
                         return;
-                    } else if (smartHouse.getOwnerCommand().size() > 0){
+                    }
+                    if (smartHouse.getOwnerCommand().size() > 0){
                         CommandEntity command = smartHouse.getOwnerCommand().take();
                         DeviceEntity device = smartHouse.getDeviceById(command.getDeviceId());
                         if (device != null) {
@@ -120,8 +125,43 @@ public class ControlMonitorService extends Service {
                         } else {
                             Log.d(TAG," null cmnr với lệnh: " + command.getDeviceState());
                         }
+                    } else
+                    if (smartHouse.getCurrentState()!= null &&
+                            smartHouse.getCurrentState().getId() != ConstManager.DEFAULT_STATE_ID){
+                        long currentTime = (new Date()).getTime();
+                        Log.d(TAG,"Time:  "+currentTime+"  - "+smartHouse.getStateChangedTime()+" "+(currentTime - smartHouse.getStateChangedTime()));
+                        if (currentTime - smartHouse.getStateChangedTime()<smartHouse.getCurrentState().getDuringSec()) {
+                            for (EventEntity event : smartHouse.getCurrentState().getEvents()) {
+                                if (event.getSenName().equals(AreaEntity.attrivutesValues[3])) {
+                                    checkCamera(smartHouse.getAreaById(event.getAreaId()));
+                                } else {
+                                    checkArea(smartHouse.getAreaById(event.getAreaId()));
+                                }
+                            }
+                        }else if (smartHouse.getCurrentState().getDuringSec() != ConstManager.DURING_MAX){
+                            int maxPri = 0;
+                            int nextStId = -1;
+                            for (EventEntity event: smartHouse.getCurrentState().getEvents()){
+                                if (event.getPriority() > maxPri){
+                                    maxPri = event.getPriority();
+                                    nextStId = event.getNextStateId();
+                                }
+                            }
+                            Log.d(TAG, "next sta"+ nextStId);
+                            if (nextStId != -1 ){
+                                smartHouse.setCurrentState(smartHouse.getStateById(nextStId));
+                                smartHouse.setStateChangedTime((new Date()).getTime());
+                                sendResult(CHANGE_STATE,-1);
+                            }
+                        }
+                        if (currentTime - smartHouse.getStateChangedTime()<smartHouse.getCurrentState().getDelaySec()){
+                            for (CommandEntity cmd : smartHouse.getCurrentState().getCommands()){
+                                smartHouse.addCommand(cmd);
+                                Log.d(TAG,"thêm cmd "+cmd.getDeviceId()+"  "+cmd.getDeviceState());
+                            }
+                        }
+                        return;
                     } else {
-
                         for (AreaEntity area: smartHouse.getAreas()){
                             if (area.isHasCamera() && areaChecked) {
                                 checkCamera(area);
@@ -129,7 +169,6 @@ public class ControlMonitorService extends Service {
                                 checkArea(area);
                             }
                         }
-
                         areaChecked = !areaChecked;
                     }
                 } catch (InterruptedException e) {

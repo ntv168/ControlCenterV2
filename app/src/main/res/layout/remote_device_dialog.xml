@@ -41,17 +41,6 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/icn_power" />
 
-            <TextView
-                android:id="@+id/txtRemoteOnOff"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="TẮT"
-                android:textAlignment="center"
-                android:textAllCaps="true"
-                android:textColor="#D52B2B"
-                android:textSize="20sp"
-                android:textStyle="bold" />
         </LinearLayout>
 
         <View

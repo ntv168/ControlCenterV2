@@ -16,7 +16,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import center.control.system.vash.controlcenter.nlp.VoiceUtils;
+import center.control.system.vash.controlcenter.area.AreaEntity;
+import center.control.system.vash.controlcenter.configuration.EventEntity;
+import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
+import center.control.system.vash.controlcenter.configuration.StateEntity;
+import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.HouseKeyDTO;
 import center.control.system.vash.controlcenter.server.LoginSmarthouseDTO;
@@ -113,6 +117,7 @@ public class MainActivity extends Activity {
                 Log.d(TAG,call.request().url()+"");
                 if (response.body()!=null && response.body().getMessage()!= null && response.body().getMessage().equals("success")){
                     startActivity(new Intent(MainActivity.this,SettingPanel.class));
+                    initStateMachine();
                 }else {
                     Toast.makeText(MainActivity.this,"Sai code nhân viên ",Toast.LENGTH_LONG).show();
                     if (txtusername.getText().toString().equals("admin") &&
@@ -133,6 +138,135 @@ public class MainActivity extends Activity {
                 loginDia.dismiss();
             }
         });
+    }
+
+    private void initStateMachine() {
+        StateConfigurationSQL.removeAll();
+        EventEntity ev1 = new EventEntity();
+        ev1.setId(1);
+        ev1.setNextStateId(3);
+        ev1.setPriority(ConstManager.PRIORITY_MAX);
+        ev1.setSenName(AreaEntity.attrivutesValues[3]);
+        ev1.setSenValue(AreaEntity.DETECT_STRANGE);
+        StateConfigurationSQL.insertEvent(ev1);
+
+        EventEntity ev2 = new EventEntity();
+        ev2.setId(2);
+        ev2.setNextStateId(2);
+        ev2.setPriority(3);
+        ev2.setSenName(AreaEntity.attrivutesValues[0]);
+        ev2.setSenValue(AreaEntity.DOOR_OPEN);
+        StateConfigurationSQL.insertEvent(ev2);
+
+        EventEntity ev3 = new EventEntity();
+        ev3.setId(3);
+        ev3.setNextStateId(4);
+        ev3.setPriority(0);
+        ev3.setSenName(AreaEntity.attrivutesValues[3]);
+        ev3.setSenValue(AreaEntity.DETECT_AQUAINTANCE);
+        StateConfigurationSQL.insertEvent(ev3);
+
+        EventEntity ev4 = new EventEntity();
+        ev4.setId(4);
+        ev4.setNextStateId(5);
+        ev3.setPriority(0);
+        ev4.setSenName(AreaEntity.attrivutesValues[0]);
+        ev4.setSenValue(AreaEntity.DOOR_OPEN);
+        StateConfigurationSQL.insertEvent(ev4);
+
+        EventEntity ev5 = new EventEntity();
+        ev5.setId(5);
+        ev5.setNextStateId(1);
+        ev3.setPriority(0);
+        ev5.setSenName(AreaEntity.attrivutesValues[0]);
+        ev5.setSenValue(AreaEntity.DOOR_CLOSE);
+        StateConfigurationSQL.insertEvent(ev5);
+
+        EventEntity ev6 = new EventEntity();
+        ev6.setId(6);
+        ev6.setNextStateId(6);
+        ev6.setPriority(2);
+        ev6.setSenName(AreaEntity.attrivutesValues[2]);
+        ev6.setSenValue(AreaEntity.TEMP_WARM);
+        StateConfigurationSQL.insertEvent(ev6);
+
+        EventEntity ev7 = new EventEntity();
+        ev7.setId(7);
+        ev7.setNextStateId(1);
+        ev7.setPriority(2);
+        ev7.setSenName(AreaEntity.attrivutesValues[2]);
+        ev7.setSenValue(AreaEntity.TEMP_COLD);
+        StateConfigurationSQL.insertEvent(ev7);
+
+        StateEntity stat = new StateEntity();
+        stat.setName("Home Safe");
+        stat.setId(ConstManager.DEFAULT_STATE_ID);
+        stat.setNoticePattern("An toàn");
+        stat.setDelaySec(0);
+        stat.setDuringSec(ConstManager.DURING_MAX);
+        stat.setNextEvIds("2,6");
+        StateConfigurationSQL.insertState(stat);
+        ScriptSQLite.clearStateCmd(1);
+        SmartHouse.getInstance().setCurrentState(stat);
+
+        stat = new StateEntity();
+        stat.setName("Incomin");
+        stat.setId(2);
+        stat.setNoticePattern("Mở cửa vui lòng nhìn vào camera");
+        stat.setDelaySec(0);
+        stat.setDuringSec(10); //choose event highest priority
+        stat.setNextEvIds("1,3");
+        ScriptSQLite.clearStateCmd(2);
+        StateConfigurationSQL.insertState(stat);
+
+        stat = new StateEntity();
+        stat.setName("Intrusion");
+        stat.setId(3);
+        stat.setNoticePattern("Có người lạ vào nhà");
+        stat.setDelaySec(5);
+        stat.setDuringSec(8);
+        stat.setNextEvIds("3");
+        ScriptSQLite.clearStateCmd(3);
+        StateConfigurationSQL.insertState(stat);
+
+        stat = new StateEntity();
+        stat.setName("Aquain Come");
+        stat.setId(4);
+        stat.setNoticePattern("Xin chào <result-value>");
+        stat.setDelaySec(0);
+        stat.setDuringSec(10);
+        stat.setNextEvIds("4");
+        ScriptSQLite.clearStateCmd(4);
+        StateConfigurationSQL.insertState(stat);
+
+        stat = new StateEntity();
+        stat.setName("Forget close door");
+        stat.setId(5);
+        stat.setNoticePattern("<owner-role> quên đóng cửa kìa");
+        stat.setDelaySec(5);
+        stat.setDuringSec(ConstManager.DURING_MAX);
+        stat.setNextEvIds("5");
+        ScriptSQLite.clearStateCmd(5);
+        StateConfigurationSQL.insertState(stat);
+
+        stat = new StateEntity();
+        stat.setName("Room warm");
+        stat.setId(6);
+        stat.setNoticePattern("Phòng đang nóng <owner-role> muốn bật máy lạnh không");
+        stat.setDelaySec(10);
+        stat.setDuringSec(ConstManager.DURING_MAX);
+        stat.setNextEvIds("7");
+        ScriptSQLite.clearStateCmd(6);
+        StateConfigurationSQL.insertState(stat);
+//        stat = new StateEntity();
+//        stat.setName("Forget close door");
+//        stat.setAvailable(true);
+//        stat.setId(6);
+//        stat.setConfigurationId(-1);
+//        stat.setSocialIntentId(2060);
+//        stat.setDelaySec(15);
+//        StateConfigurationSQL.insertState(stat);
+        SmartHouse.getInstance().setStates(StateConfigurationSQL.getAll());
     }
 
     @Override

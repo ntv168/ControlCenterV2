@@ -597,7 +597,7 @@ public class BotUtils {
             Log.d(TAG,"Xác nhận "+ConstManager.getVerbByIntent(functionIntent.getFunctionName()+" chế độ "+mode.getName()));
             return "Xác nhận "+ConstManager.getVerbByIntent(functionIntent.getFunctionName()+" chế độ "+mode.getName());
         } else {
-            Log.d(TAG,"LKhong thay mode ");
+            Log.d(TAG,"Khong thay mode ");
             DetectSocialEntity askWhichMode = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_MODE);
             return BotUtils.completeSentence(askWhichMode.getQuestionPattern(),
                     ConstManager.getVerbByIntent(functionIntent.getFunctionName()), "");
@@ -651,12 +651,14 @@ public class BotUtils {
             if (current.getDetectedFunction() != null ){
                 if (current.getDevice() != null) {
                     BotUtils.implementCommand(current.getDetectedFunction(), current.getDevice(), null);
-                    return "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getFunctionName() +
+                    String res = "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getFunctionName() +
                             " " + current.getDevice().getName()+" trong "+current.getArea().getName());
+                    return res;
                 } else  if (current.getScript() != null) {
                     BotUtils.implementCommand(current.getDetectedFunction(), null, current.getScript());
-                    return "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getFunctionName() +
+                    String res  ="Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getFunctionName() +
                             " chế độ " + current.getScript().getName());
+                    return res;
                 }
             } else {
                 DetectSocialEntity notUnderReply = BotUtils.getSocialByName(ConstManager.NOT_UNDERSTD);

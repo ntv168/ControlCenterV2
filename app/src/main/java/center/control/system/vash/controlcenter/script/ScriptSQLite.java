@@ -49,7 +49,7 @@ public class ScriptSQLite {
                 + KEY_STATE_ID + " INTEGER , "
                 +  KEY_DEVICE_ID+ "  INTEGER  ," +
                 KEY_DEVICE_STATE + "  TEXT  ,"+
-                "PRIMARY KEY ("+KEY_DEVICE_ID+","+ KEY_GROUP_ID+")" +
+                "PRIMARY KEY ("+KEY_DEVICE_ID+","+ KEY_GROUP_ID+","+KEY_STATE_ID+")" +
                 ")";
     }
     public static void insertScript(ScriptEntity script,List<CommandEntity> command) {
@@ -77,6 +77,7 @@ public class ScriptSQLite {
         values = new ContentValues();
         values.put(KEY_DEVICE_ID, sde.getDeviceId() );
         values.put(KEY_GROUP_ID, sde.getGroupId());
+        values.put(KEY_STATE_ID, sde.getStateId());
         values.put(KEY_CONFIG_ID, sde.getConfigurationId());
         values.put(KEY_DEVICE_STATE, sde.getDeviceState());
         return values;
@@ -171,9 +172,9 @@ public class ScriptSQLite {
         }
         SQLiteManager.getInstance().closeDatabase();
     }
-    public void delete( ) {
+    public static void clearStateCmd( int id) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
-        db.delete(TABLE_SCRIPT,null,null);
+        db.delete(TABLE_SCRIPT_DEVICE, KEY_STATE_ID+"="+id,null);
         SQLiteManager.getInstance().closeDatabase();
     }
 

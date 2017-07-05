@@ -48,9 +48,10 @@ public class ConstManager {
     public static final String FUNCTION_DEC_TEMP = "decreaseTemperature";
     public static final String FUNCTION_START_MODE = "startMode";
     public static final String FUNCTION_STOP_MODE = "stopMode";
-    public static final int SERVICE_PERIOD = 4000;
+    public static final int SERVICE_PERIOD = 3500;
     public static final int PRIORITY_MAX = 100;
     public static final int DURING_MAX = 1000;
+    public static final int DEFAULT_STATE_ID = 1;
 
     public static String getTime(){
         Date time = new Date();
