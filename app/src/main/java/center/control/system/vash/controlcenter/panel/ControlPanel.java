@@ -198,14 +198,14 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     CurrentContext current = CurrentContext.getInstance();
                     String target = current.getDevice()!=null?current.getDevice().getName():current.getScript().getName();
                     if (result == ControlMonitorService.SUCCESS){
-                        flagpromt = 3;
+                        flagpromt = -1;
                         showReply(BotUtils.completeSentence(
                                 current.getDetectedFunction().getSuccessPattern(),"",target));
                         SmartHouse house = SmartHouse.getInstance();
                         deviceAdapter.updateHouseDevice(house.getDevicesInAreaAttribute(currentArea.getId(),currentAttrib));
 
                     } else if (result == ControlMonitorService.FAIL){
-                        flagpromt = 3;
+                        flagpromt = -1;
                         showReply(BotUtils.completeSentence(
                                 current.getDetectedFunction().getFailPattern(),"",target));
 
@@ -607,11 +607,20 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     }
 
     private void showReply(String sentenceReply){
-        if (flagpromt < 3 && !sentenceReply.equals("") && !sentenceReply.equals("xác nhận")) {
+        if (sentenceReply.contains("em xin cáo lui")) {
+            flagpromt = -1;
+        }
+        if (flagpromt >= 0
+                && !sentenceReply.equals("")
+                && !sentenceReply.equals("xác nhận")) {
             VoiceUtils.speak(sentenceReply);
             promptSpeechInput();
             flagpromt +=1;
-        } else {
+        } if (sentenceReply.contains("không")
+                && sentenceReply.contains("muốn")) {
+            flagpromt = -1;
+        }
+        else {
             flagpromt = 1;
             VoiceUtils.speak(sentenceReply);
         }
