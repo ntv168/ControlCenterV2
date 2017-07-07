@@ -41,8 +41,8 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaHolder> {
 
     @Override
     public void onBindViewHolder(final AreaHolder holder, final int position) {
-        Log.d(TAG, areaEntities.get(position).getName() + " bind");
-        Log.d(TAG, "Focus item: " + focusedItem);
+//        Log.d(TAG, areaEntities.get(position).getName() + " bind");
+//        Log.d(TAG, "Focus item: " + focusedItem);
         holder.name.setText(areaEntities.get(position).getName());
         if (position == focusedItem){
             holder.linArea.setBackgroundResource(R.drawable.background_area_active);

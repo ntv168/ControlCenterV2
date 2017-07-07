@@ -56,7 +56,10 @@ public class AreaEntity extends TargetObject{
         if (detect == null || detect.equals(NOBODY)){
             return "Không có ai";
         }
-        return detect;
+        String result = detect;
+        result = result.replace(DETECT_STRANGE,"Phát hiện người lạ");
+        result = result.replace(DETECT_AQUAINTANCE,"Phát hiện người nhà");
+        return result;
     }
 
     public void setDetect(String detect) {
@@ -263,4 +266,7 @@ public class AreaEntity extends TargetObject{
         return result;
     }
 
+    public String getRawDetect() {
+        return detect;
+    }
 }

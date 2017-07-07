@@ -58,6 +58,7 @@ public class SmartHouse {
         this.states = states;
         for (StateEntity stat: this.states){
             if (stat.getNextEvIds() != null) {
+                stat.setEvents(new ArrayList<EventEntity>());
                 String[] nextEvId = stat.getNextEvIds().split(",");
                 for (int i = 0; i < nextEvId.length; i++) {
                     if (nextEvId[i].length() > 0) {
@@ -75,6 +76,11 @@ public class SmartHouse {
 
     public void setCurrentState(StateEntity currentState) {
         this.currentState = currentState;
+    }
+    public void resetStateToDefault(){
+        this.currentState = this.getStateById(ConstManager.DEFAULT_STATE_ID);
+        this.stateChangedTime = -1;
+
     }
 
     public StateEntity getCurrentState() {
@@ -126,7 +132,7 @@ public class SmartHouse {
                     houseInstance.setConfigurations(ConfigurationSQLite.getAll());
                     houseInstance.setSensors(SensorSQLite.getAll());
                     houseInstance.setStates(StateConfigurationSQL.getAll());
-                    SmartHouse.getInstance().setCurrentState(houseInstance.getStateById(ConstManager.DEFAULT_STATE_ID));
+                    SmartHouse.getInstance().resetStateToDefault();
                 }
             }
 
@@ -140,7 +146,13 @@ public class SmartHouse {
             e.printStackTrace();
         }
     }
-
+    public void startConfigCmds(){
+        if (currentState.getCommands()!= null){
+            for (CommandEntity cmd: currentState.getCommands()){
+                addCommand(cmd);
+            }
+        } else Log.d(TAG," No cmd found");
+    }
     public BlockingQueue<CommandEntity> getOwnerCommand() {
         return ownerCommand;
     }
@@ -277,16 +289,6 @@ public class SmartHouse {
         return result;
     }
 
-    public List<SensorEntity> getSensorByAreaId(int id) {
-        List<SensorEntity> result = new ArrayList<>();
-        for (SensorEntity sensor : this.getSensors()){
-//            Log.d(TAG,device.getAreaId()+"  id");
-            if (sensor.getAreaId() == id ){
-                result.add(sensor);
-            }
-        }
-        return result;
-    }
 
     public List<SensorEntity> getSensorWithoutTriggerByAreaId(int id, int triggerid) {
         List<SensorEntity> result = new ArrayList<>();
@@ -524,5 +526,14 @@ public class SmartHouse {
 
     public long getStateChangedTime() {
         return stateChangedTime;
+    }
+
+    public void revertCmdState() {
+        if (currentState.getCommands() != null){
+            for (CommandEntity cmd: currentState.getCommands()){
+                cmd.inverseDeviceState();
+                addCommand(cmd);
+            }
+        }
     }
 }

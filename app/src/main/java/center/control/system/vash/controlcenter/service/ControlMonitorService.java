@@ -50,7 +50,6 @@ public class ControlMonitorService extends Service {
     public static final String NOBODY = "Nobody";
     public static final String NOT_SUPPORT = "None";
     private static Timer repeatScheduler;
-    private LocalBroadcastManager broadcaster;
     private boolean areaChecked = false;
     public static String CHANGE_STATE = "state.change";
 
@@ -77,6 +76,7 @@ public class ControlMonitorService extends Service {
                                 deviceEntity.setState(status);
                                 house.updateDeviceStateById(deviceEntity.getId(),status);
                                 Log.d(TAG,deviceEntity.getName()+ " với lệnh: " + status);
+                                sendResult(CONTROL, SUCCESS);
                             }
                             if (CurrentContext.getInstance().finishCurrentScript(deviceEntity.getId())) {
                                 sendResult(CONTROL, SUCCESS);
@@ -86,26 +86,19 @@ public class ControlMonitorService extends Service {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG,"send fail");
-//                    if (status.equals("on") || status.equals("off")) {
-//                        SmartHouse house = SmartHouse.getInstance();
-//                        deviceEntity.setState(status);
-//                        house.updateDeviceStateById(deviceEntity.getId(),status);
-//                        Log.d(TAG,deviceEntity.getName()+ " với lệnh: " + status);
-//                    }
-
                     sendResult(CONTROL,FAIL);
                 }
             });
             control.setRetryPolicy(new DefaultRetryPolicy(1000,0,1f));
 
             VolleySingleton.getInstance(this).addToRequestQueue(control);
+        } else {
+            Log.d(TAG,deviceEntity.getName()+" đã được "+deviceEntity.getState());
         }
     }
     @Override
     public void onCreate() {
         super.onCreate();
-        final Context context = this;
-        broadcaster = LocalBroadcastManager.getInstance(context);
         repeatScheduler = new Timer();
         Log.d(TAG,"Start service");
         repeatScheduler.schedule(new TimerTask() {
@@ -128,18 +121,36 @@ public class ControlMonitorService extends Service {
                     } else
                     if (smartHouse.getCurrentState()!= null &&
                             smartHouse.getCurrentState().getId() != ConstManager.DEFAULT_STATE_ID){
-                        long currentTime = (new Date()).getTime();
-                        Log.d(TAG,"Time:  "+currentTime+"  - "+smartHouse.getStateChangedTime()+" "+(currentTime - smartHouse.getStateChangedTime()));
-                        if (currentTime - smartHouse.getStateChangedTime()<smartHouse.getCurrentState().getDuringSec()) {
+                        long waitedTime = ((new Date()).getTime() - smartHouse.getStateChangedTime())/1000;
+                        Log.d(TAG,"Time:  "+(waitedTime));
+                        Log.d(TAG,"Delay:  "+smartHouse.getCurrentState().getDelaySec()+" "+smartHouse.getCurrentState().getDuringSec()+"" +
+                                " "+smartHouse.getCurrentState().getNextEvIds());
+
+                        if (waitedTime < smartHouse.getCurrentState().getDelaySec()) {
+                            Log.d(TAG,"Cấu hình chờ lệnh hoặc biến chuyển");
                             for (EventEntity event : smartHouse.getCurrentState().getEvents()) {
-                                if (event.getSenName().equals(AreaEntity.attrivutesValues[3])) {
-                                    checkCamera(smartHouse.getAreaById(event.getAreaId()));
+                                if (SmartHouse.getAreaById(event.getAreaId())!= null) {
+                                    if (event.getSenName().equals(AreaEntity.attrivutesValues[3])) {
+                                        checkCamera(SmartHouse.getAreaById(event.getAreaId()));
+                                    } else {
+                                        checkArea(SmartHouse.getAreaById(event.getAreaId()));
+                                    }
                                 } else {
-                                    checkArea(smartHouse.getAreaById(event.getAreaId()));
+                                    Log.d(TAG," chưa đặt không gian cho cấu hình");
                                 }
                             }
-                        }else if (smartHouse.getCurrentState().getDuringSec() != ConstManager.DURING_MAX){
-                            int maxPri = 0;
+                        }else
+                        if (waitedTime >= smartHouse.getCurrentState().getDelaySec()){
+                            Log.d(TAG,"Cấu hình tự động kích hoạt");
+                            for (CommandEntity cmd : smartHouse.getCurrentState().getCommands()){
+                                smartHouse.addCommand(cmd);
+                                Log.d(TAG,"thêm cmd "+cmd.getDeviceId()+"  "+cmd.getDeviceState());
+                            }
+                        }
+                        if ( waitedTime >= smartHouse.getCurrentState().getDuringSec()
+                                && smartHouse.getCurrentState().getDuringSec() != ConstManager.DURING_MAX){
+                            Log.d(TAG,"Cấu hình tự động chuyển thông minh");
+                            int maxPri = -1;
                             int nextStId = -1;
                             for (EventEntity event: smartHouse.getCurrentState().getEvents()){
                                 if (event.getPriority() > maxPri){
@@ -147,18 +158,15 @@ public class ControlMonitorService extends Service {
                                     nextStId = event.getNextStateId();
                                 }
                             }
-                            Log.d(TAG, "next sta"+ nextStId);
+                            Log.d(TAG, smartHouse.getCurrentState().getEvents().size()+ " s next state : "+ nextStId);
                             if (nextStId != -1 ){
+//                                smartHouse.revertCmdState();
                                 smartHouse.setCurrentState(smartHouse.getStateById(nextStId));
                                 smartHouse.setStateChangedTime((new Date()).getTime());
                                 sendResult(CHANGE_STATE,-1);
                             }
-                        }
-                        if (currentTime - smartHouse.getStateChangedTime()<smartHouse.getCurrentState().getDelaySec()){
-                            for (CommandEntity cmd : smartHouse.getCurrentState().getCommands()){
-                                smartHouse.addCommand(cmd);
-                                Log.d(TAG,"thêm cmd "+cmd.getDeviceId()+"  "+cmd.getDeviceState());
-                            }
+                        } else if ( waitedTime < smartHouse.getCurrentState().getDuringSec()){
+                            Log.d(TAG,"Dang kich hoat he thong "+smartHouse.getCurrentState().getName());
                         }
                         return;
                     } else {
@@ -197,10 +205,7 @@ public class ControlMonitorService extends Service {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                String response =  "security:có người lạ,light:phòng sáng,tempurature:12,sound:to";
-                Log.d(TAG,response);
-                SmartHouse.getInstance().updateSensorArea(area.getId(),response);
-                sendResult(MONITOR,area.getId());
+
             }
         });
         readRoom.setRetryPolicy(new DefaultRetryPolicy(VolleySingleton.CHECK_AREA_TIMEOUT,0,1f));

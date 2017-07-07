@@ -65,7 +65,6 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
     private ListAreaAdapter areaAdapter;
     private DeviceEntity currentDevice;
     private AreaEntity currentArea;
-    private android.app.AlertDialog.Builder editNickNameDiag;
     private Dialog deviceDialog;
     private EditText ipArea;
 
@@ -75,8 +74,6 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
         setContentView(R.layout.activity_manage_device);
         RecyclerView lstAreaManage = (RecyclerView) findViewById(R.id.listItemLeft);
         lstAreaManage.setHasFixedSize(true);
-        editNickNameDiag = new android.app.AlertDialog.Builder(ManageDeviceActivity.this);
-        editNickNameDiag.setCancelable(false);
         LinearLayoutManager verticalLayout = new LinearLayoutManager(this);
         verticalLayout.setOrientation(LinearLayoutManager.VERTICAL);
         lstAreaManage.setLayoutManager(verticalLayout);
@@ -334,7 +331,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
         final EditText txtNickName = (EditText) deviceDialog.findViewById(R.id.txtDeviceNickname);
         final TextView txtErr = (TextView) deviceDialog.findViewById(R.id.txtError);
         txtName.setText(currentDevice.getName()+"");
-        txtNickName.setText(currentDevice.getNickName()+"");
+        txtNickName.setText(currentDevice.getName()+"");
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -376,30 +373,32 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
     }
 
     @Override
-    public void onDeviceLongClick(DeviceEntity deviceEntity) {
-        DeviceSQLite.deleteByDevId(deviceEntity.getId());
-        devicesAdapter.remove(deviceEntity);
+    public void onDeviceLongClick(final DeviceEntity deviceEntity) {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Xóa thiết bị")
+                .setMessage("Bạn có muốn xóa thiết bị "+deviceEntity.getName()+" không?")
+                .setPositiveButton("Đồng ý", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DeviceSQLite.deleteByDevId(deviceEntity.getId());
+                        devicesAdapter.remove(deviceEntity);
+                    }
+
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
     private void refineNickNameTarget(){
         final SmartHouse house = SmartHouse.getInstance();
         for (final DeviceEntity device: house.getDevices()){
             if (device.getNickName() == null || device.getNickName().equals("")){
-//                editNickNameDiag.setTitle("Tên gọi khác cho thiết bị : "+device.getName());
-//                final EditText input = new EditText(ManageDeviceActivity.this);
-//                input.setInputType(InputType.TYPE_CLASS_TEXT);
-//                input.setText(device.getName()+" ");
-//                editNickNameDiag.setView(input);
-//                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        device.setNickName(input.getText().toString());
-//                        DeviceSQLite.upById(device.getId(),device);
-//                        house.updateDeviceById(device.getId(),device);
-//                        dialog.dismiss();
-//                        refineNickNameTarget();
-//                    }
-//                });
-//                editNickNameDiag.show();
                 this.onDeviceClick(device);
                 return;
             }

@@ -110,7 +110,7 @@ public class DetectIntentSQLite {
         SQLiteManager.getInstance().closeDatabase();
     }
 
-    public DetectFunctionEntity findFunctionById(int id) {
+    public static DetectFunctionEntity findFunctionById(int id) {
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
@@ -157,7 +157,7 @@ public class DetectIntentSQLite {
         } else return null;
 
     }
-    public DetectSocialEntity findSocialById(int id) {
+    public static DetectSocialEntity findSocialById(int id) {
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "

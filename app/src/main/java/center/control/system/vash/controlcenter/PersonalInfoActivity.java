@@ -44,6 +44,7 @@ import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.FunctionIntentDTO;
 import center.control.system.vash.controlcenter.server.RetroFitSingleton;
 import center.control.system.vash.controlcenter.server.SocialIntentDTO;
+import center.control.system.vash.controlcenter.server.VolleySingleton;
 import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
@@ -204,43 +205,47 @@ public class PersonalInfoActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<BotDataCentralDTO> call, Response<BotDataCentralDTO> response) {
                         Log.d(TAG,call.request().url()+"");
-                        SharedPreferences.Editor edit = sharedPreferences.edit();
-                        edit.putString(ConstManager.BOT_ROLE,botRole);
-                        edit.putString(ConstManager.OWNER_ROLE,ownerRole);
-                        edit.putString(ConstManager.OWNER_NAME,ownerName);
-                        edit.putInt(ConstManager.BOT_TYPE_ID,botTypeId);
-                        edit.putString(ConstManager.BOT_TYPE,botType);
-                        edit.putString(ConstManager.BOT_NAME,botName);
-                        edit.commit();
-                        TermSQLite sqLite = new TermSQLite();
-                        List<OwnerTrainEntity> trained = sqLite.getOwnerTrain();
-                        Log.d(TAG,trained.size()+"  trains");
-                        Map<String,Map<String,Integer>> updatedFunct = BotUtils.updateFuncts(trained,response.body().getFunctionMap());
-                        DetectIntentSQLite sqlDect = new DetectIntentSQLite();
-                        sqLite.clearAll();
-                        sqlDect.clearAll();
-                        Log.d(TAG,"term FuncMap;"+response.body().getFunctionMap().size());
-                        Log.d(TAG,"term SocMap;"+response.body().getSocialMap().size());
-                        Log.d(TAG,"funct ;"+response.body().getFunctions().size());
-                        Log.d(TAG,"soc ;"+response.body().getSocials().size());
+                        if (response.body() != null) {
+                            SharedPreferences.Editor edit = sharedPreferences.edit();
+                            edit.putString(ConstManager.BOT_ROLE, botRole);
+                            edit.putString(ConstManager.OWNER_ROLE, ownerRole);
+                            edit.putString(ConstManager.OWNER_NAME, ownerName);
+                            edit.putInt(ConstManager.BOT_TYPE_ID, botTypeId);
+                            edit.putString(ConstManager.BOT_TYPE, botType);
+                            edit.putString(ConstManager.BOT_NAME, botName);
+                            edit.commit();
+                            TermSQLite sqLite = new TermSQLite();
+                            List<OwnerTrainEntity> trained = sqLite.getOwnerTrain();
+                            Log.d(TAG, trained.size() + "  trains");
+                            Map<String, Map<String, Integer>> updatedFunct = BotUtils.updateFuncts(trained, response.body().getFunctionMap());
+                            DetectIntentSQLite sqlDect = new DetectIntentSQLite();
+                            sqLite.clearAll();
+                            sqlDect.clearAll();
+                            Log.d(TAG, "term FuncMap;" + response.body().getFunctionMap().size());
+                            Log.d(TAG, "term SocMap;" + response.body().getSocialMap().size());
+                            Log.d(TAG, "funct ;" + response.body().getFunctions().size());
+                            Log.d(TAG, "soc ;" + response.body().getSocials().size());
 
-                        for (SocialIntentDTO soc : response.body().getSocials()){
-                            sqlDect.insertSocial(new DetectSocialEntity(soc.getId(),
-                                    soc.getName(),soc.getQuestion(),soc.getReply()));
+                            for (SocialIntentDTO soc : response.body().getSocials()) {
+                                sqlDect.insertSocial(new DetectSocialEntity(soc.getId(),
+                                        soc.getName(), soc.getQuestion(), soc.getReply()));
+                            }
+                            for (FunctionIntentDTO funct : response.body().getFunctions()) {
+                                sqlDect.insertFunction(new DetectFunctionEntity(funct.getId(),
+                                        funct.getName(), funct.getSuccess(), funct.getFail(), funct.getRemind()));
+                            }
+                            SmartHouse house = SmartHouse.getInstance();
+                            BotUtils bot = new BotUtils();
+                            bot.saveFunctionTFIDFTerm(updatedFunct);
+                            bot.saveSocialTFIDFTerm(response.body().getSocialMap());
+                            bot.saveDeviceTFIDFTerm(house.getDevices());
+                            bot.saveAreaTFIDFTerm(house.getAreas());
+                            bot.saveScriptTFIDFTerm(house.getScripts());
+                            waitDialog.dismiss();
+                            Toast.makeText(PersonalInfoActivity.this, "Tải dữ liệu trợ lý " + botName + " thành công", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(PersonalInfoActivity.this, "Không kết nối được "+ VolleySingleton.SERVER_HOST, Toast.LENGTH_SHORT).show();
                         }
-                        for (FunctionIntentDTO funct : response.body().getFunctions()){
-                            sqlDect.insertFunction(new DetectFunctionEntity(funct.getId(),
-                                    funct.getName(),funct.getSuccess(),funct.getFail(),funct.getRemind()));
-                        }
-                        SmartHouse house = SmartHouse.getInstance();
-                        BotUtils bot = new BotUtils();
-                        bot.saveFunctionTFIDFTerm(updatedFunct);
-                        bot.saveSocialTFIDFTerm(response.body().getSocialMap());
-                        bot.saveDeviceTFIDFTerm(house.getDevices());
-                        bot.saveAreaTFIDFTerm(house.getAreas());
-                        bot.saveScriptTFIDFTerm(house.getScripts());
-                        waitDialog.dismiss();
-                        Toast.makeText(PersonalInfoActivity.this,"Tải dữ liệu trợ lý "+botName+" thành công",Toast.LENGTH_SHORT).show();
                     }
 
                     @Override

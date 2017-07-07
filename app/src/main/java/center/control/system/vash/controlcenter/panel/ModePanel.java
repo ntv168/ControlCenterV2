@@ -301,7 +301,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
 
     @Override
     public void activaScript(ScriptEntity item) {
-        DetectFunctionEntity funct = DetectIntentSQLite.findFunctionByName(ConstManager.FUNCTION_START_MODE);
+        DetectFunctionEntity funct = DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_START_MODE);
         CurrentContext.getInstance().setDetectedFunction(funct);
         CurrentContext.getInstance().setScript(item);
         BotUtils.implementCommand(funct,null,item);

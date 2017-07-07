@@ -63,6 +63,52 @@
             android:screenOrientation="landscape" />
         <activity android:name=".trigger.MapDeviceTriggerActivity"
             android:screenOrientation="landscape"></activity>
+        <activity android:name=".watch.SonyActivity">
+            <intent-filter>
+                <action android:name="smart.house.watch.SONY_ACTIVITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <service android:name=".watch.WatchService" />
+        <service android:name="com.sonyericsson.extras.liveware.extension.util.TunnelService">
+            <intent-filter>
+                <action android:name="com.sonyericsson.extras.liveware.aef.tunnel.action.BIND" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name=".watch.WatchBroadcastReceiver">
+            <intent-filter>
+
+                <!-- Generic extension intents. -->
+                <action android:name="com.sonyericsson.extras.liveware.aef.registration.EXTENSION_REGISTER_REQUEST" />
+                <action android:name="com.sonyericsson.extras.liveware.aef.registration.ACCESSORY_CONNECTION" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+
+                <!-- Notification intents -->
+                <action android:name="com.sonyericsson.extras.liveware.aef.notification.VIEW_EVENT_DETAIL" />
+                <action android:name="com.sonyericsson.extras.liveware.aef.notification.REFRESH_REQUEST" />
+
+                <!-- Widget intents -->
+                <action android:name="com.sonyericsson.extras.aef.widget.START_REFRESH_IMAGE_REQUEST" />
+                <action android:name="com.sonyericsson.extras.aef.widget.STOP_REFRESH_IMAGE_REQUEST" />
+                <action android:name="com.sonyericsson.extras.aef.widget.ONTOUCH" />
+                <action android:name="com.sonyericsson.extras.liveware.extension.util.widget.scheduled.refresh" />
+
+                <!-- Control intents -->
+                <action android:name="com.sonyericsson.extras.aef.control.START" />
+                <action android:name="com.sonyericsson.extras.aef.control.STOP" />
+                <action android:name="com.sonyericsson.extras.aef.control.PAUSE" />
+                <action android:name="com.sonyericsson.extras.aef.control.RESUME" />
+                <action android:name="com.sonyericsson.extras.aef.control.ERROR" />
+                <action android:name="com.sonyericsson.extras.aef.control.KEY_EVENT" />
+                <action android:name="com.sonyericsson.extras.aef.control.TOUCH_EVENT" />
+                <action android:name="com.sonyericsson.extras.aef.control.SWIPE_EVENT" />
+                <action android:name="com.sonyericsson.extras.aef.control.OBJECT_CLICK_EVENT" />
+                <action android:name="com.sonyericsson.extras.aef.control.MENU_ITEM_SELECTED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
