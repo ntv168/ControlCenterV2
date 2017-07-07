@@ -57,9 +57,6 @@ public class VoiceUtils {
         }
     }
     public static VoiceUtils getInstance() {
-        if (singleton == null){
-            return null;
-        }
         return singleton;
     }
 
@@ -86,6 +83,7 @@ public class VoiceUtils {
             singleton.tts.stop();
             singleton.tts.shutdown();
         }
+        singleton = null;
     }
     public interface OnSpeakFinish{
         public void onFinish();
