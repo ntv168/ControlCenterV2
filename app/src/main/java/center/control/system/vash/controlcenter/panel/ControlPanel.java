@@ -735,6 +735,14 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             receiver = null;
 //            waitDialog.dismiss();
         }
+        Log.i(TAG, "on pause called");
+        if(sr!=null){
+            sr.stopListening();
+            sr.cancel();
+            sr.destroy();
+
+        }
+        sr = null;
         stopService(new Intent(this,ControlMonitorService.class));
     }
 
