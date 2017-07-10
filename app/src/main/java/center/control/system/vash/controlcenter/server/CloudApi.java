@@ -21,5 +21,7 @@ public  interface CloudApi {
     Call<List<AssistantTypeDTO>> getDataVAType();
     @POST("/api/SmartHouse/StaffCodeLogin")
     Call<StaffCodeDTO> staffLogin(@Body StaffCodeDTO staff);
+    @GET("/api/Configuration/getConfigInContract/{id}")
+    Call<ConfigControlCenterDTO> getConfig( @Path("id") String houseId);
 
 }

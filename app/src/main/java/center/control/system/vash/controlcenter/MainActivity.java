@@ -93,9 +93,7 @@ public class MainActivity extends Activity {
                 })
                 .setNegativeButton("Xóa", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
                         dialog.dismiss();
-
                     }
                 });
         modHost.show();
@@ -103,7 +101,7 @@ public class MainActivity extends Activity {
 
     private void loginStaffCode() {
         final StaffCodeDTO stff = new StaffCodeDTO();
-        stff.setUsername(txtusername.getText().toString().replace("admin",""));
+        stff.setUsername(ConstManager.HOUSE_ID);
         stff.setStaffCode(txtpassword.getText().toString());
         final CloudApi loginStaffApi = RetroFitSingleton.getInstance().getCloudApi();
         loginStaffApi.staffLogin(stff).enqueue(new Callback<StaffCodeDTO>() {
@@ -112,9 +110,8 @@ public class MainActivity extends Activity {
                 Log.d(TAG,call.request().url()+"");
                 if (response.body()!=null && response.body().getMessage()!= null && response.body().getMessage().equals("success")){
                     startActivity(new Intent(MainActivity.this,SettingPanel.class));
-                    initStateMachine();
                 }else {
-                    Toast.makeText(MainActivity.this,"Sai code nhân viên ",Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this,"Sai code nhân viên ",Toast.LENGTH_SHORT).show();
                     if (txtusername.getText().toString().equals("admin") &&
                             txtpassword.getText().toString().equals("admin")) {
                         startActivity(new Intent(MainActivity.this,SettingPanel.class));
@@ -125,7 +122,7 @@ public class MainActivity extends Activity {
             @Override
             public void onFailure(Call<StaffCodeDTO> call, Throwable t) {
                 Log.d(TAG,call.request().url()+" sai staff cose");
-                Toast.makeText(MainActivity.this,"Sai code nhân viên ",Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this,"Sai code nhân viên ",Toast.LENGTH_SHORT).show();
                 if (txtusername.getText().toString().equals("admin") &&
                         txtpassword.getText().toString().equals("admin")) {
                     startActivity(new Intent(MainActivity.this,SettingPanel.class));
@@ -135,185 +132,67 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void initStateMachine() {
-        StateConfigurationSQL.removeAll();
-        EventEntity ev1 = new EventEntity();
-        ev1.setId(1);
-        ev1.setNextStateId(5);
-        ev1.setPriority(4);
-        ev1.setSenName(AreaEntity.attrivutesValues[2]);
-        ev1.setSenValue(AreaEntity.TEMP_BURN);
-        StateConfigurationSQL.insertEvent(ev1);
-
-        EventEntity ev2 = new EventEntity();
-        ev2.setId(2);
-        ev2.setNextStateId(6);
-        ev2.setPriority(2);
-        ev2.setSenName(AreaEntity.attrivutesValues[2]);
-        ev2.setSenValue(AreaEntity.TEMP_WARM);
-        StateConfigurationSQL.insertEvent(ev2);
-
-        EventEntity ev3 = new EventEntity();
-        ev3.setId(3);
-        ev3.setNextStateId(2);
-        ev3.setPriority(3);
-        ev3.setSenName(AreaEntity.attrivutesValues[0]);
-        ev3.setSenValue(AreaEntity.DOOR_OPEN);
-        StateConfigurationSQL.insertEvent(ev3);
-
-        EventEntity ev4 = new EventEntity();
-        ev4.setId(4);
-        ev4.setNextStateId(3);
-        ev4.setPriority(1);
-        ev4.setSenName(AreaEntity.attrivutesValues[3]);
-        ev4.setSenValue(AreaEntity.DETECT_STRANGE);
-        StateConfigurationSQL.insertEvent(ev4);
-
-        EventEntity ev5 = new EventEntity();
-        ev5.setId(5);
-        ev5.setNextStateId(4);
-        ev5.setPriority(0);
-        ev5.setSenName(AreaEntity.attrivutesValues[3]);
-        ev5.setSenValue(AreaEntity.DETECT_AQUAINTANCE);
-        StateConfigurationSQL.insertEvent(ev5);
-
-        EventEntity ev6 = new EventEntity();
-        ev6.setId(6);
-        ev6.setNextStateId(1);
-        ev6.setPriority(1);
-        ev6.setSenName("");
-        ev6.setSenValue("");
-        StateConfigurationSQL.insertEvent(ev6);
-
-        StateEntity stat = new StateEntity();
-        stat.setName("Home Safe - Như chưa có gì xảy ra");
-        stat.setId(ConstManager.DEFAULT_STATE_ID);
-        stat.setNoticePattern("");
-        stat.setDelaySec(0);
-        stat.setDuringSec(ConstManager.DURING_MAX);
-        stat.setNextEvIds("1,2,3");
-        StateConfigurationSQL.insertState(stat);
-        ScriptSQLite.clearStateCmd(1);
-        SmartHouse.getInstance().setCurrentState(stat);
-
-        stat = new StateEntity();
-        stat.setName("Incomin - Cửa mở chờ xác nhận");
-        stat.setId(2);
-        stat.setNoticePattern("Ai đến vui lòng nhìn vào camera");
-        stat.setDelaySec(0);
-        stat.setDuringSec(20); //choose event highest priority
-        stat.setNextEvIds("4,5");
-        ScriptSQLite.clearStateCmd(2);
-        StateConfigurationSQL.insertState(stat);
-
-        stat = new StateEntity();
-        stat.setName("Intrusion - Đột nhập");
-        stat.setId(3);
-        stat.setNoticePattern("Có người lạ vào nhà");
-        stat.setDelaySec(7);
-        stat.setDuringSec(5);
-        stat.setNextEvIds("5,6");
-        ScriptSQLite.clearStateCmd(3);
-        StateConfigurationSQL.insertState(stat);
-
-        stat = new StateEntity();
-        stat.setName("Owner arrived - Người thân đến");
-        stat.setId(4);
-        stat.setNoticePattern("Xin chào "+ BotUtils.RESULT_VALUE);
-        stat.setDelaySec(0);
-        stat.setDuringSec(5);
-        stat.setNextEvIds("6");
-        ScriptSQLite.clearStateCmd(4);
-        StateConfigurationSQL.insertState(stat);
-
-        stat = new StateEntity();
-        stat.setName("Burning - Cháy nhà");
-        stat.setId(5);
-        stat.setNoticePattern("Có lửa trong nhà thưa "+ BotUtils.OWNER_ROLE);
-        stat.setDelaySec(0);
-        stat.setDuringSec(10);
-        stat.setNextEvIds("6");
-        ScriptSQLite.clearStateCmd(5);
-        StateConfigurationSQL.insertState(stat);
-
-        stat = new StateEntity();
-        stat.setName("Room warm - Phòng nóng quá");
-        stat.setId(6);
-        stat.setNoticePattern("Phòng đang nóng "+BotUtils.OWNER_ROLE+" muốn bật máy lạnh không");
-        stat.setDelaySec(10);
-        stat.setDuringSec(10);
-        stat.setNextEvIds("6");
-        ScriptSQLite.clearStateCmd(6);
-        StateConfigurationSQL.insertState(stat);
-        SmartHouse.getInstance().setStates(StateConfigurationSQL.getAll());
-
-        Log.d(TAG,"inint stateSQL");
-    }
 
     @Override
     protected void onResume() {
         super.onResume();
         username = sharedPreferences.getString(ConstManager.USERNAME,"");
         password = sharedPreferences.getString(ConstManager.PASSWORD,"");
-
     }
 
     private void loginSmartHouse() {
-        final HouseKeyDTO key = new HouseKeyDTO();
-        key.setUsername(txtusername.getText().toString());
-        key.setPassword(txtpassword.getText().toString());
-        final CloudApi loginApi = RetroFitSingleton.getInstance().getCloudApi();
-        loginApi.mobileLogin(key).enqueue(new Callback<LoginSmarthouseDTO>() {
-            @Override
-            public void onResponse(Call<LoginSmarthouseDTO> call, retrofit2.Response<LoginSmarthouseDTO> response) {
-                if (response.body()!= null && response.body().getContractId()!= null) {
-                    Log.d(TAG,call.request().url()+" --- "+response.body().getContractId());
-                    SharedPreferences.Editor edit = sharedPreferences.edit();
-                    edit.putString(ConstManager.USERNAME,key.getUsername());
-                    edit.putString(ConstManager.STATIC_ADDRESS,response.body().getStaticAddress());
-                    edit.putString(ConstManager.CONTRACT_CODE,response.body().getContractCode());
-                    edit.putString(ConstManager.OWNER_NAME,response.body().getOwnerName());
-                    edit.putString(ConstManager.OWNER_ADD,response.body().getOwnerAddress());
-                    edit.putString(ConstManager.OWNER_TEL,response.body().getOwnerTel());
-                    edit.putString(ConstManager.OWNER_CMND,response.body().getOwnerCmnd());
-                    edit.putString(ConstManager.CONTRACT_ID,response.body().getContractId());
-                    edit.putString(ConstManager.ACTIVE_DAY,response.body().getActiveDay());
-                    edit.putString(ConstManager.BOT_NAME,response.body().getVirtualAssistantName());
-                    edit.putString(ConstManager.BOT_TYPE,response.body().getVirtualAssistantType());
-                    edit.putInt(ConstManager.BOT_TYPE_ID,response.body().getVirtualAssistantTypeId());
-                    SmartHouse.getInstance().setContractId(response.body().getContractId());
-                    edit.commit();
-                    Log.d(TAG,response.body().getVirtualAssistantType());
-                    startActivity( new Intent(MainActivity.this, ControlPanel.class));
-                    finish();
-                } else {
-                    Log.d(TAG,call.request().url()+" sai ten");
-                    Toast.makeText(MainActivity.this,"Sai tên đăng nhập mật khẩu",Toast.LENGTH_LONG).show();
+        if (username.equals("") || password.equals("")) {
+            final HouseKeyDTO key = new HouseKeyDTO();
+            key.setUsername(txtusername.getText().toString());
+            key.setPassword(txtpassword.getText().toString());
+            key.setHouseId(ConstManager.HOUSE_ID);
+            final CloudApi loginApi = RetroFitSingleton.getInstance().getCloudApi();
+            loginApi.mobileLogin(key).enqueue(new Callback<LoginSmarthouseDTO>() {
+                @Override
+                public void onResponse(Call<LoginSmarthouseDTO> call, retrofit2.Response<LoginSmarthouseDTO> response) {
+                    if (response.body() != null && response.body().getContractId() != null) {
+                        Log.d(TAG, call.request().url() + " --- " + response.body().getContractId());
+                        SharedPreferences.Editor edit = sharedPreferences.edit();
+                        edit.putString(ConstManager.USERNAME, key.getUsername());
+                        edit.putString(ConstManager.PASSWORD, key.getPassword());
+                        edit.putString(ConstManager.STATIC_ADDRESS, response.body().getStaticAddress());
+                        edit.putString(ConstManager.CONTRACT_CODE, response.body().getContractCode());
+                        edit.putString(ConstManager.OWNER_NAME, response.body().getOwnerName());
+                        edit.putString(ConstManager.OWNER_ADD, response.body().getOwnerAddress());
+                        edit.putString(ConstManager.OWNER_TEL, response.body().getOwnerTel());
+                        edit.putString(ConstManager.OWNER_CMND, response.body().getOwnerCmnd());
+                        edit.putString(ConstManager.CONTRACT_ID, response.body().getContractId());
+                        edit.putString(ConstManager.ACTIVE_DAY, response.body().getActiveDay());
+                        edit.putString(ConstManager.BOT_NAME, response.body().getVirtualAssistantName());
+                        edit.putString(ConstManager.BOT_TYPE, response.body().getVirtualAssistantType());
+                        edit.putInt(ConstManager.BOT_TYPE_ID, response.body().getVirtualAssistantTypeId());
+                        SmartHouse.getInstance().setContractId(response.body().getContractId());
+                        edit.commit();
+                        startActivity(new Intent(MainActivity.this, ControlPanel.class));
+                        finish();
+                    } else {
+                        Log.d(TAG, call.request().url() + " sai ten");
+                        Toast.makeText(MainActivity.this, "Sai tên đăng nhập mật khẩu", Toast.LENGTH_SHORT).show();
+                    }
+                    loginDia.dismiss();
                 }
-                loginDia.dismiss();
-            }
-            @Override
-            public void onFailure(Call<LoginSmarthouseDTO> call, Throwable t) {
-                Log.d(TAG,call.request().url()+"  ---err "+t.getMessage());
-                Toast.makeText(MainActivity.this,"Không kết nối được server",Toast.LENGTH_LONG).show();
-//                username = key.getUsername();
-//                password = key.getPassword();
-//                houseId = "123123";
-//                staticAddress = "123123";
-//                contractCode = "123123";
-//                ownerName = "Mỹ";
-//                ownerAddress = "123123";
-//                ownerTel = "123123";
-//                ownerCmnd = "123123";
-//                contractId = "123123";
-//                activeDay = "123123";
-//                virtualAssistantName = "Sen";
-//                virtualAssistantType = "Quản gia già";
-//                Log.d(TAG,virtualAssistantType);
-//                virtualAssistantId = response.body().getVirtualAssistantTypeId();
-                loginDia.dismiss();
-            }
-        });
 
+                @Override
+                public void onFailure(Call<LoginSmarthouseDTO> call, Throwable t) {
+                    Log.d(TAG, call.request().url() + "  ---err " + t.getMessage());
+                    Toast.makeText(MainActivity.this, "Không kết nối được server", Toast.LENGTH_SHORT).show();
+                    loginDia.dismiss();
+                }
+            });
+        } else {
+            if (txtusername.getText().toString().equals(username) &&
+                    txtpassword.getText().toString().equals(password)){
+                startActivity(new Intent(MainActivity.this, ControlPanel.class));
+                finish();
+            } else {
+                Log.d(TAG, " sai ten mat khau local");
+                Toast.makeText(MainActivity.this, "Sai tên đăng nhập mật khẩu", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

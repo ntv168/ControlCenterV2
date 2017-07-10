@@ -122,6 +122,8 @@ public class ScriptSQLite {
         script.setHour(cursor.getInt(cursor.getColumnIndex(KEY_HOUR)));
         script.setMinute(cursor.getInt(cursor.getColumnIndex(KEY_MIN)));
         script.setWeeksDay(cursor.getString(cursor.getColumnIndex(KEY_WEEKSDAY)));
+
+        Log.d("SQLItee",script.getName()+"  "+script.getWeekDay());
         return script;
     }
     public static ScriptEntity findById(int id){
@@ -181,6 +183,13 @@ public class ScriptSQLite {
     public static void upModeOnly(int id, ScriptEntity mode) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         db.update(TABLE_SCRIPT, scriptToCV(mode), KEY_ID + " = "+id, null);
+        SQLiteManager.getInstance().closeDatabase();
+    }
+
+    public static void deleteModeById(int modeId) {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        db.delete(TABLE_SCRIPT, KEY_ID+"="+modeId,null);
+        db.delete(TABLE_SCRIPT_DEVICE, KEY_GROUP_ID+"="+modeId,null);
         SQLiteManager.getInstance().closeDatabase();
     }
 }

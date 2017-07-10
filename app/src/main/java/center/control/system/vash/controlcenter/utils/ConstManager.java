@@ -10,6 +10,7 @@ import java.util.Date;
  */
 
 public class ConstManager {
+    public static final String HOUSE_ID = "b1deb6fc-4ea9-4aac-9290-534044faa0ad";
     public static final String STAFF_CODE =  "staff.code";
     public static final String SHARED_PREF_NAME = "Sharef preference controlcenter";
     public static final String USERNAME = "key_username";

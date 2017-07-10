@@ -343,7 +343,6 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                             attributeType += AreaEntity.attrivutesValues[i] + ',';
                         }
                     }
-                    Log.d(TAG, attributeType);
                     currentDevice.setName(txtName.getText().toString());
                     currentDevice.setNickName(txtNickName.getText().toString());
                     currentDevice.setAttributeType(attributeType);

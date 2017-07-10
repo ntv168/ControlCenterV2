@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -44,6 +45,7 @@ public class SmartHouse {
     private List<SensorEntity> sensors;
     private List<ScriptEntity> scripts;
     private List<StateEntity> states;
+    private List<ScriptEntity> runToday;
 
     private String botName;
     private String botRole;
@@ -535,5 +537,38 @@ public class SmartHouse {
                 addCommand(cmd);
             }
         }
+    }
+
+    public void addMode(ScriptEntity scriptEntity) {
+        this.getScripts().add(scriptEntity);
+    }
+
+    public List<ScriptEntity> getTodayMode() {
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
+        List<ScriptEntity> res = new ArrayList<>();
+        for (ScriptEntity mode: this.getScripts()){
+            if (mode.getWeeksDay()!= null  &&
+            mode.getWeekDay().contains(day+"")){
+                res.add(mode);
+            }
+        }
+        return res;
+    }
+
+    public void removeModeById(int id) {
+        for (ScriptEntity script : scripts){
+            if (script.getId() == id){
+                scripts.remove(script);
+            }
+        }
+    }
+
+    public List<ScriptEntity> getRunToday() {
+        return runToday;
+    }
+
+    public void setRunToday(List<ScriptEntity> todayScript) {
+        this.runToday = todayScript;
     }
 }

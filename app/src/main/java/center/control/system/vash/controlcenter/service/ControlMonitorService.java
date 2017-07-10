@@ -1,7 +1,6 @@
 package center.control.system.vash.controlcenter.service;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,11 +24,14 @@ import java.util.TimerTask;
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.configuration.EventEntity;
-import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.nlp.CurrentContext;
+import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
+import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
 
+import center.control.system.vash.controlcenter.script.ScriptEntity;
+import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
@@ -109,6 +111,18 @@ public class ControlMonitorService extends Service {
                     if (smartHouse.getContractId() == null){
                         sendResult(DEACTIVATE,-1);
                         return;
+                    }
+                    for (ScriptEntity todayMode : smartHouse.getRunToday()){
+                        if (todayMode.isEnabled() && todayMode.getHour()==((new Date()).getHours())
+                                && todayMode.getMinute()<=((new Date()).getMinutes())){
+                            DetectFunctionEntity funct = DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_START_MODE);
+                            CurrentContext.getInstance().setDetectedFunction(funct);
+                            CurrentContext.getInstance().setScript(todayMode);
+                            todayMode.setEnabled(false);
+                            smartHouse.getRunToday().remove(todayMode);
+                            BotUtils.implementCommand(funct,null,todayMode);
+                            Log.d(TAG,"Scheduler acted");
+                        }
                     }
                     if (smartHouse.getOwnerCommand().size() > 0){
                         CommandEntity command = smartHouse.getOwnerCommand().take();

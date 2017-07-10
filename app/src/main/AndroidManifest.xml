@@ -6,8 +6,6 @@
         android:name="android.hardware.camera"
         android:required="true" />
 
-    <uses-permission android:name="com.sonyericsson.extras.liveware.aef.EXTENSION_PERMISSION" />
-    <uses-permission android:name="com.android.vending.setup.PLAY_SETUP_SERVICE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -16,6 +14,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="com.sonyericsson.extras.liveware.aef.EXTENSION_PERMISSION" />
+    <uses-permission android:name="com.android.vending.setup.PLAY_SETUP_SERVICE" />
 
     <application
         android:name=".App"
@@ -56,8 +56,10 @@
         <activity
             android:name=".device.ManageDeviceActivity"
             android:screenOrientation="landscape" />
-        <activity android:name=".panel.UserSettingPanel" />
-        <activity android:name=".PersonalInfoActivity"></activity>
+        <activity android:name=".panel.UserSettingPanel"
+            android:screenOrientation="landscape"/>
+        <activity android:name=".PersonalInfoActivity"
+            android:screenOrientation="landscape"></activity>
         <activity android:name=".nlp.TrainVAActivity"
             android:screenOrientation="landscape"/>
         <activity
@@ -68,7 +70,6 @@
         <activity android:name=".watch.SonyActivity">
             <intent-filter>
                 <action android:name="smart.house.watch.SONY_ACTIVITY" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -82,7 +83,6 @@
 
         <receiver android:name=".watch.WatchBroadcastReceiver">
             <intent-filter>
-
                 <!-- Generic extension intents. -->
                 <action android:name="com.sonyericsson.extras.liveware.aef.registration.EXTENSION_REGISTER_REQUEST" />
                 <action android:name="com.sonyericsson.extras.liveware.aef.registration.ACCESSORY_CONNECTION" />

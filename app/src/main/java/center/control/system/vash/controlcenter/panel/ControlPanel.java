@@ -84,7 +84,7 @@ import center.control.system.vash.controlcenter.watch.WatchService;
 public class ControlPanel extends ListeningActivity implements AreaAttributeAdapter.AttributeClickListener,
         AreaAdapter.AreaClickListener,DeviceAdapter.DeviceItemClickListener, VoiceUtils.OnSpeakFinish {
     private static final String TAG = "Control Panel";
-    public static final String CONTROL_FILTER_RECEIVER = "control filter receiver";
+    public static final String CONTROL_FILTER_RECEIVER = "smart.house.watch.SONY_ACTIVITY";
     public static final String ACTION_TYPE = "control action type receiver";
     public static final String AREA_ID = "service.area.check.id";
     public static final String WATCH_STT_CONTENT = "receiving_speech_to_text_from_sony";
