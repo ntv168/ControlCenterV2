@@ -89,6 +89,7 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
             public void onClick(DialogInterface dialog, int which) {
                 btnSltState.setText(stats.get(which).getName());
                 cmdAdapter.setScriptEntities(stats.get(which).getCommands());
+                Log.d(TAG,stats.get(which).getEvents().size()+" s");
                 eventAdapter.setScriptEntities(stats.get(which).getEvents());
                 currentState = stats.get(which);
                 dialog.dismiss();

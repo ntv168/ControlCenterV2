@@ -33,7 +33,8 @@ public class HttpResponseThread extends Thread {
     private static final String RUN_MODE_TODAY = "modeToday";
     private static final String RESPONSE_SUCCESS = "tung=success";
     private static final String DATABASE_VERS = "databaseVersion";
-    private static final String RESPONSE_FAIL = "tung=fail";
+    private static final String NEWUPDATE = "newUpdate";
+    private static final String BOTUPDATE = "botUpdate";
     private static final String DEACTIVATE = "deactivateSystem";
     private static final String SEND_MESSAGE = "sendMessage";
     private final String TAG = "HttpResponseThread";
@@ -97,9 +98,11 @@ public class HttpResponseThread extends Thread {
                     response += "ver=6";
                 }else if (request.contains(DEACTIVATE)) {
                     String[] reqElement = request.split("/");
-                    Log.d(TAG, "Code :  " + reqElement[2]);
-                    if (reqElement[2].contains(house.getContractId())) {
-                        SmartHouse.getInstance().setContractId(null);
+                    if (reqElement.length>=3) {
+                        Log.d(TAG, "Code :  " + reqElement[2]);
+                        if (reqElement[2].contains(house.getContractId())) {
+                            SmartHouse.getInstance().setContractId(null);
+                        }
                     }
                 }else if (request.contains(SEND_MESSAGE)) {
                     String[] reqElement = request.split("/");
@@ -107,6 +110,26 @@ public class HttpResponseThread extends Thread {
                     BotUtils.botReplyToSentence(reqElement[2]);
                 }else if (request.contains(MODE_TODAY)){
                     response += "Thức dậy buổi sáng=1=on=06:30;Đi làm=2=on=12:35;Ăn tối với cả nhà=3=on=17:00";
+                    for (ScriptEntity script : house.getRunToday()){
+                        response += script.getName()+"="+script.getId()+"="+
+                                (script.isEnabled()?"on":"off")+"="+script.getHour()+":"+script.getMinute()+";";
+                    }
+                }else if (request.contains(NEWUPDATE)) {
+                    String[] reqElement = request.split("/");
+                    if (reqElement.length>=3) {
+                        Log.d(TAG, "Code :  " + reqElement[2]);
+                        if (reqElement[2].equals(house.getContractId())) {
+                            SmartHouse.getInstance().setRequireUpdate(true);
+                        }
+                    }
+                }else if (request.contains(BOTUPDATE)) {
+                    String[] reqElement = request.split("/");
+                    if (reqElement.length>=3) {
+                        Log.d(TAG, "Code :  " + reqElement[2]);
+                        if (reqElement[2].equals(house.getContractId())) {
+                            SmartHouse.getInstance().setRequireBotUpdate(true);
+                        }
+                    }
                 }
             }
             Log.d(TAG,response);

@@ -63,6 +63,9 @@ public class ConstManager {
     public static final int CHECK_LIGHT= 1018;
     public static final int SOCIAL_FEEL_HOT = 4057;
     public static final int SOCIAL_FEEL_COLD = 4058;
+    public static final int SOCIAL_APPEL = 4060;
+    public static final int UPDATE_BRAIN = 4062;
+    public static final int UPDATE_CONFIG = 4064;
 
     public static String getTime(){
         Date time = new Date();
@@ -92,6 +95,37 @@ public class ConstManager {
                 return "tăng nhiệt độ";
             case FUNCTION_DEC_TEMP:
                 return "giảm nhiệt độ";
+        }
+        return "";
+    }
+    public static String getVietnameseName(int functId) {
+        switch (functId){
+            case FUNCTION_TURN_ON:
+                return "bật thiết bị";
+            case FUNCTION_START_MODE:
+                return "bật chế độ";
+            case FUNCTION_TURN_OFF:
+                return "tắt thiết bị";
+            case FUNCTION_STOP_MODE:
+                return "dừng chế độ";
+            case FUNCTION_INC_TEMP:
+                return "tăng nhiệt độ";
+            case FUNCTION_DEC_TEMP:
+                return "giảm nhiệt độ";
+            case SHOW_CAMERA:
+                return "xem hình camera";
+            case CHECK_DEV_STATE:
+                return "kiểm tra trạng thái thiết bị";
+            case CHECK_ELECTRIC:
+                return "kiểm tra thiết bị sử dụng điện";
+            case CHECK_LIGHT:
+                return "kiểm tra thiết bị chiếu sáng";
+            case CHECK_PERSON:
+                return "kiểm tra người";
+            case CHECK_SECURITTY:
+                return "kiểm tra an ninh";
+            case CHECK_TEMPERATUR:
+                return "kiểm tra nhiệt độ";
         }
         return "";
     }

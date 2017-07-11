@@ -1,10 +1,10 @@
 package center.control.system.vash.controlcenter;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.microsoft.projectoxford.face.FaceServiceClient;
 import com.microsoft.projectoxford.face.contract.Person;
@@ -35,11 +34,13 @@ import center.control.system.vash.controlcenter.panel.VAPanel;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.ConfigControlCenterDTO;
+import center.control.system.vash.controlcenter.server.EventDTO;
 import center.control.system.vash.controlcenter.server.RetroFitSingleton;
 import center.control.system.vash.controlcenter.server.StateDTO;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
 import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
+import center.control.system.vash.controlcenter.utils.MessageUtils;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,19 +54,13 @@ public class SettingPanel extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        String Id = StorageHelper.getPersonGroupId("nguoinha",SettingPanel.this);
-        if (!StorageHelper.getAllPersonIds(Id, SettingPanel.this).isEmpty()) {
-            StorageHelper.clearPersonIds(Id,SettingPanel.this);
-        }
-        waitDiag.show();
-        new GetPersonIdsTask().execute(Id);
-        initStateMachine();
     }
     private void initStateMachine() {
         configApi.getConfig(ConstManager.HOUSE_ID).enqueue(new Callback<ConfigControlCenterDTO>() {
             @Override
             public void onResponse(Call<ConfigControlCenterDTO> call, Response<ConfigControlCenterDTO> response) {
                 if (response.body()!=null){
+                    StateConfigurationSQL.removeAll();
                     for (StateDTO state: response.body().getStates()){
                         StateEntity statEnt = new StateEntity();
                         statEnt.setDelaySec(state.getDelay());
@@ -75,148 +70,63 @@ public class SettingPanel extends AppCompatActivity {
                         statEnt.setName(state.getName());
                         statEnt.setNoticePattern(state.getNotification());
                         StateConfigurationSQL.insertState(statEnt);
-                        Log.d(TAG,statEnt.getNextEvIds()+"  "+statEnt.getName());
-                        SmartHouse.getInstance().setStates(StateConfigurationSQL.getAll());
 //                        ScriptSQLite.clearStateCmd(state.getId());
                      }
+                    for (EventDTO ev: response.body().getEvents()){
+                        EventEntity eventEnt = new EventEntity();
+                        eventEnt.setId(ev.getId());
+                        eventEnt.setSenValue(ev.getSensorValue());
+                        eventEnt.setSenName(ev.getSensorName());
+                        eventEnt.setNextStateId(ev.getNextState());
+                        eventEnt.setPriority(ev.getPriority());
+                        StateConfigurationSQL.insertEvent(eventEnt);
+                    }
+                    SmartHouse.getInstance().setStates(StateConfigurationSQL.getAll());
                     SmartHouse.getInstance().resetStateToDefault();
-                    Toast.makeText(SettingPanel.this, "Tai cau hinh thanh cong", Toast.LENGTH_SHORT).show();
                     if (waitDiag.isShowing()) waitDiag.dismiss();
                 }else {
-                    Toast.makeText(SettingPanel.this, "Không tai được "+ VolleySingleton.SERVER_HOST, Toast.LENGTH_SHORT).show();
+                    if (waitDiag.isShowing()) waitDiag.dismiss();
+                    MessageUtils.makeText(SettingPanel.this, "Không tải được dữ liệu"+ VolleySingleton.SERVER_HOST).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ConfigControlCenterDTO> call, Throwable t) {
-                Toast.makeText(SettingPanel.this, "Không kết nối được "+ VolleySingleton.SERVER_HOST, Toast.LENGTH_SHORT).show();
+                MessageUtils.makeText(SettingPanel.this, "Không kết nối được "+ VolleySingleton.SERVER_HOST).show();
             }
-        });
-//        StateConfigurationSQL.removeAll();
-//        EventEntity ev1 = new EventEntity();
-//        ev1.setId(1);
-//        ev1.setNextStateId(5);
-//        ev1.setPriority(4);
-//        ev1.setSenName(AreaEntity.attrivutesValues[2]);
-//        ev1.setSenValue(AreaEntity.TEMP_BURN);
-//        StateConfigurationSQL.insertEvent(ev1);
-//
-//        EventEntity ev2 = new EventEntity();
-//        ev2.setId(2);
-//        ev2.setNextStateId(6);
-//        ev2.setPriority(2);
-//        ev2.setSenName(AreaEntity.attrivutesValues[2]);
-//        ev2.setSenValue(AreaEntity.TEMP_WARM);
-//        StateConfigurationSQL.insertEvent(ev2);
-//
-//        EventEntity ev3 = new EventEntity();
-//        ev3.setId(3);
-//        ev3.setNextStateId(2);
-//        ev3.setPriority(3);
-//        ev3.setSenName(AreaEntity.attrivutesValues[0]);
-//        ev3.setSenValue(AreaEntity.DOOR_OPEN);
-//        StateConfigurationSQL.insertEvent(ev3);
-//
-//        EventEntity ev4 = new EventEntity();
-//        ev4.setId(4);
-//        ev4.setNextStateId(3);
-//        ev4.setPriority(1);
-//        ev4.setSenName(AreaEntity.attrivutesValues[3]);
-//        ev4.setSenValue(AreaEntity.DETECT_STRANGE);
-//        StateConfigurationSQL.insertEvent(ev4);
-//
-//        EventEntity ev5 = new EventEntity();
-//        ev5.setId(5);
-//        ev5.setNextStateId(4);
-//        ev5.setPriority(0);
-//        ev5.setSenName(AreaEntity.attrivutesValues[3]);
-//        ev5.setSenValue(AreaEntity.DETECT_AQUAINTANCE);
-//        StateConfigurationSQL.insertEvent(ev5);
-//
-//        EventEntity ev6 = new EventEntity();
-//        ev6.setId(6);
-//        ev6.setNextStateId(1);
-//        ev6.setPriority(1);
-//        ev6.setSenName("");
-//        ev6.setSenValue("");
-//        StateConfigurationSQL.insertEvent(ev6);
-//
-//        StateEntity stat = new StateEntity();
-//        stat.setName("Home Safe - Như chưa có gì xảy ra");
-//        stat.setId(ConstManager.DEFAULT_STATE_ID);
-//        stat.setNoticePattern("");
-//        stat.setDelaySec(0);
-//        stat.setDuringSec(ConstManager.DURING_MAX);
-//        stat.setNextEvIds("1,2,3");
-//        StateConfigurationSQL.insertState(stat);
-//        ScriptSQLite.clearStateCmd(1);
-//        SmartHouse.getInstance().setCurrentState(stat);
-//
-//        stat = new StateEntity();
-//        stat.setName("Incomin - Cửa mở chờ xác nhận");
-//        stat.setId(2);
-//        stat.setNoticePattern("Ai đến vui lòng nhìn vào camera");
-//        stat.setDelaySec(0);
-//        stat.setDuringSec(20); //choose event highest priority
-//        stat.setNextEvIds("4,5");
-//        ScriptSQLite.clearStateCmd(2);
-//        StateConfigurationSQL.insertState(stat);
-//
-//        stat = new StateEntity();
-//        stat.setName("Intrusion - Đột nhập");
-//        stat.setId(3);
-//        stat.setNoticePattern("Có người lạ vào nhà");
-//        stat.setDelaySec(7);
-//        stat.setDuringSec(5);
-//        stat.setNextEvIds("5,6");
-//        ScriptSQLite.clearStateCmd(3);
-//        StateConfigurationSQL.insertState(stat);
-//
-//        stat = new StateEntity();
-//        stat.setName("Owner arrived - Người thân đến");
-//        stat.setId(4);
-//        stat.setNoticePattern("Xin chào "+ BotUtils.RESULT_VALUE);
-//        stat.setDelaySec(0);
-//        stat.setDuringSec(5);
-//        stat.setNextEvIds("6");
-//        ScriptSQLite.clearStateCmd(4);
-//        StateConfigurationSQL.insertState(stat);
-//
-//        stat = new StateEntity();
-//        stat.setName("Burning - Cháy nhà");
-//        stat.setId(5);
-//        stat.setNoticePattern("Có lửa trong nhà thưa "+ BotUtils.OWNER_ROLE);
-//        stat.setDelaySec(0);
-//        stat.setDuringSec(10);
-//        stat.setNextEvIds("6");
-//        ScriptSQLite.clearStateCmd(5);
-//        StateConfigurationSQL.insertState(stat);
-//
-//        stat = new StateEntity();
-//        stat.setName("Room warm - Phòng nóng quá");
-//        stat.setId(6);
-//        stat.setNoticePattern("Phòng đang nóng "+BotUtils.OWNER_ROLE+" muốn bật máy lạnh không");
-//        stat.setDelaySec(10);
-//        stat.setDuringSec(10);
-//        stat.setNextEvIds("6");
-//        ScriptSQLite.clearStateCmd(6);
-//        StateConfigurationSQL.insertState(stat);
-//        SmartHouse.getInstance().setStates(StateConfigurationSQL.getAll());
-//
-//        Log.d(TAG,"inint stateSQL");
+        }); 
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_panel);
 
-        final Dialog dialog = new Dialog(SettingPanel.this);
-        dialog.setContentView(R.layout.activate_diaglog);
+        final AlertDialog dialog;
 
-       configApi = RetroFitSingleton.getInstance().getCloudApi();
+        AlertDialog.Builder builer = new AlertDialog.Builder(this);
+
+        builer.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builer.setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        dialog = builer.create();
+        dialog.setTitle("Đặt lại thiết bị");
+        dialog.setMessage("Đặt lại thiết bị sẽ xóa mọi kết nối và cấu hình trong trung tâm điều khiển?");
+        dialog.setCancelable(false);
+
+
+    configApi = RetroFitSingleton.getInstance().getCloudApi();
 
         waitDiag = new ProgressDialog(this);
-        waitDiag.setTitle("Dang tai cau hinh");
+        waitDiag.setTitle("Tải dữ liệu");
         waitDiag.setIndeterminate(true);
 //        waitDialog.setCancelable(false);
 
@@ -225,25 +135,25 @@ public class SettingPanel extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Button btnUpdatePerson = (Button) dialog.findViewById(R.id.btnUpdatePersons);
-                btnUpdatePerson.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String Id = StorageHelper.getPersonGroupId("nguoinha",SettingPanel.this);
-                        if (!StorageHelper.getAllPersonIds(Id, SettingPanel.this).isEmpty()) {
-                            StorageHelper.clearPersonIds(Id,SettingPanel.this);
-                        }
-                        new GetPersonIdsTask().execute(Id);
-                    }
-                });
-
-                Button btnCancel = (Button) dialog.findViewById(R.id.btnCancel);
-                btnCancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                    }
-                });
+//                Button btnUpdatePerson = (Button) dialog.findViewById(R.id.btnUpdatePersons);
+//                btnUpdatePerson.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        String Id = StorageHelper.getPersonGroupId("nguoinha",SettingPanel.this);
+//                        if (!StorageHelper.getAllPersonIds(Id, SettingPanel.this).isEmpty()) {
+//                            StorageHelper.clearPersonIds(Id,SettingPanel.this);
+//                        }
+//                        new GetPersonIdsTask().execute(Id);
+//                    }
+//                });
+//
+//                Button btnCancel = (Button) dialog.findViewById(R.id.btnCancel);
+//                btnCancel.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        dialog.dismiss();
+//                    }
+//                });
 
                 dialog.show();
             }
@@ -272,6 +182,14 @@ public class SettingPanel extends AppCompatActivity {
                 startActivity(new Intent(SettingPanel.this, SetConfigActivity.class));
             }
         });
+
+        String Id = StorageHelper.getPersonGroupId("nguoinha",SettingPanel.this);
+        if (!StorageHelper.getAllPersonIds(Id, SettingPanel.this).isEmpty()) {
+            StorageHelper.clearPersonIds(Id,SettingPanel.this);
+        }
+        waitDiag.show();
+        new GetPersonIdsTask().execute(Id);
+        initStateMachine();
     }
 
     class GetPersonIdsTask extends AsyncTask<String, String, Person[]> {

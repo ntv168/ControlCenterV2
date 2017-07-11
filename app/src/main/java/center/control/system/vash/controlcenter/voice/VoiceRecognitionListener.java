@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.SpeechRecognizer;
+import android.util.Log;
 
 public class VoiceRecognitionListener implements RecognitionListener {
 	
@@ -42,7 +43,7 @@ public class VoiceRecognitionListener implements RecognitionListener {
 	
 	// User starts speaking
 	public void onBeginningOfSpeech() {
-		System.out.println("Starting to listen");
+		Log.d("voiceListner","Starting to listen");
 	}
 	
 	public void onBufferReceived(byte[] buffer) { }

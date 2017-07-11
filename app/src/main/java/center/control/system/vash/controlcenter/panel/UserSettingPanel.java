@@ -41,9 +41,6 @@ public class UserSettingPanel extends AppCompatActivity {
                 startActivity(new Intent(UserSettingPanel.this, PersonalInfoActivity.class));
             }
         });
-
-
-
     }
 
     public void clicktoSettingPanel(View view) {}

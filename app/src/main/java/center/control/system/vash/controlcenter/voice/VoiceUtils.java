@@ -79,7 +79,7 @@ public class VoiceUtils {
     }
 
     public static void stopSpeakApi() {
-        if (singleton.tts != null){
+        if (singleton != null){
             singleton.tts.stop();
             singleton.tts.shutdown();
         }

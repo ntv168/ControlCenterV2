@@ -46,6 +46,18 @@ public class SmartHouse {
     private List<ScriptEntity> scripts;
     private List<StateEntity> states;
     private List<ScriptEntity> runToday;
+    private boolean requireUpdate;
+    private boolean stateStarted;
+
+    public boolean isRequireBotUpdate() {
+        return requireBotUpdate;
+    }
+
+    public void setRequireBotUpdate(boolean requireBotUpdate) {
+        this.requireBotUpdate = requireBotUpdate;
+    }
+
+    private boolean requireBotUpdate;
 
     private String botName;
     private String botRole;
@@ -55,6 +67,14 @@ public class SmartHouse {
     private String contractId;
     private int databseVer;
     private StateEntity currentState;
+
+    public boolean isRequireUpdate() {
+        return requireUpdate;
+    }
+
+    public void setRequireUpdate(boolean requireUpdate) {
+        this.requireUpdate = requireUpdate;
+    }
 
     public void setStates(List<StateEntity> states) {
         this.states = states;
@@ -66,6 +86,7 @@ public class SmartHouse {
                     if (nextEvId[i].length() > 0) {
                         stat.addEvent(StateConfigurationSQL.findEventById(
                                 Integer.parseInt(nextEvId[i])));
+                        Log.d(TAG,stat.getEvents().get(0)+"  ev");
                     }
                 }
             }
@@ -82,6 +103,10 @@ public class SmartHouse {
     public void resetStateToDefault(){
         this.currentState = this.getStateById(ConstManager.DEFAULT_STATE_ID);
         this.stateChangedTime = -1;
+        if (stateStarted) {
+            this.revertCmdState();
+            stateStarted = false;
+        }
 
     }
 
@@ -134,6 +159,9 @@ public class SmartHouse {
                     houseInstance.setConfigurations(ConfigurationSQLite.getAll());
                     houseInstance.setSensors(SensorSQLite.getAll());
                     houseInstance.setStates(StateConfigurationSQL.getAll());
+                    houseInstance.requireUpdate = false;
+                    houseInstance.requireBotUpdate = false;
+                    houseInstance.stateStarted = false;
                     SmartHouse.getInstance().resetStateToDefault();
                 }
             }
@@ -150,6 +178,7 @@ public class SmartHouse {
     }
     public void startConfigCmds(){
         if (currentState.getCommands()!= null){
+            stateStarted = true;
             for (CommandEntity cmd: currentState.getCommands()){
                 addCommand(cmd);
             }
@@ -550,6 +579,7 @@ public class SmartHouse {
         for (ScriptEntity mode: this.getScripts()){
             if (mode.getWeeksDay()!= null  &&
             mode.getWeekDay().contains(day+"")){
+                mode.setEnabled(true);
                 res.add(mode);
             }
         }
@@ -565,6 +595,8 @@ public class SmartHouse {
     }
 
     public List<ScriptEntity> getRunToday() {
+        if (runToday == null) return getTodayMode();
+        else
         return runToday;
     }
 

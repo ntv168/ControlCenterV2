@@ -1,10 +1,10 @@
 package center.control.system.vash.controlcenter.utils;
 
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +24,7 @@ import center.control.system.vash.controlcenter.nlp.OwnerTrainEntity;
 import center.control.system.vash.controlcenter.nlp.TargetTernEntity;
 import center.control.system.vash.controlcenter.nlp.TermEntity;
 import center.control.system.vash.controlcenter.nlp.TermSQLite;
+import center.control.system.vash.controlcenter.panel.ControlPanel;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 
@@ -142,7 +143,8 @@ public class BotUtils {
         Map<Integer,Map<String,Integer>> targetNameWordCount =  new HashMap<>();
         for (TargetObject obj: objs) {
             int objId = obj.getId();
-            String words[] = (obj.getName()+ " "+obj.getNickName()).split("( )+");
+            String words[] = (obj.getName()+ " "+obj.getName()+ " "+obj.getName()+ " "+
+                    obj.getName()+ " "+obj.getName()+ " "+obj.getNickName()).split("( )+");
             for (int i = 0; i < words.length; i++){
                 words[i] = words[i].toLowerCase();
             }
@@ -170,7 +172,7 @@ public class BotUtils {
         SmartHouse house = SmartHouse.getInstance();
         if (sentence == null){
             if (notLearnSentence == null) {
-                DetectSocialEntity soc = getSocialByName(ConstManager.NOT_LEARN_YET);
+                DetectSocialEntity soc = getSocialById(ConstManager.NOT_LEARN_YET);
                 if (soc.getQuestionPattern() == null) {
                     Log.e(TAG, "not learn yet không có câu question");
 
@@ -197,7 +199,7 @@ public class BotUtils {
             return result.trim();
         }
     }
-    public static DetectSocialEntity getSocialByName(int id){
+    public static DetectSocialEntity getSocialById(int id){
         DetectIntentSQLite sqLite = new DetectIntentSQLite();
         DetectSocialEntity reply = sqLite.findSocialById(id);
         if (reply == null){
@@ -524,7 +526,7 @@ public class BotUtils {
             return completeSentence(functionIntent.getRemindPattern(), "", target);
         } else {
             Log.d(TAG, "Không thấy gì hết ngoài " + functionIntent.getFunctionName());
-            DetectSocialEntity askDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEONLY);
+            DetectSocialEntity askDevice = BotUtils.getSocialById(ConstManager.SOCIAL_ASK_DEVICEONLY);
             return completeSentence(askDevice.getQuestionPattern(),
                     ConstManager.getVerbByIntent(functionIntent.getId()), "");
         }
@@ -537,7 +539,7 @@ public class BotUtils {
             DeviceEntity device = BotUtils.findBestDevice(termTargets,current.getArea().getId());
             if (device == null) {
                 Log.d(TAG, "Tim thấy không gian " + current.getArea().getName() + " mà không tìm thấy thiết bị");
-                DetectSocialEntity askWhichDevice = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_DEVICEAREA);
+                DetectSocialEntity askWhichDevice = BotUtils.getSocialById(ConstManager.SOCIAL_ASK_DEVICEAREA);
                 current.setDetectSocial(askWhichDevice);
 
                 return completeSentence(askWhichDevice.getQuestionPattern(),
@@ -551,7 +553,7 @@ public class BotUtils {
                         " " + current.getDevice().getName()+" trong "+current.getArea().getName();
             }
         } else {
-            DetectSocialEntity notUnderReply = BotUtils.getSocialByName(ConstManager.NOT_UNDERSTD);
+            DetectSocialEntity notUnderReply = BotUtils.getSocialById(ConstManager.NOT_UNDERSTD);
             current.setDetectSocial(notUnderReply);
             return completeSentence(notUnderReply.getQuestionPattern(), "", "");
         } 
@@ -587,7 +589,7 @@ public class BotUtils {
             } else if (functFound != null && socialFound == null) {
                 return processFunction(termTargets, functFound);
             } else {
-                DetectSocialEntity notUnderReply = BotUtils.getSocialByName(ConstManager.NOT_UNDERSTD);
+                DetectSocialEntity notUnderReply = BotUtils.getSocialById(ConstManager.NOT_UNDERSTD);
                 CurrentContext.getInstance().setDetectSocial(notUnderReply);
                 return completeSentence(notUnderReply.getQuestionPattern(), "", "");
             }
@@ -605,7 +607,7 @@ public class BotUtils {
             return "Xác nhận "+ConstManager.getVerbByIntent(functionIntent.getId())+" chế độ "+mode.getName();
         } else {
             Log.d(TAG,"Khong thay mode ");
-            DetectSocialEntity askWhichMode = BotUtils.getSocialByName(ConstManager.SOCIAL_ASK_MODE);
+            DetectSocialEntity askWhichMode = BotUtils.getSocialById(ConstManager.SOCIAL_ASK_MODE);
             return completeSentence(askWhichMode.getQuestionPattern(),
                     ConstManager.getVerbByIntent(functionIntent.getId()), "");
         }
@@ -639,7 +641,16 @@ public class BotUtils {
             }  
             Log.d(TAG,"Khong tim thay phong");
             return completeSentence(functionIntent.getRemindPattern(),"",""); 
-        } else  {
+        } else if (functionIntent.getId() == ConstManager.SHOW_CAMERA) {
+            AreaEntity area = BotUtils.findBestArea(termTargets);
+            if (area != null) {
+                Log.d(TAG,"Thay phong de check"+area.getName());
+                return "Đang lấy hình";
+                //
+            }
+            Log.d(TAG,"Khong tim thay phong");
+            return completeSentence(functionIntent.getRemindPattern(),"","");
+        }else  {
             return notLearnSentence;
         }
     }
@@ -668,7 +679,7 @@ public class BotUtils {
                         return res;
                     }
                 } else {
-                    DetectSocialEntity notUnderReply = BotUtils.getSocialByName(ConstManager.NOT_UNDERSTD);
+                    DetectSocialEntity notUnderReply = BotUtils.getSocialById(ConstManager.NOT_UNDERSTD);
                     current.setDetectSocial(notUnderReply);
                     return completeSentence(notUnderReply.getQuestionPattern(), "", "");
                 }

@@ -5,22 +5,12 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-
-import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.configuration.EventEntity;
-import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
-import center.control.system.vash.controlcenter.configuration.StateEntity;
-import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.HouseKeyDTO;
 import center.control.system.vash.controlcenter.server.LoginSmarthouseDTO;
@@ -30,6 +20,7 @@ import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
+import center.control.system.vash.controlcenter.utils.MessageUtils;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,8 +31,6 @@ public class MainActivity extends Activity {
     SharedPreferences sharedPreferences;
     private String username;
     private String password;
-    private String houseId;
-    private String contractId;
     private ProgressDialog loginDia;
     private EditText txtusername;
     private EditText txtpassword;
@@ -111,7 +100,7 @@ public class MainActivity extends Activity {
                 if (response.body()!=null && response.body().getMessage()!= null && response.body().getMessage().equals("success")){
                     startActivity(new Intent(MainActivity.this,SettingPanel.class));
                 }else {
-                    Toast.makeText(MainActivity.this,"Sai code nhân viên ",Toast.LENGTH_SHORT).show();
+                    MessageUtils.makeText(MainActivity.this,"Sai code nhân viên ").show();
                     if (txtusername.getText().toString().equals("admin") &&
                             txtpassword.getText().toString().equals("admin")) {
                         startActivity(new Intent(MainActivity.this,SettingPanel.class));
@@ -122,7 +111,7 @@ public class MainActivity extends Activity {
             @Override
             public void onFailure(Call<StaffCodeDTO> call, Throwable t) {
                 Log.d(TAG,call.request().url()+" sai staff cose");
-                Toast.makeText(MainActivity.this,"Sai code nhân viên ",Toast.LENGTH_SHORT).show();
+                MessageUtils.makeText(MainActivity.this,"Sai code nhân viên ").show();
                 if (txtusername.getText().toString().equals("admin") &&
                         txtpassword.getText().toString().equals("admin")) {
                     startActivity(new Intent(MainActivity.this,SettingPanel.class));
@@ -171,8 +160,8 @@ public class MainActivity extends Activity {
                         startActivity(new Intent(MainActivity.this, ControlPanel.class));
                         finish();
                     } else {
-                        Log.d(TAG, call.request().url() + " sai ten");
-                        Toast.makeText(MainActivity.this, "Sai tên đăng nhập mật khẩu", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, call.request().url() + " sai ten "+ username + ConstManager.HOUSE_ID);
+                        MessageUtils.makeText(MainActivity.this, "Sai tên đăng nhập mật khẩu").show();
                     }
                     loginDia.dismiss();
                 }
@@ -180,7 +169,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void onFailure(Call<LoginSmarthouseDTO> call, Throwable t) {
                     Log.d(TAG, call.request().url() + "  ---err " + t.getMessage());
-                    Toast.makeText(MainActivity.this, "Không kết nối được server", Toast.LENGTH_SHORT).show();
+                    MessageUtils.makeText(MainActivity.this, "Không kết nối được server").show();
                     loginDia.dismiss();
                 }
             });
@@ -191,7 +180,7 @@ public class MainActivity extends Activity {
                 finish();
             } else {
                 Log.d(TAG, " sai ten mat khau local");
-                Toast.makeText(MainActivity.this, "Sai tên đăng nhập mật khẩu", Toast.LENGTH_SHORT).show();
+                MessageUtils.makeText(MainActivity.this, "Sai tên đăng nhập mật khẩu").show();
             }
         }
     }

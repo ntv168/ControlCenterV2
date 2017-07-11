@@ -20,7 +20,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +46,7 @@ import center.control.system.vash.controlcenter.server.SocialIntentDTO;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
 import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
+import center.control.system.vash.controlcenter.utils.MessageUtils;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -85,12 +85,12 @@ public class PersonalInfoActivity extends AppCompatActivity {
         botType = sharedPreferences.getString(ConstManager.BOT_TYPE,"");
         botRole = sharedPreferences.getString(ConstManager.BOT_ROLE,"");
         if (botType.length() < 2){
-            Toast.makeText(this,"Chưa chọn loại quản gia",Toast.LENGTH_SHORT);
+            MessageUtils.makeText(this,"Chưa chọn loại quản gia").show();
         }
         Log.d(TAG,botType + "  loai");
         botName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
         if (botName.length() <2){
-            Toast.makeText(this,"Chưa Tên quản gia",Toast.LENGTH_SHORT);
+            MessageUtils.makeText(this,"Chưa có Tên quản gia").show();
         }
         Log.d(TAG,botName + "  ten");
 
@@ -221,10 +221,6 @@ public class PersonalInfoActivity extends AppCompatActivity {
                             DetectIntentSQLite sqlDect = new DetectIntentSQLite();
                             sqLite.clearAll();
                             sqlDect.clearAll();
-                            Log.d(TAG, "term FuncMap;" + response.body().getFunctionMap().size());
-                            Log.d(TAG, "term SocMap;" + response.body().getSocialMap().size());
-                            Log.d(TAG, "funct ;" + response.body().getFunctions().size());
-                            Log.d(TAG, "soc ;" + response.body().getSocials().size());
 
                             for (SocialIntentDTO soc : response.body().getSocials()) {
                                 sqlDect.insertSocial(new DetectSocialEntity(soc.getId(),
@@ -241,17 +237,18 @@ public class PersonalInfoActivity extends AppCompatActivity {
                             bot.saveDeviceTFIDFTerm(house.getDevices());
                             bot.saveAreaTFIDFTerm(house.getAreas());
                             bot.saveScriptTFIDFTerm(house.getScripts());
-                            waitDialog.dismiss();
-                            Toast.makeText(PersonalInfoActivity.this, "Tải dữ liệu trợ lý " + botName + " thành công", Toast.LENGTH_SHORT).show();
+                            vaSetDiag.dismiss();
+                            MessageUtils.makeText(PersonalInfoActivity.this, "Tải dữ liệu trợ lý " + botName + " thành công").show();
                         } else {
-                            Toast.makeText(PersonalInfoActivity.this, "Không kết nối được "+ VolleySingleton.SERVER_HOST, Toast.LENGTH_SHORT).show();
+                            MessageUtils.makeText(PersonalInfoActivity.this, "Không kết nối được "+ VolleySingleton.SERVER_HOST).show();
                         }
+                        waitDialog.dismiss();
                     }
 
                     @Override
                     public void onFailure(Call<BotDataCentralDTO> call, Throwable t) {
                         Log.d(TAG,"down load bot data failed");
-                        Toast.makeText(PersonalInfoActivity.this,"Tải dữ liệu trợ lý "+botName+" thất bại",Toast.LENGTH_SHORT).show();
+                        MessageUtils.makeText(PersonalInfoActivity.this,"Tải dữ liệu trợ lý "+botName+" thất bại").show();
                         waitDialog.dismiss();
                     }
                 });

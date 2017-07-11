@@ -19,14 +19,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.speech.RecognizerIntent;
-import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -43,12 +40,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Map;
 import java.util.UUID;
 
 import center.control.system.vash.controlcenter.App;
@@ -64,10 +61,22 @@ import center.control.system.vash.controlcenter.configuration.EventEntity;
 import center.control.system.vash.controlcenter.configuration.StateEntity;
 import center.control.system.vash.controlcenter.device.DeviceAdapter;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
-import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.helper.StorageHelper;
 import center.control.system.vash.controlcenter.nlp.CurrentContext;
+import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
+import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
+import center.control.system.vash.controlcenter.nlp.OwnerTrainEntity;
+import center.control.system.vash.controlcenter.nlp.TermEntity;
+import center.control.system.vash.controlcenter.nlp.TermSQLite;
+import center.control.system.vash.controlcenter.server.BotDataCentralDTO;
+import center.control.system.vash.controlcenter.server.CloudApi;
+import center.control.system.vash.controlcenter.server.FunctionIntentDTO;
+import center.control.system.vash.controlcenter.server.RetroFitSingleton;
+import center.control.system.vash.controlcenter.server.SmartHouseRequestDTO;
+import center.control.system.vash.controlcenter.server.SocialIntentDTO;
+import center.control.system.vash.controlcenter.server.VolleySingleton;
+import center.control.system.vash.controlcenter.utils.MessageUtils;
 import center.control.system.vash.controlcenter.voice.VoiceUtils;
 import center.control.system.vash.controlcenter.recognition.Facedetect;
 import center.control.system.vash.controlcenter.recognition.ImageHelper;
@@ -79,7 +88,9 @@ import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import center.control.system.vash.controlcenter.voice.ListeningActivity;
 import center.control.system.vash.controlcenter.voice.VoiceRecognitionListener;
-import center.control.system.vash.controlcenter.watch.WatchService;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ControlPanel extends ListeningActivity implements AreaAttributeAdapter.AttributeClickListener,
         AreaAdapter.AreaClickListener,DeviceAdapter.DeviceItemClickListener, VoiceUtils.OnSpeakFinish {
@@ -105,6 +116,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     private String mPersonGroupId;
     private ProgressDialog waitDialog;
     private AlertDialog stateDialog;
+    private AlertDialog configUpdateDialog;
+    private String sentenceReply;
 
     @Override
     protected void onResume() {
@@ -129,7 +142,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
             startService(new Intent(this, ControlMonitorService.class));
         } else {
-            Toast.makeText(this,"Nhân viên chưa cấu hình thiết bị",Toast.LENGTH_SHORT).show();
+            MessageUtils.makeText(this,"Nhân viên chưa cấu hình thiết bị").show();
             startActivity(new Intent(this,MainActivity.class));
             finish();
         }
@@ -150,6 +163,26 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         waitDialog.setTitle("Vui lòng đợi");
         waitDialog.setIndeterminate(true);
         waitDialog.setCancelable(false);
+
+        AlertDialog.Builder builer = new AlertDialog.Builder(this);
+
+        builer.setNegativeButton("Để sau", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                CurrentContext.getInstance().renew();
+                dialog.dismiss();
+            }
+        });
+        builer.setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                updateBot();
+                dialog.dismiss();
+            }
+        });
+        configUpdateDialog = builer.create();
+        configUpdateDialog.setTitle("Cập nhật mới");
+        configUpdateDialog.setCancelable(false);
 
         if (contractId.length()<2){
             startActivity(new Intent(this,MainActivity.class));
@@ -225,6 +258,81 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         }
         areaAttributeAdapter = new AreaAttributeAdapter(lstAttribute,this);
         lstAreaAttribute.setAdapter(areaAttributeAdapter);
+    }
+
+    private void updateBot() {
+        final CloudApi botApi = RetroFitSingleton.getInstance().getCloudApi();
+        botApi.getDataVA(sharedPreferences.getInt(ConstManager.BOT_TYPE_ID,-1)
+        ).enqueue(new Callback<BotDataCentralDTO>() {
+            @Override
+            public void onResponse(Call<BotDataCentralDTO> call, Response<BotDataCentralDTO> response) {
+                Log.d(TAG,call.request().url()+"");
+                if (response.body() != null) {
+                    TermSQLite sqLite = new TermSQLite();
+                    List<OwnerTrainEntity> trained = sqLite.getOwnerTrain();
+                    Map<String, Map<String, Integer>> updatedFunct = BotUtils.updateFuncts(trained, response.body().getFunctionMap());
+                    DetectIntentSQLite sqlDect = new DetectIntentSQLite();
+                    sqLite.clearAll();
+                    sqlDect.clearAll();
+
+                    for (SocialIntentDTO soc : response.body().getSocials()) {
+                        sqlDect.insertSocial(new DetectSocialEntity(soc.getId(),
+                                soc.getName(), soc.getQuestion(), soc.getReply()));
+                    }
+                    for (FunctionIntentDTO funct : response.body().getFunctions()) {
+                        sqlDect.insertFunction(new DetectFunctionEntity(funct.getId(),
+                                funct.getName(), funct.getSuccess(), funct.getFail(), funct.getRemind()));
+                    }
+                    SmartHouse house = SmartHouse.getInstance();
+                    BotUtils bot = new BotUtils();
+                    bot.saveFunctionTFIDFTerm(updatedFunct);
+                    bot.saveSocialTFIDFTerm(response.body().getSocialMap());
+                    bot.saveDeviceTFIDFTerm(house.getDevices());
+                    bot.saveAreaTFIDFTerm(house.getAreas());
+                    bot.saveScriptTFIDFTerm(house.getScripts());
+                    showReply(BotUtils.completeSentence(CurrentContext.getInstance().getDetectSocial().getReplyPattern(),"",""));
+                } else {
+                    showReply(BotUtils.completeSentence("Không kết nối được <owner-role> vui lòng tự cập nhật","",""));
+                }
+                waitDialog.dismiss();
+                restartListeningService();
+
+            }
+
+            @Override
+            public void onFailure(Call<BotDataCentralDTO> call, Throwable t) {
+                Log.d(TAG,"down load bot data failed");
+                showReply(BotUtils.completeSentence("Không kết nối được <owner-role> vui lòng tự cập nhật","",""));
+                waitDialog.dismiss();
+                restartListeningService();
+            }
+        });
+        waitDialog.show();
+    }
+    private void updateConfig() {
+        final CloudApi botApi = RetroFitSingleton.getInstance().getCloudApi();
+        SmartHouseRequestDTO request = new SmartHouseRequestDTO();
+        request.setContractId(contractId);
+        request.setRequestContent("Yêu cầu nhân viên cập nhật cấu hình");
+        request.setRequestDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
+        botApi.sendRequest(request).enqueue(new Callback<SmartHouseRequestDTO>() {
+            @Override
+            public void onResponse(Call<SmartHouseRequestDTO> call, Response<SmartHouseRequestDTO> response) {
+                waitDialog.dismiss();
+                Log.d(TAG,call.request().url()+"");
+                showReply(BotUtils.completeSentence(CurrentContext.getInstance().getDetectSocial().getReplyPattern(),"",""));
+                restartListeningService();
+            }
+
+            @Override
+            public void onFailure(Call<SmartHouseRequestDTO> call, Throwable t) {
+                waitDialog.dismiss();
+                Log.d(TAG,call.request().url()+"");
+                showReply(BotUtils.completeSentence("Không kết nối được <owner-role> vui lòng tự cập nhật","",""));
+                restartListeningService();
+            }
+        });
+        waitDialog.show();
     }
 
     private void checkConfiguration(AreaEntity area) {
@@ -305,7 +413,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     }
 
     public void clicktoVAPanel(View view) {
-        promptSpeechInput();
+        promptSpeechInput("");
     }
 
     @Override
@@ -413,7 +521,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     public void onFinish() {
         Log.d(TAG, CurrentContext.getInstance().isWaitingOwnerSpeak()+ "  ");
         if (CurrentContext.getInstance().isWaitingOwnerSpeak()) {
-            promptSpeechInput();
+            promptSpeechInput(sentenceReply);
         }
     }
 
@@ -606,21 +714,57 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             }
         });
         txtResult.setText(currentArea.getDetect());
+        showReply(currentArea.getDetect());
+        restartListeningService();
     }
 
     private void showReply(String sentenceReply){
-
+        this.sentenceReply = sentenceReply;
         if (sentenceReply.contains("ác nhậ")){
             CurrentContext.getInstance().stopWaitOwner();
             stopListening();
-        } else if (CurrentContext.getInstance().getDetectSocial()!= null &&
+        }else if (sentenceReply.contains("Đang lấy hình")){
+
+            SmartHouse house = SmartHouse.getInstance();
+            Bitmap bmImg = house.getBitmapByAreaId(currentArea.getId());
+            ImageView imgFace = (ImageView) cameraDialog.findViewById(R.id.imgFace);
+
+            if (bmImg!=null){
+                stopListening();
+                imgFace.setImageBitmap(bmImg);
+                File myDir =  Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES);
+                myDir.mkdirs();
+                String nameFile = "testSelf.jpg";
+                File file = new File(myDir, nameFile);
+                if (file.exists ()) file.delete();
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+//                                Log.d(TAG,file.getAbsolutePath());
+                    bmImg.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    out.close();
+                } catch (IOException e){
+                    Log.d(TAG, e.getMessage());
+                }
+
+                Uri uri = Uri.fromFile(file);
+                Bitmap mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
+                        uri, getContentResolver());
+                detect(mBitmap);
+                cameraDialog.show();
+                sentenceReply = "";
+            } else {
+                 sentenceReply = BotUtils.completeSentence(
+                         CurrentContext.getInstance().getDetectedFunction().getFailPattern(), "", currentArea.getName());
+            }
+        }else if (CurrentContext.getInstance().getDetectSocial()!= null &&
                 (CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SAY_BYE ||
                 CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.NOT_UNDERSTD)) {
-            startListening();
+            restartListeningService();
             CurrentContext.getInstance().stopWaitOwner();
         }
         VoiceUtils.speak(sentenceReply);
-        Toast.makeText(this, sentenceReply + "  " +CurrentContext.getInstance().isWaitingOwnerSpeak(), Toast.LENGTH_SHORT).show();
+        Log.d(TAG, sentenceReply + "  " +CurrentContext.getInstance().isWaitingOwnerSpeak());
     }
     @Override
     protected void onPause() {
@@ -663,16 +807,34 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             @Override
             public void onReceive(Context context, Intent intent) {
                 String resultType = intent.getStringExtra(ACTION_TYPE);
-//                Toast.makeText(ControlPanel.this, resultType, Toast.LENGTH_SHORT).show();
-                Log.d(TAG,resultType+" ");
+                Log.d(TAG,resultType);
+                if (resultType.equals(ControlMonitorService.BOT_UPDATE)){
+                    CurrentContext currentContext = CurrentContext.getInstance();
+                    currentContext.setDetectSocial(BotUtils.getSocialById(ConstManager.UPDATE_BRAIN));
+                    String sentence = BotUtils.completeSentence(
+                            currentContext.getDetectSocial().getQuestionPattern(),"","");
+                    configUpdateDialog.setMessage(sentence);
+                    showReply(sentence);
+                    SmartHouse.getInstance().setRequireBotUpdate(false);
+                    configUpdateDialog.show();
+                } else if (resultType.equals(ControlMonitorService.NEW_UPDATE)){
+                    CurrentContext currentContext = CurrentContext.getInstance();
+                    currentContext.setDetectSocial(BotUtils.getSocialById(ConstManager.UPDATE_CONFIG));
+                    String sentence = BotUtils.completeSentence(
+                            currentContext.getDetectSocial().getQuestionPattern(),"","");
+                    configUpdateDialog.setMessage(sentence);
+                    showReply(sentence);
+                    configUpdateDialog.show();
+                    SmartHouse.getInstance().setRequireUpdate(false);
+                } else
                 if (resultType.equals(WebServerService.SERVER_SUCCESS)) {
                     noticBuilder.setContentText(resultType);
-                    noticBuilder.setContentTitle("Server stated port "+8080);
+                    noticBuilder.setContentTitle("Server stated port 8080");
                     NotificationManager man = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                     man.notify(0,noticBuilder.build());
 
                 } else if (resultType.equals(ControlMonitorService.DEACTIVATE)){
-                    SharedPreferences sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
+                    sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
                     SharedPreferences.Editor edit = sharedPreferences.edit();
                     edit.putString(ConstManager.CONTRACT_ID,"");
                     edit.commit();
@@ -767,16 +929,17 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         Log.d(TAG,"on start");
     }
 
-    private void promptSpeechInput() {
+    private void promptSpeechInput(String message) {
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"vi");
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,message);
         try {
             startActivityForResult(intent, VAPanel.REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
-            Toast.makeText(this,"Không hiểu được nói gì",Toast.LENGTH_SHORT).show();
+            MessageUtils.makeText(this,"Không kết nối được nhận diện giọng nói").show();
         }
     }
     @Override
@@ -807,12 +970,47 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     public void processVoiceCommands(String... voiceCommands) {
 
         Log.d(TAG, "processVoiceCommands: "+ voiceCommands[0].toString());
-        if (voiceCommands[0].contains(" ơi")) {
+        List<TermEntity> terms = (new TermSQLite()).getHumanIntentInSentence(" "+voiceCommands[0]+" ");
+        DetectSocialEntity social = BotUtils.findBestSocialDetected(terms);
+        if (social!=null) {
+            Log.d(TAG, social.getName());
+        }
+        if (social != null && social.getId() == ConstManager.SOCIAL_APPEL) {
             stopListening();
             CurrentContext.getInstance().waitOwner();
-            CurrentContext.getInstance().setDetectSocial(null);
-            showReply(BotUtils.completeSentence("Dạ "+BotUtils.BOT_ROLE+" nghe","",""));
-        }else {
+            CurrentContext.getInstance().setDetectSocial(social);
+            showReply(BotUtils.completeSentence(social.getReplyPattern(),"",""));
+        }else if (social!= null && social.getId() == ConstManager.SOCIAL_AGREE && CurrentContext.getInstance().getDetectSocial() !=null) {
+            if (configUpdateDialog.isShowing()){
+                configUpdateDialog.dismiss();
+            }
+            if (CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.UPDATE_BRAIN) {
+                stopListening();
+                updateBot();
+            }
+            if (CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.UPDATE_CONFIG){
+                stopListening();
+                updateConfig();
+            }
+        }else if (social!= null && social.getId() == ConstManager.SOCIAL_AGREE &&
+                SmartHouse.getInstance().getCurrentState().getId() !=ConstManager.DEFAULT_STATE_ID) {
+            SmartHouse.getInstance().startConfigCmds();
+            if (stateDialog.isShowing()){
+                stateDialog.dismiss(    );
+            }
+        } else if (social!= null && social.getId() == ConstManager.SOCIAL_DENY && CurrentContext.getInstance().getDetectSocial() !=null) {
+            if (configUpdateDialog.isShowing()){
+                configUpdateDialog.dismiss();
+            }
+            if (stateDialog.isShowing()){
+                stateDialog.dismiss();
+            }
+            SmartHouse.getInstance().setRequireBotUpdate(false);
+            SmartHouse.getInstance().setRequireUpdate(false);
+            SmartHouse.getInstance().resetStateToDefault();
+            CurrentContext.getInstance().renew();
+            restartListeningService();
+        } else {
             restartListeningService();
         }
         Toast.makeText(this, voiceCommands[0], Toast.LENGTH_SHORT).show();

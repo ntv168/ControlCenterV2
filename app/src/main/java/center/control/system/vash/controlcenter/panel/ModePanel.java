@@ -27,7 +27,6 @@ import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,7 +34,6 @@ import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.command.CommandEntity;
-import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.nlp.CurrentContext;
 import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;

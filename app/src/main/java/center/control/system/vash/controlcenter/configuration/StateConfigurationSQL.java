@@ -95,7 +95,7 @@ public class StateConfigurationSQL {
         SQLiteManager.getInstance().closeDatabase();
     }
     public static EventEntity findEventById(int id){
-
+        Log.d(TAG," findEventById "+id);
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
                 + " FROM " + TABLE_EVENT
@@ -120,7 +120,7 @@ public class StateConfigurationSQL {
         event.setNextStateId(cursor.getInt(cursor.getColumnIndex(KEY_NEXT_STATE)));
         event.setPriority(cursor.getInt(cursor.getColumnIndex(KEY_PRIORITY)));
         event.setAreaId(cursor.getInt(cursor.getColumnIndex(KEY_AREA_ID)));
-        Log.d(TAG,event.getAreaId()+"  s");
+        Log.d(TAG,event.getAreaId()+"  s"+event.getId());
 
         return event;
     }

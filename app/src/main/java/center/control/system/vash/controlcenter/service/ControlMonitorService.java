@@ -31,6 +31,7 @@ import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.panel.ControlPanel;
 
 import center.control.system.vash.controlcenter.script.ScriptEntity;
+import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
@@ -51,6 +52,8 @@ public class ControlMonitorService extends Service {
     public static final String DEACTIVATE = "deactivate.action";
     public static final String NOBODY = "Nobody";
     public static final String NOT_SUPPORT = "None";
+    public static final String NEW_UPDATE = "new config update";
+    public static final String BOT_UPDATE = "new bot update";
     private static Timer repeatScheduler;
     private boolean areaChecked = false;
     public static String CHANGE_STATE = "state.change";
@@ -111,6 +114,10 @@ public class ControlMonitorService extends Service {
                     if (smartHouse.getContractId() == null){
                         sendResult(DEACTIVATE,-1);
                         return;
+                    } else  if (smartHouse.isRequireBotUpdate()) {
+                        sendResult(BOT_UPDATE,-1);
+                    }else  if (smartHouse.isRequireUpdate()) {
+                        sendResult(NEW_UPDATE,-1);
                     }
                     for (ScriptEntity todayMode : smartHouse.getRunToday()){
                         if (todayMode.isEnabled() && todayMode.getHour()==((new Date()).getHours())
@@ -120,6 +127,9 @@ public class ControlMonitorService extends Service {
                             CurrentContext.getInstance().setScript(todayMode);
                             todayMode.setEnabled(false);
                             smartHouse.getRunToday().remove(todayMode);
+                            if (todayMode.isOnlyOneTime()) {
+                                ScriptSQLite.deleteModeById(todayMode.getId());
+                            }
                             BotUtils.implementCommand(funct,null,todayMode);
                             Log.d(TAG,"Scheduler acted");
                         }
@@ -174,7 +184,7 @@ public class ControlMonitorService extends Service {
                             }
                             Log.d(TAG, smartHouse.getCurrentState().getEvents().size()+ " s next state : "+ nextStId);
                             if (nextStId != -1 ){
-//                                smartHouse.revertCmdState();
+                                smartHouse.revertCmdState();
                                 smartHouse.setCurrentState(smartHouse.getStateById(nextStId));
                                 smartHouse.setStateChangedTime((new Date()).getTime());
                                 sendResult(CHANGE_STATE,-1);

@@ -23,5 +23,8 @@ public  interface CloudApi {
     Call<StaffCodeDTO> staffLogin(@Body StaffCodeDTO staff);
     @GET("/api/Configuration/getConfigInContract/{id}")
     Call<ConfigControlCenterDTO> getConfig( @Path("id") String houseId);
+    @POST("api/SmartHouseRequest/sendSmartHouseRequest")
+    Call<SmartHouseRequestDTO> sendRequest(@Body SmartHouseRequestDTO requestDTO);
+
 
 }
