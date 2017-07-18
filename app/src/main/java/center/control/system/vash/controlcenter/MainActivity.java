@@ -130,7 +130,8 @@ public class MainActivity extends Activity {
     }
 
     private void loginSmartHouse() {
-        if (username.equals("") || password.equals("")) {
+//        Log.d(TAG, username + " --" + password);
+//        if (username.equals("") || password.equals("")) {
             final HouseKeyDTO key = new HouseKeyDTO();
             key.setUsername(txtusername.getText().toString());
             key.setPassword(txtpassword.getText().toString());
@@ -173,15 +174,15 @@ public class MainActivity extends Activity {
                     loginDia.dismiss();
                 }
             });
-        } else {
-            if (txtusername.getText().toString().equals(username) &&
-                    txtpassword.getText().toString().equals(password)){
-                startActivity(new Intent(MainActivity.this, ControlPanel.class));
-                finish();
-            } else {
-                Log.d(TAG, " sai ten mat khau local");
-                MessageUtils.makeText(MainActivity.this, "Sai tên đăng nhập mật khẩu").show();
-            }
-        }
+//        } else {
+//            if (txtusername.getText().toString().equals(username) &&
+//                    txtpassword.getText().toString().equals(password)){
+//                startActivity(new Intent(MainActivity.this, ControlPanel.class));
+//                finish();
+//            } else {
+//                Log.d(TAG, " sai ten mat khau local");
+//                MessageUtils.makeText(MainActivity.this, "Sai tên đăng nhập mật khẩu").show();
+//            }
+//        }
     }
 }

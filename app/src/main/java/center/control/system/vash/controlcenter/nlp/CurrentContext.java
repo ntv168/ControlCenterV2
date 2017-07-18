@@ -126,7 +126,7 @@ public class CurrentContext {
     }
 
     public boolean finishCurrentScript(int devId) {
-        if (ConstManager.FUNCTION_FOR_SCRIPT.contains(detectedFunction.getFunctionName())){
+        if (detectedFunction != null && ConstManager.FUNCTION_FOR_SCRIPT.contains(detectedFunction.getFunctionName())){
             List<CommandEntity> cmds  = ScriptSQLite.getCommandByScriptId(script.getId());
             if (cmds.size()>0) {
                 Log.d("Context", cmds.get(cmds.size() - 1).getDeviceName() + "");

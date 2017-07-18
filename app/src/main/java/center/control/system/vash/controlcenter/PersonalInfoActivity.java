@@ -41,6 +41,7 @@ import center.control.system.vash.controlcenter.server.AssistantTypeDTO;
 import center.control.system.vash.controlcenter.server.BotDataCentralDTO;
 import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.FunctionIntentDTO;
+import center.control.system.vash.controlcenter.server.LoginSmarthouseDTO;
 import center.control.system.vash.controlcenter.server.RetroFitSingleton;
 import center.control.system.vash.controlcenter.server.SocialIntentDTO;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
@@ -57,7 +58,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private static final String TAG = "Personal Activity";
     private List<AssistantTypeDTO> typeDTOs;
-    private AlertDialog.Builder editNickNameDiag;
+    private AlertDialog.Builder inputDialog;
     private ArrayAdapter<String> botRoleAdapter;
     private EditText editOwnerName;
     private ArrayAdapter<String> ownerRoleAdapter;
@@ -78,6 +79,8 @@ public class PersonalInfoActivity extends AppCompatActivity {
     TextView txtHouseAddress;
     TextView txtContractID;
     TextView txtActiveDay;
+    LoginSmarthouseDTO passDto;
+    private ProgressDialog waitDialog;
 
     @Override
     protected void onResume() {
@@ -128,6 +131,11 @@ public class PersonalInfoActivity extends AppCompatActivity {
         setContentView(R.layout.personal);
         sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME,MODE_PRIVATE);
 
+        waitDialog = new ProgressDialog(this);
+        waitDialog.setTitle("Vui lòng đợi");
+        waitDialog.setIndeterminate(true);
+        waitDialog.setCancelable(false);
+
         LinearLayout lnBack = (LinearLayout) findViewById(R.id.lnBack);
         lnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,7 +157,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
         vaSetDiag.requestWindowFeature(Window.FEATURE_NO_TITLE);
         vaSetDiag.setContentView(R.layout.va_setting_dialog);
 
-        editNickNameDiag = new AlertDialog.Builder(PersonalInfoActivity.this);
+        inputDialog = new AlertDialog.Builder(PersonalInfoActivity.this);
         refineNickNameTarget();
 
         final ProgressDialog waitDialog = new ProgressDialog(PersonalInfoActivity.this);
@@ -187,6 +195,63 @@ public class PersonalInfoActivity extends AppCompatActivity {
                     editOwnerName.setText(ownerName);
                     vaSetDiag.show();
                 }
+            }
+        });
+
+        LinearLayout btnChangePass = (LinearLayout) findViewById(R.id.btnChangePass);
+        btnChangePass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog passDiag = new Dialog(PersonalInfoActivity.this);
+                passDiag.setTitle("Nhập mật khẩu cũ ");
+                passDiag.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                passDiag.setContentView(R.layout.change_password_dialog);
+                final EditText txtOldPass = (EditText) passDiag.findViewById(R.id.txtOldPass);
+                final EditText txtNewPass = (EditText) passDiag.findViewById(R.id.txtNewPass);
+                final EditText txtConf = (EditText) passDiag.findViewById(R.id.txtConfirmPass);
+
+                ((Button)passDiag.findViewById(R.id.btnSave)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        passDiag.dismiss();
+                        waitDialog.show();
+                        if (txtConf.getText().toString().equals(txtNewPass.getText().toString())){
+                            passDto = new LoginSmarthouseDTO();
+                            passDto.setContractId(sharedPreferences.getString(ConstManager.CONTRACT_ID,""));
+                            passDto.setNewPassword(txtNewPass.getText().toString());
+                            passDto.setOldPassword(txtOldPass.getText().toString());
+                            final CloudApi loginStaffApi = RetroFitSingleton.getInstance().getCloudApi();
+                            loginStaffApi.changePass(passDto).enqueue(new Callback<LoginSmarthouseDTO>() {
+                                @Override
+                                public void onResponse(Call<LoginSmarthouseDTO> call, Response<LoginSmarthouseDTO> response) {
+                                    if (response.body().getNewPassword().equals("success")){
+                                        passDiag.dismiss();
+                                    } else {
+                                        MessageUtils.makeText(PersonalInfoActivity.this,response.body().getNewPassword()).show();
+                                    }
+                                    waitDialog.dismiss();
+                                }
+
+                                @Override
+                                public void onFailure(Call<LoginSmarthouseDTO> call, Throwable t) {
+                                    MessageUtils.makeText(PersonalInfoActivity.this,"Không kết nối được").show();
+                                    waitDialog.dismiss();
+                                }
+                            });
+                            waitDialog.show();
+                        }else {
+                            MessageUtils.makeText(PersonalInfoActivity.this,"Mật khẩu xác nhận không giống mật khẩu mới").show();
+                        }
+
+                    }
+                });
+                ((Button)passDiag.findViewById(R.id.btnCancel)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        passDiag.dismiss();
+                    }
+                });
+                passDiag.show();
             }
         });
 
@@ -264,11 +329,11 @@ public class PersonalInfoActivity extends AppCompatActivity {
         final SmartHouse house = SmartHouse.getInstance();
         for (final DeviceEntity device: house.getDevices()){
             if (device.getNickName() == null || device.getNickName().equals("")){
-                editNickNameDiag.setTitle("Tên gọi khác cho thiết bị"+device.getName());
+                inputDialog.setTitle("Tên gọi khác cho thiết bị"+device.getName());
                 final EditText input = new EditText(PersonalInfoActivity.this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
-                editNickNameDiag.setView(input);
-                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                inputDialog.setView(input);
+                inputDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         device.setNickName(input.getText().toString());
@@ -277,16 +342,16 @@ public class PersonalInfoActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
-                editNickNameDiag.show();
+                inputDialog.show();
             }
         }
         for (final AreaEntity area: house.getAreas()){
             if (area.getNickName().length()<2){
-                editNickNameDiag.setTitle("Tên gọi khác cho không gian "+area.getName());
+                inputDialog.setTitle("Tên gọi khác cho không gian "+area.getName());
                 final EditText input = new EditText(PersonalInfoActivity.this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
-                editNickNameDiag.setView(input);
-                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                inputDialog.setView(input);
+                inputDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         area.setNickName(input.getText().toString());
@@ -295,16 +360,16 @@ public class PersonalInfoActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
-                editNickNameDiag.show();
+                inputDialog.show();
             }
         }
         for (final ScriptEntity mode: house.getScripts()){
             if (mode.getNickName().length()<2){
-                editNickNameDiag.setTitle("Tên gọi khác cho chế độ "+mode.getName());
+                inputDialog.setTitle("Tên gọi khác cho chế độ "+mode.getName());
                 final EditText input = new EditText(PersonalInfoActivity.this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
-                editNickNameDiag.setView(input);
-                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                inputDialog.setView(input);
+                inputDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mode.setNickName(input.getText().toString());
@@ -313,7 +378,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
-                editNickNameDiag.show();
+                inputDialog.show();
             }
         }
     }

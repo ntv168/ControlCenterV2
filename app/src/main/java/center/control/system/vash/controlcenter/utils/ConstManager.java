@@ -49,10 +49,10 @@ public class ConstManager {
     public static final int FUNCTION_DEC_TEMP = 1024;
     public static final int FUNCTION_START_MODE = 1015;
     public static final int FUNCTION_STOP_MODE = 1016;
-    public static final int SERVICE_PERIOD = 3500;
+    public static final int SERVICE_PERIOD = 4000;
     public static final int PRIORITY_MAX = 100;
     public static final int DURING_MAX = 1000;
-    public static final int DEFAULT_STATE_ID = 1;
+    public static final int NO_BODY_HOME_STATE= 1;
     public static final int SAY_BYE = 1019;
     public static final int CHECK_PERSON = 1017;
     public static final int CHECK_TEMPERATUR = 1019;
@@ -66,6 +66,10 @@ public class ConstManager {
     public static final int SOCIAL_APPEL = 4060;
     public static final int UPDATE_BRAIN = 4062;
     public static final int UPDATE_CONFIG = 4064;
+    public static final int SOCIAL_THANK = 1014;
+    public static final int OWNER_LEAVE = 4065;
+    public static final int GREETING = 1017;
+    public static final int OWNER_IN_HOUSE_STATE = 10;
 
     public static String getTime(){
         Date time = new Date();

@@ -315,12 +315,11 @@ public class BotUtils {
                 termEnt.setTfidfPoint(termTfidf);
                 termEnt.setContent(" "+term.trim()+" ");
                 sqLite.insertHumanTerm(termEnt);
-                Log.d(TAG, termTfidf + "   " + term + "  "+functionName+" - "+functId);
+//                Log.d(TAG, termTfidf + "   " + term + "  "+functionName+" - "+functId);
             }
         }
     }
     public void saveSocialTFIDFTerm(Map<String,Map<String,Integer>> trainingSetMap) {
-
         Map<String,Map<String,Integer>> cloneForCalculate = new HashMap<>(trainingSetMap);
         TermSQLite sqLite= new TermSQLite();
         Iterator it = trainingSetMap.entrySet().iterator();
@@ -343,7 +342,7 @@ public class BotUtils {
                 termEnt.setTfidfPoint(termTfidf);
                 termEnt.setContent(" "+term.trim()+" ");
                 sqLite.insertHumanTerm(termEnt);
-                Log.d(TAG, termTfidf + "   " + term + "  "+socialName+" "+socId);
+//                Log.d(TAG, termTfidf + "   " + term + "  "+socialName+" "+socId);
             }
         }
     }

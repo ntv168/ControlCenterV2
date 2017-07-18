@@ -12,8 +12,13 @@ import java.nio.charset.StandardCharsets;
 import center.control.system.vash.controlcenter.area.AreaEntity;
 
 import center.control.system.vash.controlcenter.command.CommandEntity;
+import center.control.system.vash.controlcenter.nlp.CurrentContext;
+import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
+import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
+import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.utils.BotUtils;
+import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 /**
@@ -31,6 +36,8 @@ public class HttpResponseThread extends Thread {
     private static final String OFF_DEVICE = "deviceOff";
     private static final String MODE_TODAY = "getModeToday";
     private static final String RUN_MODE_TODAY = "modeToday";
+    private static final String ACTIVATE_CONFIG = "activeConfig";
+    private static final String DEACTIVATE_CONFIG = "cancelConfig";
     private static final String RESPONSE_SUCCESS = "tung=success";
     private static final String DATABASE_VERS = "databaseVersion";
     private static final String NEWUPDATE = "newUpdate";
@@ -50,7 +57,6 @@ public class HttpResponseThread extends Thread {
         OutputStream os;
         String request;
 
-
         try {
             is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             request = is.readLine();
@@ -67,23 +73,43 @@ public class HttpResponseThread extends Thread {
                 } else if (request.contains(AREA_ATTRIBUTE_REQ)){
                     String[] reqElement  = request.split("/");
                     Log.d(TAG,"area id:  "+reqElement[2]);
-                    AreaEntity area = SmartHouse.getAreaById(Integer.parseInt(reqElement[2]));
-                    response +=  area.generateAttributeForApi();
+                    if (house.getCurrentState().getId() != ConstManager.DEFAULT_STATE_ID) {
+                        response += "config;"+house.getCurrentState().getNoticePattern()+
+                                ";"+house.getCurrentState().getName();
+                    } else {
+                        AreaEntity area = SmartHouse.getAreaById(Integer.parseInt(reqElement[2]));
+                        response += area.generateAttributeForApi();
+                    }
                 }
                 else if (request.contains(AREA_DEVICE)){
                     String[] reqElement  = request.split("/");
                     Log.d(TAG,"area id:  "+reqElement[2]);
                     response += house.generateDeviceByAreaForApi(Integer.parseInt(reqElement[2]));
                     Log.d(TAG,response);
+                } else if (request.contains(ACTIVE_MODE)){
+                    String[] reqElement  = request.split("/");
+                    Log.d(TAG,"device id:  "+reqElement[2]);
+                    ScriptEntity item = SmartHouse.getInstance().getModeById(Integer.parseInt(reqElement[2]));
+                    DetectFunctionEntity funct = DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_START_MODE);
+                    CurrentContext.getInstance().setDetectedFunction(funct);
+                    CurrentContext.getInstance().setScript(item);
+                    for (CommandEntity cmd : ScriptSQLite.getCommandByScriptId(Integer.parseInt(reqElement[2]))){
+                        house.addCommand(cmd);
+                    }
+                    response += RESPONSE_SUCCESS;
                 } else if (request.contains(ON_DEVICE)){
                     String[] reqElement  = request.split("/");
                     Log.d(TAG,"device id:  "+reqElement[2]);
                     house.addCommand(new CommandEntity(Integer.parseInt(reqElement[2]),"on"));
+                    CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_TURN_ON));
+                    CurrentContext.getInstance().setDevice(house.getDeviceById(Integer.parseInt(reqElement[2])));
                     response += RESPONSE_SUCCESS;
                 } else if (request.contains(OFF_DEVICE)){
                     String[] reqElement  = request.split("/");
                     Log.d(TAG,"device id:  "+reqElement[2]);
                     house.addCommand(new CommandEntity(Integer.parseInt(reqElement[2]),"off"));
+                    CurrentContext.getInstance().setDevice(house.getDeviceById(Integer.parseInt(reqElement[2])));
+                    CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_TURN_OFF));
                     response += RESPONSE_SUCCESS;
                 } else if (request.contains(MODE_DEVICE)){
                     String[] reqElement  = request.split("/");
@@ -109,7 +135,6 @@ public class HttpResponseThread extends Thread {
                     Log.d(TAG, "message :  " + reqElement[2]);
                     BotUtils.botReplyToSentence(reqElement[2]);
                 }else if (request.contains(MODE_TODAY)){
-                    response += "Thức dậy buổi sáng=1=on=06:30;Đi làm=2=on=12:35;Ăn tối với cả nhà=3=on=17:00";
                     for (ScriptEntity script : house.getRunToday()){
                         response += script.getName()+"="+script.getId()+"="+
                                 (script.isEnabled()?"on":"off")+"="+script.getHour()+":"+script.getMinute()+";";
@@ -128,6 +153,22 @@ public class HttpResponseThread extends Thread {
                         Log.d(TAG, "Code :  " + reqElement[2]);
                         if (reqElement[2].equals(house.getContractId())) {
                             SmartHouse.getInstance().setRequireBotUpdate(true);
+                        }
+                    }
+                } else if (request.contains(ACTIVATE_CONFIG)) {
+                    String[] reqElement = request.split("/");
+                    if (reqElement.length>=3) {
+                        Log.d(TAG, "Code :  " + reqElement[2]);
+                        if (reqElement[2].equals(house.getContractId())) {
+                            SmartHouse.getInstance().startConfigCmds();
+                        }
+                    }
+                } else if (request.contains(DEACTIVATE_CONFIG)) {
+                    String[] reqElement = request.split("/");
+                    if (reqElement.length>=3) {
+                        Log.d(TAG, "Code :  " + reqElement[2]);
+                        if (reqElement[2].equals(house.getContractId())) {
+                            SmartHouse.getInstance().resetStateToDefault();
                         }
                     }
                 }

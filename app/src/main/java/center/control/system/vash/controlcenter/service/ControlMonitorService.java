@@ -18,6 +18,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -150,30 +152,42 @@ public class ControlMonitorService extends Service {
                         Log.d(TAG,"Delay:  "+smartHouse.getCurrentState().getDelaySec()+" "+smartHouse.getCurrentState().getDuringSec()+"" +
                                 " "+smartHouse.getCurrentState().getNextEvIds());
 
-                        if (waitedTime < smartHouse.getCurrentState().getDelaySec()) {
+                        if (waitedTime < (smartHouse.getCurrentState().getDuringSec() + smartHouse.getCurrentState().getDelaySec()) ) {
                             Log.d(TAG,"Cấu hình chờ lệnh hoặc biến chuyển");
+                            Set<Integer> areaIds = new HashSet<Integer>();
                             for (EventEntity event : smartHouse.getCurrentState().getEvents()) {
                                 if (SmartHouse.getAreaById(event.getAreaId())!= null) {
-                                    if (event.getSenName().equals(AreaEntity.attrivutesValues[3])) {
-                                        checkCamera(SmartHouse.getAreaById(event.getAreaId()));
-                                    } else {
-                                        checkArea(SmartHouse.getAreaById(event.getAreaId()));
+                                    if (!areaIds.contains(event.getAreaId())) {
+                                        areaIds.add(event.getAreaId());
+                                        if (event.getSenName().equals(AreaEntity.attrivutesValues[3])) {
+                                            checkCamera(SmartHouse.getAreaById(event.getAreaId()));
+                                        } else {
+                                            checkArea(SmartHouse.getAreaById(event.getAreaId()));
+                                        }
                                     }
                                 } else {
                                     Log.d(TAG," chưa đặt không gian cho cấu hình");
                                 }
+
                             }
                         }else
                         if (waitedTime >= smartHouse.getCurrentState().getDelaySec()){
                             Log.d(TAG,"Cấu hình tự động kích hoạt");
-                            for (CommandEntity cmd : smartHouse.getCurrentState().getCommands()){
-                                smartHouse.addCommand(cmd);
-                                Log.d(TAG,"thêm cmd "+cmd.getDeviceId()+"  "+cmd.getDeviceState());
+                            smartHouse.startConfigCmds();
+                            while (smartHouse.getOwnerCommand().size() > 0){
+                                CommandEntity command = smartHouse.getOwnerCommand().take();
+                                DeviceEntity device = smartHouse.getDeviceById(command.getDeviceId());
+                                if (device != null) {
+                                    sendControl(device,command.getDeviceState());
+                                } else {
+                                    Log.d(TAG," null cmnr với lệnh: " + command.getDeviceState());
+                                }
                             }
                         }
-                        if ( waitedTime >= smartHouse.getCurrentState().getDuringSec()
-                                && smartHouse.getCurrentState().getDuringSec() != ConstManager.DURING_MAX){
-                            Log.d(TAG,"Cấu hình tự động chuyển thông minh");
+                        if ( waitedTime >= (smartHouse.getCurrentState().getDuringSec() + smartHouse.getCurrentState().getDelaySec())
+                                && smartHouse.getCurrentState().getDuringSec() != ConstManager.DURING_MAX
+                                && smartHouse.getCurrentState().getId() != ConstManager.DEFAULT_STATE_ID){
+                            Log.d(TAG,smartHouse.getCurrentState().getName()+ " Cấu hình tự động chuyển thông minh ");
                             int maxPri = -1;
                             int nextStId = -1;
                             for (EventEntity event: smartHouse.getCurrentState().getEvents()){
@@ -189,12 +203,13 @@ public class ControlMonitorService extends Service {
                                 smartHouse.setStateChangedTime((new Date()).getTime());
                                 sendResult(CHANGE_STATE,-1);
                             }
-                        } else if ( waitedTime < smartHouse.getCurrentState().getDuringSec()){
-                            Log.d(TAG,"Dang kich hoat he thong "+smartHouse.getCurrentState().getName());
+//                        } else if ( waitedTime < smartHouse.getCurrentState().getDuringSec()){
+//                            Log.d(TAG,"Dang kich hoat he thong "+smartHouse.getCurrentState().getName());
                         }
                         return;
                     } else {
                         for (AreaEntity area: smartHouse.getAreas()){
+                            Log.d(TAG,area.getName()+"   "+area.isHasCamera());
                             if (area.isHasCamera() && areaChecked) {
                                 checkCamera(area);
                             } else if (!areaChecked) {
@@ -245,9 +260,11 @@ public class ControlMonitorService extends Service {
                     public void onResponse(String response) {
                         Log.d(TAG, response.length()+"");
                         if (response.trim().equals(NOBODY)) {
-                            area.setDetect(AreaEntity.NOBODY);
-                            SmartHouse.getInstance().updateAreaById(area.getId(),area);
-                            sendResult(MONITOR, area.getId());
+                            if (area.getUpdatePerson() == -1 || (new Date()).getTime() - area.getUpdatePerson() > AreaEntity.HOLD_PERSON) {
+                                area.setDetect(AreaEntity.NOBODY);
+                                SmartHouse.getInstance().updateAreaById(area.getId(), area);
+                                sendResult(MONITOR, area.getId());
+                            }
                             return;
                         }else if (response.trim().equals(NOT_SUPPORT)) {
                             SmartHouse.getInstance().removeCameraArea(area.getId());
@@ -263,7 +280,6 @@ public class ControlMonitorService extends Service {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                SmartHouse.getInstance().removeCameraArea(area.getId());
             }
         });
         readRoom.setRetryPolicy(new DefaultRetryPolicy(VolleySingleton.CHECK_CAMERA_TIMEOUT,0,1f));

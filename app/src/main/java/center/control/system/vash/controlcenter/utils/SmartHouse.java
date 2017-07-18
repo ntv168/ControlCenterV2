@@ -101,13 +101,8 @@ public class SmartHouse {
         this.currentState = currentState;
     }
     public void resetStateToDefault(){
-        this.currentState = this.getStateById(ConstManager.DEFAULT_STATE_ID);
+        this.currentState = this.getStateById(ConstManager.NO_BODY_HOME_STATE);
         this.stateChangedTime = -1;
-        if (stateStarted) {
-            this.revertCmdState();
-            stateStarted = false;
-        }
-
     }
 
     public StateEntity getCurrentState() {
@@ -205,7 +200,6 @@ public class SmartHouse {
     }
 
     public void updateSensorArea(int areaId, String response) {
-        SensorSQLite sensorSQLite = new SensorSQLite();
         for (AreaEntity area: this.getAreas()){
             if (area.getId() == areaId){
                 String[] ele = response.split(",");
@@ -218,8 +212,8 @@ public class SmartHouse {
                             area.setLight(val[1]);
                         } else if (val[0].equals(AreaEntity.attrivutesValues[2])){
                             area.setTemperature(val[1]);
-//                             new checkConfiguration(areaId,val[1]).execute(val[0]);
                         } else if (getDeviceByPort(val[0]) != -1){
+                             Log.d(TAG,val[0]+"   :  "+val[1]);
                              devices.get(getDeviceByPort(val[0])).setState(val[1]);
                         }
                     }
@@ -398,6 +392,16 @@ public class SmartHouse {
         for (DeviceEntity device: this.getDevices()){
             if (device.getId() == deviceId){
                 return  device;
+            }
+        }
+        return null;
+    }
+
+
+    public ScriptEntity getModeById(int id) {
+        for (ScriptEntity mode: this.getScripts()){
+            if (mode.getId() == id){
+                return  mode;
             }
         }
         return null;
@@ -602,5 +606,16 @@ public class SmartHouse {
 
     public void setRunToday(List<ScriptEntity> todayScript) {
         this.runToday = todayScript;
+    }
+
+    public void turnOffAll() {
+        for (DeviceEntity dev: getDevices()){
+            if (dev.getAreaId() != -1) {
+                CommandEntity cmd = new CommandEntity();
+                cmd.setDeviceState("off");
+                cmd.setDeviceId(dev.getId());
+                addCommand(cmd);
+            }
+        }
     }
 }

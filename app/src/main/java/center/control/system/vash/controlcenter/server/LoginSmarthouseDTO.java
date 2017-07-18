@@ -12,6 +12,9 @@ public class LoginSmarthouseDTO {
     @SerializedName("staticAddress")
     @Expose
     private String staticAddress;
+    @SerializedName("offlineAddress")
+    @Expose
+    private String offlineAddress;
     @SerializedName("contractCode")
     @Expose
     private String contractCode;
@@ -42,7 +45,80 @@ public class LoginSmarthouseDTO {
     @SerializedName("virtualAssistantTypeId")
     @Expose
     private int virtualAssistantTypeId;
+    @SerializedName("newPassword")
+    @Expose
+    private String newPassword;
+    @SerializedName("oldPassword")
+    @Expose
+    private String oldPassword;
 
+    public String getOldPassword() {
+        return oldPassword;
+    }
+
+    public void setOldPassword(String oldPassword) {
+        this.oldPassword = oldPassword;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public void setStaticAddress(String staticAddress) {
+        this.staticAddress = staticAddress;
+    }
+
+    public void setContractCode(String contractCode) {
+        this.contractCode = contractCode;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public void setOwnerAddress(String ownerAddress) {
+        this.ownerAddress = ownerAddress;
+    }
+
+    public void setOwnerTel(String ownerTel) {
+        this.ownerTel = ownerTel;
+    }
+
+    public void setOwnerCmnd(String ownerCmnd) {
+        this.ownerCmnd = ownerCmnd;
+    }
+
+    public void setContractId(String contractId) {
+        this.contractId = contractId;
+    }
+
+    public void setActiveDay(String activeDay) {
+        this.activeDay = activeDay;
+    }
+
+    public void setVirtualAssistantName(String virtualAssistantName) {
+        this.virtualAssistantName = virtualAssistantName;
+    }
+
+    public void setVirtualAssistantType(String virtualAssistantType) {
+        this.virtualAssistantType = virtualAssistantType;
+    }
+
+    public void setVirtualAssistantTypeId(int virtualAssistantTypeId) {
+        this.virtualAssistantTypeId = virtualAssistantTypeId;
+    }
+
+    public String getOfflineAddress() {
+        return offlineAddress;
+    }
+
+    public void setOfflineAddress(String offlineAddress) {
+        this.offlineAddress = offlineAddress;
+    }
 
     public String getStaticAddress() {
         return staticAddress;
