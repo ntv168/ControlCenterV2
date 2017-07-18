@@ -40,11 +40,6 @@ public class SettingPanel extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        String Id = StorageHelper.getPersonGroupId("nguoinha",SettingPanel.this);
-        if (!StorageHelper.getAllPersonIds(Id, SettingPanel.this).isEmpty()) {
-            StorageHelper.clearPersonIds(Id,SettingPanel.this);
-        }
-        new GetPersonIdsTask().execute(Id);
 
     }
 

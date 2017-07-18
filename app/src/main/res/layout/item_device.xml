@@ -7,30 +7,29 @@
     android:layout_margin="5dp"
     android:background="@drawable/background_device"
     android:orientation="vertical"
-    android:weightSum="1">
+    android:weightSum="4">
 
     <ImageView
         android:id="@+id/deviceIcon"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_gravity="top"
-        android:layout_weight="1"
+        android:layout_margin="10dp"
+        android:layout_weight="2"
         android:padding="10dp"
-        android:scaleType="fitCenter"
         android:src="@drawable/bell"
         android:tint="@android:color/white" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:background="@drawable/background_status_name"
         android:padding="5dp">
 
         <TextView
             android:id="@+id/deviceName"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="center"
             android:text="Đèn chính 1 phòng khách"
             android:textAlignment="center"
@@ -39,18 +38,12 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/nWhite" />
-
     <TextView
         android:id="@+id/deviceStatus"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:gravity="center"
-        android:padding="5dp"
         android:text="Đang bật"
         android:textAlignment="center"
         android:textColor="@android:color/white"

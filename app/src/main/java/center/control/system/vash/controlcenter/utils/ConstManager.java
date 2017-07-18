@@ -10,6 +10,7 @@ import java.util.Date;
  */
 
 public class ConstManager {
+    public static final String SERVER_HOST ="http://54.255.183.91:8080/";
     public static final String STAFF_CODE =  "staff.code";
     public static final String SHARED_PREF_NAME = "Sharef preference controlcenter";
     public static final String USERNAME = "key_username";
@@ -30,38 +31,28 @@ public class ConstManager {
     public static final String BOT_TYPE_ID = "bot.type.Id";
     public static final String BOT_ROLE = "bot.role";
     public static final String OWNER_ROLE = "owner.role";
-    public static final int NOT_UNDERSTD = 2023;
-    public static final int SOCIAL_AGREE = 2046;
-    public static final int SOCIAL_DENY = 2049;
-    public static final int SOCIAL_WHAT_TIME = 1018;
-    public static final int SOCIAL_WHAT_DAY = 2024;
-    public static final int SOCIAL_ASK_DEVICEAREA = 2038;
-    public static final int SOCIAL_ASK_DEVICEONLY = 2047;
-    public static final int SOCIAL_ASK_MODE = 2039;
-    public static final int SOCIAL_WHAT_SEX = 2034;
+    public static final String NOT_UNDERSTD = "notUnderstand";
+    public static final String SOCIAL_AGREE = "agree";
+    public static final String SOCIAL_DENY = "deny";
+    public static final String SOCIAL_WHAT_TIME = "whatTime";
+    public static final String SOCIAL_WHAT_DAY = "whatDay";
+    public static final String SOCIAL_ASK_DEVICEAREA = "askAreaDevice";
+    public static final String SOCIAL_ASK_DEVICEONLY = "askWhichDevice";
+    public static final String SOCIAL_ASK_MODE = "askMode";
+    public static final String SOCIAL_WHAT_SEX = "whatSex";
     public static final String FUNCTION_FOR_SCRIPT = "startMode,stopMode";
     public static final String FUNCTION_FOR_DEVICE = "turnObjectOn,turnObjectOff,increaseTemperature,decreaseTemperature";
-    public static final int NOT_LEARN_YET = 2043;
-    public static final int FUNCTION_TURN_ON = 10;
-    public static final int FUNCTION_TURN_OFF = 11;
-    public static final int FUNCTION_INC_TEMP = 1014;
-    public static final int FUNCTION_DEC_TEMP = 1024;
-    public static final int FUNCTION_START_MODE = 1015;
-    public static final int FUNCTION_STOP_MODE = 1016;
+    public static final String NOT_LEARN_YET = "notLearnYet";
+    public static final String FUNCTION_TURN_ON = "turnObjectOn";
+    public static final String FUNCTION_TURN_OFF = "turnObjectOff";
+    public static final String FUNCTION_INC_TEMP = "increaseTemperature";
+    public static final String FUNCTION_DEC_TEMP = "decreaseTemperature";
+    public static final String FUNCTION_START_MODE = "startMode";
+    public static final String FUNCTION_STOP_MODE = "stopMode";
     public static final int SERVICE_PERIOD = 3500;
     public static final int PRIORITY_MAX = 100;
     public static final int DURING_MAX = 1000;
     public static final int DEFAULT_STATE_ID = 1;
-    public static final int SAY_BYE = 1019;
-    public static final int CHECK_PERSON = 1017;
-    public static final int CHECK_TEMPERATUR = 1019;
-    public static final int SHOW_CAMERA = 12;
-    public static final int CHECK_SECURITTY = 1020;
-    public static final int CHECK_ELECTRIC = 1022;
-    public static final int CHECK_DEV_STATE= 1025;
-    public static final int CHECK_LIGHT= 1018;
-    public static final int SOCIAL_FEEL_HOT = 4057;
-    public static final int SOCIAL_FEEL_COLD = 4058;
 
     public static String getTime(){
         Date time = new Date();
@@ -77,8 +68,8 @@ public class ConstManager {
         result += " ngày "+day+" tháng "+month+" ";
         return result;
     }
-    public static String getVerbByIntent(int functId) {
-        switch (functId){
+    public static String getVerbByIntent(String functionName) {
+        switch (functionName){
             case FUNCTION_TURN_ON:
                 return "bật";
             case FUNCTION_START_MODE:

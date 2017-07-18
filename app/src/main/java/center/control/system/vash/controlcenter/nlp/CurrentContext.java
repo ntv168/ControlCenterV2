@@ -26,17 +26,6 @@ public class CurrentContext {
     private ScriptEntity script;
     private String sentence;
     private long lastConnect;
-    private boolean waitingOwnerSpeak;
-
-    public boolean isWaitingOwnerSpeak() {
-        return this.waitingOwnerSpeak;
-    }
-    public void stopWaitOwner(){
-        this.waitingOwnerSpeak = false;
-    }
-    public void waitOwner(){
-        this.waitingOwnerSpeak = true;
-    }
 
     public long getLastConnect() {
         return lastConnect;

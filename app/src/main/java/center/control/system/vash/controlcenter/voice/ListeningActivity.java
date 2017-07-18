@@ -39,7 +39,6 @@ public abstract class ListeningActivity extends Activity implements IVoiceContro
 		    }
 			sr.startListening(intent);
 		} catch(Exception ex) {
-			Log.d("COn bot nghe",ex.getMessage());
 			ex.getMessage();
 		}
 	}

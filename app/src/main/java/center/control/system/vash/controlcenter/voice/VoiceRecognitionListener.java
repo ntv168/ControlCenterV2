@@ -33,9 +33,9 @@ public class VoiceRecognitionListener implements RecognitionListener {
 	public void onResults(Bundle data) {
 		ArrayList<String> matches = data.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 		String[] commands = new String[matches.size()];
-//		for (String command : matches) {
-//			System.out.println(command);
-//		}
+		for (String command : matches) {
+			System.out.println(command);
+		}
 		commands = matches.toArray(commands);
 		processVoiceCommands(commands);
 	}
@@ -49,7 +49,7 @@ public class VoiceRecognitionListener implements RecognitionListener {
 	
 	// User finished speaking
 	public void onEndOfSpeech() {
-//		System.out.println("Waiting for result...");
+		System.out.println("Waiting for result...");
 	}
 	
 	// If the user said nothing the service will be restarted

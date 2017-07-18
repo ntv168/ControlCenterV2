@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\smart_watch_notification_widget.xml",
+        "source": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\layout\\smart_watch_notification_widget.xml"
+    },
+    {
+        "merged": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\smart_watch_widget.xml",
+        "source": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\layout\\smart_watch_widget.xml"
+    }
+]

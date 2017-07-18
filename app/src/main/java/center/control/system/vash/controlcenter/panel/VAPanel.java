@@ -36,7 +36,7 @@ public class VAPanel extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (DetectIntentSQLite.findSocialById(ConstManager.NOT_UNDERSTD) == null){
+        if (DetectIntentSQLite.findSocialByName(ConstManager.NOT_UNDERSTD) == null){
             startActivity(new Intent(this, PersonalInfoActivity.class));
         }
     }
