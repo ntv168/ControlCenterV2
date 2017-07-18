@@ -135,9 +135,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         if (DetectIntentSQLite.findSocialById(ConstManager.NOT_UNDERSTD) == null){
             startActivity(new Intent(this, PersonalInfoActivity.class));
         }
-      initControl();
-
-
         Intent webService = new Intent(ControlPanel.this, WebServerService.class);
         startService(webService);
 
@@ -154,6 +151,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         }
         lockDialog.show();
     }
+
     private void initControl(){
         String botRole = sharedPreferences.getString(ConstManager.BOT_ROLE,"");
         String botName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
@@ -163,6 +161,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         ((TextView) findViewById(R.id.txtOwnerName)).setText(ownerName);
         SmartHouse.getInstance().setCurrentState(SmartHouse.getInstance().getStateById(ConstManager.OWNER_IN_HOUSE_STATE));
         showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(),"",""));
+        startListening(); // starts listening
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -244,9 +243,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         }
         context = this.getApplicationContext();
         VoiceRecognitionListener.getInstance().setListener(this); // Here we set the current listener
-        startListening(); // starts listening
         CurrentContext.getInstance().stopWaitOwner();
-
 
         final ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnHome);
         currentTab.setImageResource(R.drawable.tab_home_active);
@@ -996,6 +993,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
                 new IntentFilter(CONTROL_FILTER_RECEIVER));
+
+        initControl();
         Log.d(TAG,"on start");
     }
 

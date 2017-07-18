@@ -73,7 +73,7 @@ public class HttpResponseThread extends Thread {
                 } else if (request.contains(AREA_ATTRIBUTE_REQ)){
                     String[] reqElement  = request.split("/");
                     Log.d(TAG,"area id:  "+reqElement[2]);
-                    if (house.getCurrentState().getId() != ConstManager.DEFAULT_STATE_ID) {
+                    if (house.getCurrentState().getId() != ConstManager.NO_BODY_HOME_STATE) {
                         response += "config;"+house.getCurrentState().getNoticePattern()+
                                 ";"+house.getCurrentState().getName();
                     } else {

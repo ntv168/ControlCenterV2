@@ -225,17 +225,21 @@ public class SettingPanel extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Person[] result) {
-            Log.d(TAG,result.length+" S");
             if (result != null) {
-                for (Person person : result) {
-                    try {
-                        String name = URLDecoder.decode(person.name, "UTF-8");
-                        Log.d(TAG,person.personId.toString()+"  "+name+"  "+ groupid);
-                        StorageHelper.setPersonName(person.personId.toString(), name, groupid, SettingPanel.this);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+                Log.d(TAG, result.length + " S");
+                if (result != null) {
+                    for (Person person : result) {
+                        try {
+                            String name = URLDecoder.decode(person.name, "UTF-8");
+                            Log.d(TAG, person.personId.toString() + "  " + name + "  " + groupid);
+                            StorageHelper.setPersonName(person.personId.toString(), name, groupid, SettingPanel.this);
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
+            } else {
+                MessageUtils.makeText(SettingPanel.this, "Không kết nối được dữ liệu nhận diện hình ảnh").show();
             }
             if (waitDiag.isShowing()) waitDiag.dismiss();
         }

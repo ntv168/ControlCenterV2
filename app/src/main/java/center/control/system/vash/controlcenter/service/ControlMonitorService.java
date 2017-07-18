@@ -146,7 +146,7 @@ public class ControlMonitorService extends Service {
                         }
                     } else
                     if (smartHouse.getCurrentState()!= null &&
-                            smartHouse.getCurrentState().getId() != ConstManager.DEFAULT_STATE_ID){
+                            smartHouse.getCurrentState().getId() != ConstManager.NO_BODY_HOME_STATE){
                         long waitedTime = ((new Date()).getTime() - smartHouse.getStateChangedTime())/1000;
                         Log.d(TAG,"Time:  "+(waitedTime));
                         Log.d(TAG,"Delay:  "+smartHouse.getCurrentState().getDelaySec()+" "+smartHouse.getCurrentState().getDuringSec()+"" +
@@ -172,7 +172,7 @@ public class ControlMonitorService extends Service {
                             }
                         }else
                         if (waitedTime >= smartHouse.getCurrentState().getDelaySec()){
-                            Log.d(TAG,"Cấu hình tự động kích hoạt");
+                            Log.d(TAG,"Cấu hình tự động kích hoạt : "+smartHouse.getCurrentState().getName());
                             smartHouse.startConfigCmds();
                             while (smartHouse.getOwnerCommand().size() > 0){
                                 CommandEntity command = smartHouse.getOwnerCommand().take();
@@ -186,7 +186,7 @@ public class ControlMonitorService extends Service {
                         }
                         if ( waitedTime >= (smartHouse.getCurrentState().getDuringSec() + smartHouse.getCurrentState().getDelaySec())
                                 && smartHouse.getCurrentState().getDuringSec() != ConstManager.DURING_MAX
-                                && smartHouse.getCurrentState().getId() != ConstManager.DEFAULT_STATE_ID){
+                                && smartHouse.getCurrentState().getId() != ConstManager.NO_BODY_HOME_STATE){
                             Log.d(TAG,smartHouse.getCurrentState().getName()+ " Cấu hình tự động chuyển thông minh ");
                             int maxPri = -1;
                             int nextStId = -1;
