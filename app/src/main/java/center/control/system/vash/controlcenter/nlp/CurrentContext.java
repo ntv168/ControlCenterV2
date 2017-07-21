@@ -25,7 +25,7 @@ public class CurrentContext {
     private DeviceEntity device;
     private ScriptEntity script;
     private String sentence;
-    private long lastConnect;
+    private boolean schedulerMode;
     private boolean waitingOwnerSpeak;
 
     public boolean isWaitingOwnerSpeak() {
@@ -38,8 +38,12 @@ public class CurrentContext {
         this.waitingOwnerSpeak = true;
     }
 
-    public long getLastConnect() {
-        return lastConnect;
+    public boolean isSchedulerMode() {
+        return schedulerMode;
+    }
+
+    public void setSchedulerMode(boolean schedulerMode) {
+        this.schedulerMode = schedulerMode;
     }
 
     public static void setInstance(CurrentContext instance) {
@@ -77,6 +81,8 @@ public class CurrentContext {
             synchronized(CurrentContext.class) {
                 if(instance == null) {
                     instance= new CurrentContext();
+                    instance.schedulerMode = false;
+                    instance.waitingOwnerSpeak =false;
                 }
             }
 

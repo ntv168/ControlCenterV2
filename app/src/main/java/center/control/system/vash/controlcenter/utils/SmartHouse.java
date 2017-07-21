@@ -9,6 +9,7 @@ import android.widget.ListAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -81,6 +82,7 @@ public class SmartHouse {
         for (StateEntity stat: this.states){
             if (stat.getNextEvIds() != null) {
                 stat.setEvents(new ArrayList<EventEntity>());
+                Log.d(TAG,stat.getNextEvIds());
                 String[] nextEvId = stat.getNextEvIds().split(",");
                 for (int i = 0; i < nextEvId.length; i++) {
                     if (nextEvId[i].length() > 0) {
@@ -90,6 +92,7 @@ public class SmartHouse {
                     }
                 }
             }
+            stat.setCommands(ScriptSQLite.getCommandByStateId(stat.getId()));
         }
     }
 
@@ -101,8 +104,9 @@ public class SmartHouse {
         this.currentState = currentState;
     }
     public void resetStateToDefault(){
-        this.currentState = this.getStateById(ConstManager.NO_BODY_HOME_STATE);
-        this.stateChangedTime = -1;
+        this.currentState = this.getStateById(this.currentState.getDefautState());
+        this.stateChangedTime = (new Date()).getTime();
+        Log.d(TAG,"chuyen default "+currentState.getName());
     }
 
     public StateEntity getCurrentState() {
@@ -151,13 +155,11 @@ public class SmartHouse {
                     houseInstance.setAreas(AreaSQLite.getAll());
                     houseInstance.setDevices(DeviceSQLite.getAll());
                     houseInstance.setScripts(ScriptSQLite.getAll());
-                    houseInstance.setConfigurations(ConfigurationSQLite.getAll());
-                    houseInstance.setSensors(SensorSQLite.getAll());
                     houseInstance.setStates(StateConfigurationSQL.getAll());
                     houseInstance.requireUpdate = false;
                     houseInstance.requireBotUpdate = false;
                     houseInstance.stateStarted = false;
-                    SmartHouse.getInstance().resetStateToDefault();
+                    houseInstance.currentState = houseInstance.getStateById(ConstManager.NO_BODY_HOME_STATE);
                 }
             }
 
@@ -172,9 +174,12 @@ public class SmartHouse {
         }
     }
     public void startConfigCmds(){
+        Log.d(TAG, "steartstrd coingfgtogh");
         if (currentState.getCommands()!= null){
+            Log.d(TAG, currentState.getCommands().size()+"");
             stateStarted = true;
             for (CommandEntity cmd: currentState.getCommands()){
+
                 addCommand(cmd);
             }
         } else Log.d(TAG," No cmd found");
@@ -287,6 +292,7 @@ public class SmartHouse {
 
     public void updateDeviceById(int id, DeviceEntity device) {
         for (int i=0; i<this.getDevices().size();i++){
+            Log.d(TAG," up device "+ id+" -- "+devices.get(i).getId()+" -- areas "+device.getAreaId());
             if (this.getDevices().get(i).getId() == id){
                 this.getDevices().set(i,device);
             }
@@ -345,6 +351,7 @@ public class SmartHouse {
         AreaSQLite.deleteById(id);
         for (int i = 0; i<this.getAreas().size(); i++) {
             if (this.getAreas().get(i).getId() == id){
+                this.removeDeviceByArea(areas.get(i).getId());
                 this.getAreas().remove(i);
             }
         }
@@ -381,10 +388,12 @@ public class SmartHouse {
     }
 
     public void removeDeviceByArea(int id) {
-        for (int i=0; i<this.getDevices().size();i++){
-            if (this.getDevices().get(i).getAreaId() == id){
-                this.getDevices().remove(i);
-            }
+        Log.d(TAG,devices.size()+" size");
+        for (int i=0 ; i<devices.size() ; i++){
+            if (devices.get(i).getAreaId() == id){
+                Log.d(TAG,"xoa thiet bi "+ devices.get(i).getName());
+                devices.remove(i);
+                i--;            }
         }
     }
 
@@ -453,34 +462,9 @@ public class SmartHouse {
                 this.getScripts().set(i,mode);
             }
         }
+        runToday = getTodayMode();
     }
 
-//    class checkConfiguration extends AsyncTask<String, String, Boolean> {
-//        String value;
-//        int areaId;
-//
-//        checkConfiguration(int areaId, String value)
-//        {
-//            this.areaId = areaId;
-//            this.value = value;
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(String... params) {
-//            checkList.getInstance(areaId,params[0], value);
-//            return true;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean result) {
-//
-//        }
-//    }
 
     public String getBotName() {
         return botName;
@@ -504,11 +488,7 @@ public class SmartHouse {
         this.ownerRole = or;
     }
 
-    public void removeAllAreaAndItsDevice() {
-        for (int i = 0; i<this.getAreas().size(); i++) {
-                this.getAreas().remove(i);
-        }
-    }
+
 
     public void addArea(AreaEntity area) {
         this.areas.add(area);
@@ -567,6 +547,7 @@ public class SmartHouse {
         if (currentState.getCommands() != null){
             for (CommandEntity cmd: currentState.getCommands()){
                 cmd.inverseDeviceState();
+                Log.d(TAG,cmd.getDeviceName()+"  "+cmd.getDeviceId()+"  "+cmd.getDeviceState());
                 addCommand(cmd);
             }
         }
@@ -576,7 +557,7 @@ public class SmartHouse {
         this.getScripts().add(scriptEntity);
     }
 
-    public List<ScriptEntity> getTodayMode() {
+    private List<ScriptEntity> getTodayMode() {
         Calendar calendar = Calendar.getInstance();
         int day = calendar.get(Calendar.DAY_OF_WEEK);
         List<ScriptEntity> res = new ArrayList<>();
@@ -591,11 +572,12 @@ public class SmartHouse {
     }
 
     public void removeModeById(int id) {
-        for (ScriptEntity script : scripts){
-            if (script.getId() == id){
-                scripts.remove(script);
+        for (int i= 0; i < scripts.size(); i++){
+            if (scripts.get(i).getId() == id){
+                scripts.remove(i);
             }
         }
+        runToday = getTodayMode();
     }
 
     public List<ScriptEntity> getRunToday() {
@@ -614,7 +596,19 @@ public class SmartHouse {
                 CommandEntity cmd = new CommandEntity();
                 cmd.setDeviceState("off");
                 cmd.setDeviceId(dev.getId());
+                Log.d(TAG,dev.getName()+" off toan bo");
                 addCommand(cmd);
+            }
+        }
+    }
+
+    public void disableToday(int id) {
+        if (runToday == null) runToday = getTodayMode();
+        for (ScriptEntity mode : runToday){
+            if (mode.getId() == id){
+                mode.setEnabled(false);
+                Log.d(TAG,"đã chạy "+mode.getName());
+                return;
             }
         }
     }

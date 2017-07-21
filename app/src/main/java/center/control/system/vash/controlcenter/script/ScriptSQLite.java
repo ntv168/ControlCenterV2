@@ -164,6 +164,28 @@ public class ScriptSQLite {
         }
         return commands;
     }
+    public static List<CommandEntity> getCommandByStateId(int state){
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT * "
+                + " FROM " + TABLE_SCRIPT_DEVICE
+                + " WHERE "+KEY_STATE_ID+" = ? ";
+
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(state)});
+        // looping through all rows and adding to list
+        List<CommandEntity> commands = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                CommandEntity cmd = new CommandEntity();
+                cmd.setDeviceId(cursor.getInt(cursor.getColumnIndex(KEY_DEVICE_ID)));
+                cmd.setGroupId(cursor.getInt(cursor.getColumnIndex(KEY_GROUP_ID)));
+                cmd.setStateId(cursor.getInt(cursor.getColumnIndex(KEY_STATE_ID)));
+                cmd.setConfigurationId(cursor.getInt(cursor.getColumnIndex(KEY_CONFIG_ID)));
+                cmd.setDeviceState(cursor.getString(cursor.getColumnIndex(KEY_DEVICE_STATE)));
+                commands.add(cmd);
+            } while (cursor.moveToNext());
+        }
+        return commands;
+    }
     public static void upById(int id, ScriptEntity scriptEntity,List<CommandEntity> command) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         db.update(TABLE_SCRIPT, scriptToCV(scriptEntity), KEY_ID + " = "+id, null);

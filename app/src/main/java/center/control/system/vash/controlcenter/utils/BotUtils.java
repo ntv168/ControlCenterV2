@@ -173,11 +173,10 @@ public class BotUtils {
         if (sentence == null){
             if (notLearnSentence == null) {
                 DetectSocialEntity soc = getSocialById(ConstManager.NOT_LEARN_YET);
-                if (soc.getQuestionPattern() == null) {
+                if (soc.getReplyPattern() == null) {
                     Log.e(TAG, "not learn yet không có câu question");
-
                 } else {
-                    notLearnSentence = soc.getQuestionPattern();
+                    notLearnSentence = soc.getReplyPattern();
                     notLearnSentence = notLearnSentence.replaceAll(BOT_NAME, house.getBotName());
                     notLearnSentence = notLearnSentence.replaceAll(BOT_ROLE, house.getBotRole());
                     notLearnSentence = notLearnSentence.replaceAll(OWNER_NAME, house.getOwnerName());
@@ -653,10 +652,13 @@ public class BotUtils {
             return notLearnSentence;
         }
     }
-    private static String processSocial(DetectSocialEntity socialIntent){
+    public static String processSocial(DetectSocialEntity socialIntent){
         CurrentContext current = CurrentContext.getInstance();
         current.setDetectSocial(socialIntent);
+        SmartHouse house = SmartHouse.getInstance();
         String result = "";
+        Log.d(TAG, SmartHouse.getInstance().getCurrentState().getName());
+        Log.d(TAG,"handle social ne" +socialIntent.getName());
         switch (socialIntent.getId()){
             case ConstManager.SOCIAL_WHAT_TIME:
                 result = ConstManager.getTime(); break;
@@ -664,15 +666,34 @@ public class BotUtils {
                 result = ConstManager.getDay(); break;
             case ConstManager.SOCIAL_WHAT_SEX:
                 result = "con gái"; break;
+            case ConstManager.OWNER_LEAVE:
+                house.setCurrentState(house.getStateById(ConstManager.NO_BODY_HOME_STATE));
+                CurrentContext.getInstance().renew();
+//                Log.d(TAG," no body "+ house.getCurrentState().getName());
+                break;
             case ConstManager.SOCIAL_AGREE:
+                 if (SmartHouse.getInstance().getCurrentState().getId() == ConstManager.NO_BODY_HOME_STATE) {
+                     Log.d(TAG, "owner leave turn off foaulll");
+                     SmartHouse.getInstance().turnOffAll();
+                     break;
+                 } else
                 if (current.getDetectedFunction() != null ){
                     if (current.getDevice() != null) {
-                        BotUtils.implementCommand(current.getDetectedFunction(), current.getDevice(), null);
+                        implementCommand(current.getDetectedFunction(), current.getDevice(), null);
                         String res = "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getId()) +
                                 " " + current.getDevice().getName()+" trong "+current.getArea().getName();
                         return res;
                     } else  if (current.getScript() != null) {
-                        BotUtils.implementCommand(current.getDetectedFunction(), null, current.getScript());
+                        if (current.isSchedulerMode()) {
+                            current.getScript().setEnabled(false);
+                            SmartHouse.getInstance().disableToday(current.getScript().getId());
+                            if (current.getScript().isOnlyOneTime()) {
+                                ScriptSQLite.deleteModeById(current.getScript().getId());
+                            }
+                            implementCommand(current.getDetectedFunction(),null,current.getScript());
+                            Log.d(TAG,"Scheduler acted");
+                        }
+                        implementCommand(current.getDetectedFunction(), null, current.getScript());
                         String res  ="Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getId()) +
                                 " chế độ " + current.getScript().getName();
                         return res;
@@ -682,7 +703,15 @@ public class BotUtils {
                     current.setDetectSocial(notUnderReply);
                     return completeSentence(notUnderReply.getQuestionPattern(), "", "");
                 }
-
+            case ConstManager.SOCIAL_DENY:
+                if (current.getDetectedFunction() != null ){
+                   current.renew();
+                    return socialIntent.getReplyPattern();
+                } else {
+                    DetectSocialEntity notUnderReply = BotUtils.getSocialById(ConstManager.NOT_UNDERSTD);
+                    current.setDetectSocial(notUnderReply);
+                    return completeSentence(notUnderReply.getQuestionPattern(), "", "");
+                }
         }
         return completeSentence(socialIntent.getReplyPattern(), result, "");
     }

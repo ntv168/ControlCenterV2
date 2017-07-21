@@ -111,7 +111,7 @@ public class MainActivity extends Activity {
             @Override
             public void onFailure(Call<StaffCodeDTO> call, Throwable t) {
                 Log.d(TAG,call.request().url()+" sai staff cose");
-                MessageUtils.makeText(MainActivity.this,"Sai code nhân viên ").show();
+                MessageUtils.makeText(MainActivity.this,"Không kết nối được máy chủ").show();
                 if (txtusername.getText().toString().equals("admin") &&
                         txtpassword.getText().toString().equals("admin")) {
                     startActivity(new Intent(MainActivity.this,SettingPanel.class));

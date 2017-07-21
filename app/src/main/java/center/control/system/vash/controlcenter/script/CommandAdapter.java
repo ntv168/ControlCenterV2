@@ -39,7 +39,9 @@ public class CommandAdapter extends RecyclerView.Adapter<CommandAdapter.ViewHold
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.item = scriptDeviceEntities.get(position);
         SmartHouse house = SmartHouse.getInstance();
-        holder.name.setText(house.getDeviceById(scriptDeviceEntities.get(position).getDeviceId()).getName());
+        if (house.getDeviceById(scriptDeviceEntities.get(position).getDeviceId()) != null) {
+            holder.name.setText(house.getDeviceById(scriptDeviceEntities.get(position).getDeviceId()).getName());
+        } else { holder.name.setText("Thiết bị đã xóa");}
         if (holder.item.getDeviceState().equals("on") || holder.item.getDeviceState().equals("open")) {
             holder.state.setChecked(true);
         } else {

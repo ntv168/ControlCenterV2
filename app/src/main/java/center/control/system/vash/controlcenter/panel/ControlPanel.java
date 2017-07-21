@@ -117,7 +117,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     private Notification.Builder noticBuilder;
     private AreaAttributeAdapter areaAttributeAdapter;
     private DeviceAdapter deviceAdapter;
-    private FaceServiceClient fsClient;
     private  String aquaintance;
     private boolean detecting;
     private String mPersonGroupId;
@@ -132,6 +131,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG,"on resume");
         if (DetectIntentSQLite.findSocialById(ConstManager.NOT_UNDERSTD) == null){
             startActivity(new Intent(this, PersonalInfoActivity.class));
         }
@@ -149,18 +149,30 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             startActivity(new Intent(this,MainActivity.class));
             finish();
         }
-        lockDialog.show();
+        Bundle bun = getIntent().getBundleExtra("bundle");
+        if (bun!= null) {
+            Log.d(TAG, bun.getString("watch") + "");
+            if (bun.getString("watch") != null &&
+                    bun.getString("watch").equals("voice")) {
+                stopListening();
+                CurrentContext.getInstance().waitOwner();
+                CurrentContext.getInstance().setDetectSocial(BotUtils.getSocialById(ConstManager.SOCIAL_APPEL));
+//            CurrentContext.getInstance().setDetectSocial(social);
+                showReply(BotUtils.completeSentence(CurrentContext.getInstance().getDetectSocial().getReplyPattern(), "", ""));
+                setIntent(new Intent());
+            }
+        }
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
     }
 
     private void initControl(){
-        String botRole = sharedPreferences.getString(ConstManager.BOT_ROLE,"");
-        String botName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
-        String ownerName = sharedPreferences.getString(ConstManager.OWNER_NAME,"");
-        String ownerRole = sharedPreferences.getString(ConstManager.OWNER_ROLE,"");
-        SmartHouse.getInstance().setBotOwnerNameRole(botName,botRole,ownerName,ownerRole);
-        ((TextView) findViewById(R.id.txtOwnerName)).setText(ownerName);
         SmartHouse.getInstance().setCurrentState(SmartHouse.getInstance().getStateById(ConstManager.OWNER_IN_HOUSE_STATE));
-        showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(),"",""));
+//        showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(),"",""));
+
         startListening(); // starts listening
     }
     @Override
@@ -169,6 +181,13 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         //Start voice running continuously
         setContentView(R.layout.activity_control_panel);
         sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
+        String botRole = sharedPreferences.getString(ConstManager.BOT_ROLE,"");
+        String botName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
+        String ownerName = sharedPreferences.getString(ConstManager.OWNER_NAME,"");
+        String ownerRole = sharedPreferences.getString(ConstManager.OWNER_ROLE,"");
+        Log.d(TAG,botRole+"  "+botName+"  "+ownerName+"  "+ownerRole);
+        SmartHouse.getInstance().setBotOwnerNameRole(botName,botRole,ownerName,ownerRole);
+        ((TextView) findViewById(R.id.txtOwnerName)).setText(ownerName);
         contractId = sharedPreferences.getString(ConstManager.CONTRACT_ID,"");
         Log.d(TAG,"contractId Id " + contractId);
         waitDialog = new ProgressDialog(this);
@@ -186,6 +205,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             }
         });
         lockDialog = builder.create();
+
+//        lockDialog.show();
 
         builder.setNegativeButton("Để sau", new DialogInterface.OnClickListener() {
             @Override
@@ -243,15 +264,10 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         }
         context = this.getApplicationContext();
         VoiceRecognitionListener.getInstance().setListener(this); // Here we set the current listener
-        CurrentContext.getInstance().stopWaitOwner();
 
         final ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnHome);
         currentTab.setImageResource(R.drawable.tab_home_active);
         currentTab.setBackgroundResource(R.drawable.background_tab_home_active);
-
-
-        fsClient = Facedetect.getInstance(ControlPanel.this);
-
 
         mPersonGroupId = "29f1ccf6-16a3-4e09-95c7-24e5e31a2acf";
         StorageHelper.setPersonGroupId(mPersonGroupId, "nguoinha", ControlPanel.this);
@@ -309,6 +325,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         }
         areaAttributeAdapter = new AreaAttributeAdapter(lstAttribute,this);
         lstAreaAttribute.setAdapter(areaAttributeAdapter);
+
     }
 
     private void updateBot() {
@@ -387,32 +404,55 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     }
 
     private void checkConfiguration(AreaEntity area) {
+        EventEntity nextEv = null;
+        int maxPrio = -2;
+        String result = "";
         for (EventEntity ev : SmartHouse.getInstance().getCurrentState().getEvents()){
             Log.d(TAG, ev.getAreaId()+" "+ev.getSenName()+" "+ev.getSenValue() );
             if (ev.getAreaId() == area.getId()){
                 if (ev.getSenName().equals(AreaEntity.attrivutesValues[0]) &&
                         ev.getSenValue().equals(area.getSafety())){
-                    Log.d(TAG, ev.getNextStateId()+" " );
-                    changeState(ev,area.getName());
+                    if (ev.getPriority() >maxPrio){
+                        Log.d(TAG, ev.getNextStateId()+" " );
+                        maxPrio = ev.getPriority();
+                        nextEv = ev;
+                        result = area.getName();
+                    }
                 } else if (ev.getSenName().equals(AreaEntity.attrivutesValues[1]) &&
                         ev.getSenValue().equals(area.getBright())){
-                    Log.d(TAG, ev.getNextStateId()+" " );
-                    changeState(ev,area.getName());
+                    if (ev.getPriority() >maxPrio){
+                        Log.d(TAG, ev.getNextStateId()+" " );
+                        maxPrio = ev.getPriority();
+                        result = area.getName();
+                        nextEv = ev;
+                    }
                 }else if (ev.getSenName().equals(AreaEntity.attrivutesValues[2]) &&
                         ev.getSenValue().equals(area.getTemperature())){
-                    Log.d(TAG, ev.getNextStateId()+" " );
-                    changeState(ev,area.getName());
+                    if (ev.getPriority() >maxPrio){
+                        Log.d(TAG, ev.getNextStateId()+" " );
+                        maxPrio = ev.getPriority();
+                        result = area.getName();
+                        nextEv = ev;
+                    }
                 } else if (ev.getSenName().equals(AreaEntity.attrivutesValues[3]) &&
                         area.getRawDetect().contains(ev.getSenValue())){
-                    Log.d(TAG, ev.getNextStateId()+" " );
-                    changeState(ev,aquaintance);
+                    if (ev.getPriority() >maxPrio){
+                        Log.d(TAG, ev.getNextStateId()+" " );
+                        maxPrio = ev.getPriority();
+                        result = aquaintance;
+                        nextEv = ev;
+                    }
                 }
             }
         }
+        if (nextEv != null)
+        changeState(nextEv,result);
     }
     private void changeState(EventEntity ev,String resultValue){
         SmartHouse house = SmartHouse.getInstance();
         house.setCurrentState(SmartHouse.getInstance().getStateById(ev.getNextStateId()));
+        Log.d(TAG,house.getCurrentState().getName())
+        ;
         house.setStateChangedTime((new Date()).getTime());
 
         if (house.getCurrentState().getId()!= ConstManager.NO_BODY_HOME_STATE &&
@@ -434,6 +474,9 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    if (SmartHouse.getInstance().getCurrentState().isActivated()){
+                        SmartHouse.getInstance().revertCmdState();
+                    }
                     SmartHouse.getInstance().resetStateToDefault();
                     startListening();
                     dialog.dismiss();
@@ -443,6 +486,9 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     SmartHouse.getInstance().startConfigCmds();
+                    CurrentContext.getInstance().setScript(null);
+                    SmartHouse.getInstance().setStateChangedTime(
+                            (new Date().getTime()) - SmartHouse.getInstance().getCurrentState().getDelaySec()*1000);
                     startListening();
                     dialog.dismiss();
                 }
@@ -453,7 +499,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             stateDialog.dismiss();
         }
         stateDialog.setTitle(state.getName());
-        stateDialog.setMessage(BotUtils.completeSentence(state.getNoticePattern(),resultValue,"")+"\n"+"Tự động kích hoat trong "+state.getDelaySec()+" giây");
+        stateDialog.setMessage(BotUtils.completeSentence(state.getNoticePattern(),resultValue,"")+
+                "\n"+"Tự động kích hoat sau "+state.getDelaySec()+" giây");
         stateDialog.setCancelable(false);
         stateDialog.show();
     }
@@ -475,6 +522,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     @Override
     public void onInitFinish() {
         waitDialog.dismiss();
+        lockDialog.show();
     }
 
     @Override
@@ -508,15 +556,12 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             btnOnOff.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    CurrentContext.getInstance().setDevice(device);
                     CurrentContext.getInstance().setScript(null);
                     if (device.getState().equals("on")) {
-                        CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_TURN_OFF));
-                        SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(), "off"));
+                         SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(), "off"));
                         waitDialog.show();
                     } else if (device.getState().equals("off")) {
-                        CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_TURN_ON));
-                        SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(), "on"));
+                         SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(), "on"));
                         waitDialog.show();
                     }
                 }
@@ -545,14 +590,11 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             });
             remoteDialog.show();
         } else {
-            CurrentContext.getInstance().setDevice(device);
             CurrentContext.getInstance().setScript(null);
             if (device.getState().equals("on")){
-                CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_TURN_OFF));
                 SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"off"));
                 waitDialog.show();
             } else {
-                CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_TURN_ON));
                 SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"on"));
                 waitDialog.show();
             }
@@ -648,7 +690,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                         Log.d("-------", "identify: facezise" + faceIds.size());
                     } else {
                         // Not detectingor person group exists.
-                        setDetectMessage(AreaEntity.DETECT_NOT_AVAILABLE);
+                        Log.d(TAG,AreaEntity.DETECT_NOT_AVAILABLE + " khong detect diuoc");
                     }
                 }
             } else {
@@ -763,7 +805,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         camArea.setDetect(info);
         camArea.setUpdatePerson((new Date()).getTime());
         SmartHouse.getInstance().updateAreaById(cameraAreaId,camArea);
-        Log.d(TAG,camArea.getName()+"  "+info);
+        Log.d(TAG,camArea.getName()+"  "+info+"  detect nguoi");
 
         checkConfiguration(camArea);
 
@@ -781,7 +823,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             CurrentContext.getInstance().stopWaitOwner();
             stopListening();
         }else if (sentenceReply.contains("Đang lấy hình")){
-
             SmartHouse house = SmartHouse.getInstance();
             Bitmap bmImg = house.getBitmapByAreaId(currentArea.getId());
             ImageView imgFace = (ImageView) cameraDialog.findViewById(R.id.imgFace);
@@ -820,6 +861,13 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                         CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_THANK)) {
             restartListeningService();
             CurrentContext.getInstance().stopWaitOwner();
+        } else if (CurrentContext.getInstance().getDetectSocial()!= null &&(
+                CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_AGREE ||
+                CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_DENY ) &&
+                SmartHouse.getInstance().getCurrentState().getId() == ConstManager.NO_BODY_HOME_STATE) {
+            stopListening();
+            lockDialog.show();
+            CurrentContext.getInstance().stopWaitOwner();
         }
         VoiceUtils.speak(sentenceReply);
         Log.d(TAG, sentenceReply + "  " +CurrentContext.getInstance().isWaitingOwnerSpeak());
@@ -849,13 +897,14 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 //            waitDialog.dismiss();
         }
         stopListening();
+        stopService(new Intent(ControlPanel.this,ControlMonitorService.class));
         Log.d(TAG,"on stop");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        restartListeningService();
+//        restartListeningService();
         if(VoiceUtils.getInstance() == null) {
             VoiceUtils.initializeInstance(this, this);
             waitDialog.show();
@@ -896,7 +945,13 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     NotificationManager man = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                     man.notify(0,noticBuilder.build());
 
-                } else if (resultType.equals(ControlMonitorService.DEACTIVATE)){
+                }  else if (resultType.equals(ControlMonitorService.SCHEDULER) && CurrentContext.getInstance().getDetectedFunction() != null) {
+                    Log.d(TAG,"scheduler sent");
+                    CurrentContext cont = CurrentContext.getInstance();
+                    showReply(BotUtils.completeSentence(cont.getDetectedFunction().getRemindPattern(),"",cont.getScript().getName()));
+//                    cont.waitOwner();
+
+                }else if (resultType.equals(ControlMonitorService.DEACTIVATE)){
                     sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
                     SharedPreferences.Editor edit = sharedPreferences.edit();
                     edit.putString(ConstManager.CONTRACT_ID,"");
@@ -994,7 +1049,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
                 new IntentFilter(CONTROL_FILTER_RECEIVER));
 
-        initControl();
         Log.d(TAG,"on start");
     }
 
@@ -1041,6 +1095,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         Log.d(TAG, "processVoiceCommands: "+ voiceCommands[0].toString());
         List<TermEntity> terms = (new TermSQLite()).getHumanIntentInSentence(" "+voiceCommands[0]+" ");
         DetectSocialEntity social = BotUtils.findBestSocialDetected(terms);
+        SmartHouse house = SmartHouse.getInstance();
         if (social!=null) {
             Log.d(TAG, social.getName());
         }
@@ -1061,33 +1116,31 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 stopListening();
                 updateConfig();
             }
-        }else if (social!= null && social.getId() == ConstManager.SOCIAL_AGREE &&
-                SmartHouse.getInstance().getCurrentState().getId() !=ConstManager.NO_BODY_HOME_STATE) {
-            SmartHouse.getInstance().startConfigCmds();
-            if (stateDialog.isShowing()){
-                stateDialog.dismiss(    );
-            }
-        } else if (social!= null && social.getId() == ConstManager.SOCIAL_DENY) {
-            if (configUpdateDialog.isShowing()){
-                configUpdateDialog.dismiss();
-            }
+        }
+        else if (social!= null && social.getId() == ConstManager.SOCIAL_AGREE &&
+                house.getCurrentState().getId() !=ConstManager.NO_BODY_HOME_STATE&&
+                house.getCurrentState().getId() !=ConstManager.OWNER_IN_HOUSE_STATE) {
+            Log.d(TAG,"kich hoat cau hinh "+house.getCurrentState().getName());
+            CurrentContext.getInstance().setScript(null);
+            house.startConfigCmds();
+            house.setStateChangedTime(
+                    (new Date().getTime()) - house.getCurrentState().getDelaySec()*1000);
             if (stateDialog.isShowing()){
                 stateDialog.dismiss();
             }
-            SmartHouse.getInstance().setRequireBotUpdate(false);
-            SmartHouse.getInstance().setRequireUpdate(false);
-            SmartHouse.getInstance().resetStateToDefault();
+        } else if (social!= null && social.getId() == ConstManager.SOCIAL_DENY) {
+            if (configUpdateDialog != null &&configUpdateDialog.isShowing()){
+                configUpdateDialog.dismiss();
+            }
+            if (stateDialog!= null && stateDialog.isShowing()){
+                stateDialog.dismiss();
+            }
+            house.setRequireBotUpdate(false);
+            house.setRequireUpdate(false);
+            house.resetStateToDefault();
             CurrentContext.getInstance().renew();
             restartListeningService();
-        } else if (social!= null && social.getId() == ConstManager.OWNER_LEAVE) {
-            lstDevice.setEnabled(false);
-            showReply(BotUtils.completeSentence(social.getReplyPattern(),"",""));
-
-            SmartHouse.getInstance().resetStateToDefault();
-            SmartHouse.getInstance().turnOffAll();
-            CurrentContext.getInstance().renew();
-            lockDialog.show();
-        }else {
+        } else {
             restartListeningService();
         }
         Toast.makeText(this, voiceCommands[0], Toast.LENGTH_SHORT).show();

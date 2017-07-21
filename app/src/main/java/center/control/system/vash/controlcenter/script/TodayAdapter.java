@@ -20,15 +20,6 @@ public class TodayAdapter extends RecyclerView.Adapter<TodayAdapter.ViewHolder> 
     private List<ScriptEntity> scriptEntities;
     private Context context;
 
-    public void addMode(ScriptEntity script) {
-        scriptEntities.add(script);
-        this.notifyDataSetChanged();
-    }
-    public void removeMode(ScriptEntity mode){
-        scriptEntities.remove(mode);
-        this.notifyDataSetChanged();
-    }
-
     public TodayAdapter(List<ScriptEntity> items, Context context) {
         scriptEntities= items;
         this.context = context;
@@ -48,6 +39,7 @@ public class TodayAdapter extends RecyclerView.Adapter<TodayAdapter.ViewHolder> 
         holder.time.setText(holder.item.getHour()+":"+holder.item.getMinute());
 
             holder.swtActive.setChecked(holder.item.isEnabled());
+
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,12 +112,12 @@ public class TodayAdapter extends RecyclerView.Adapter<TodayAdapter.ViewHolder> 
     private void updateModeById(ScriptEntity mode) {
         for (ScriptEntity script: this.scriptEntities){
             if (script.getId() == mode.getId()){
+                script.setEnabled(mode.isEnabled());
                 script.setHour(mode.getHour());
                 script.setMinute(mode.getMinute());
-                this.notifyDataSetChanged();
-                return;
 
             }
         }
+        notifyDataSetChanged();
     }
 }

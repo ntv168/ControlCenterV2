@@ -138,6 +138,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                                             currentArea = saveArea(areaName.getText().toString(),
                                                     areaNickName.getText().toString(),
                                                     ipArea.getText().toString());
+                                            Log.d(TAG,encodedResp);
                                             insertDeviceByPort(encodedResp, currentArea.getId());
                                             progressDialog.dismiss();
                                             dialog.dismiss();
@@ -251,9 +252,11 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                             new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {
+                                    String encodedResp = VolleySingleton.fixEncodingUnicode(response);
                                 updateArea(areaEntity,nickName.getText().toString(),
                                         areaAddress.getText().toString());
-                                renewDeviceByPort(response, currentArea.getId());
+                                    Log.d(TAG,encodedResp);
+                                renewDeviceByPort(encodedResp, currentArea.getId());
                                 progressDialog.dismiss();
                                 dialog.dismiss();
                                 }
@@ -270,18 +273,23 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
 
                     private void renewDeviceByPort(String response, int id) {
                         String[] ports = response.split(",");
+
                         DeviceSQLite sqLite = new DeviceSQLite();
-                        sqLite.deleteByAreaId(currentArea.getId());
                         SmartHouse house = SmartHouse.getInstance();
                         house.removeDeviceByArea(currentArea.getId());
-                        for (String port : ports){
-                            DeviceEntity device = new DeviceEntity();
-                            device.setPort(port);
-                            device.setAreaId(currentArea.getId());
-                            device.setState("off");
-                            int deviceId =sqLite.insert(device);
-                            device.setId(deviceId);
-                            house.addDevice(device);
+                        sqLite.deleteByAreaId(currentArea.getId());
+                        for (String pair : ports){
+                            if (pair.length()>1) {
+                                String[] ele = pair.split("=");
+                                DeviceEntity device = new DeviceEntity();
+                                device.setPort(ele[1]);
+                                device.setName(ele[0]);
+                                device.setAreaId(currentArea.getId());
+                                device.setState("off");
+                                int deviceId = sqLite.insert(device);
+                                device.setId(deviceId);
+                                house.addDevice(device);
+                            }
                         }
                         devicesAdapter.setDevices(house.getDevicesByAreaId(currentArea.getId()));
                     }
@@ -347,7 +355,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                     currentDevice.setNickName(txtNickName.getText().toString());
                     currentDevice.setAttributeType(attributeType);
                     currentDevice.setType(DeviceEntity.types[spnDeviceType.getSelectedItemPosition()]);
-                    currentDevice.setAreaId(currentArea.getId());
+                    currentDevice.setAreaId(currentDevice.getAreaId());
                     currentDevice.setState("off");
                     SmartHouse house = SmartHouse.getInstance();
                     house.updateDeviceById(currentDevice.getId(), currentDevice);

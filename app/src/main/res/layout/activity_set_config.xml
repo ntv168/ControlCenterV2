@@ -60,6 +60,19 @@
             android:textColor="@color/nGreen1"
             android:textSize="30sp" />
 
+
+        <!--<Button-->
+            <!--android:id="@+id/btnSelectDefault"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="77dp"-->
+            <!--android:background="@drawable/background_home_sensor"-->
+            <!--android:elevation="1dp"-->
+            <!--android:layout_marginTop="10dp"-->
+            <!--android:gravity="center_vertical|center_horizontal|center"-->
+            <!--android:text="Chọn trạng thái"-->
+            <!--android:textColor="@color/nGreen1"-->
+            <!--android:textSize="20sp" />-->
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lstCmd"
             android:layout_width="match_parent"

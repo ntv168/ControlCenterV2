@@ -59,6 +59,7 @@ public class SettingPanel extends AppCompatActivity {
         configApi.getConfig(ConstManager.HOUSE_ID).enqueue(new Callback<ConfigControlCenterDTO>() {
             @Override
             public void onResponse(Call<ConfigControlCenterDTO> call, Response<ConfigControlCenterDTO> response) {
+                Log.d(TAG,call.request().url().toString());
                 if (response.body()!=null){
                     StateConfigurationSQL.removeAll();
                     for (StateDTO state: response.body().getStates()){
@@ -69,8 +70,9 @@ public class SettingPanel extends AppCompatActivity {
                         statEnt.setId(state.getId());
                         statEnt.setName(state.getName());
                         statEnt.setNoticePattern(state.getNotification());
+                        statEnt.setDefautState(state.getTimeoutState());
                         StateConfigurationSQL.insertState(statEnt);
-//                        ScriptSQLite.clearStateCmd(state.getId());
+                        ScriptSQLite.clearStateCmd(state.getId());
                      }
                     for (EventDTO ev: response.body().getEvents()){
                         EventEntity eventEnt = new EventEntity();
@@ -82,7 +84,7 @@ public class SettingPanel extends AppCompatActivity {
                         StateConfigurationSQL.insertEvent(eventEnt);
                     }
                     SmartHouse.getInstance().setStates(StateConfigurationSQL.getAll());
-                    SmartHouse.getInstance().resetStateToDefault();
+                    SmartHouse.getInstance().setCurrentState(SmartHouse.getInstance().getStateById(ConstManager.NO_BODY_HOME_STATE));
                     if (waitDiag.isShowing()) waitDiag.dismiss();
                 }else {
                     if (waitDiag.isShowing()) waitDiag.dismiss();
@@ -135,25 +137,6 @@ public class SettingPanel extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-//                Button btnUpdatePerson = (Button) dialog.findViewById(R.id.btnUpdatePersons);
-//                btnUpdatePerson.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        String Id = StorageHelper.getPersonGroupId("nguoinha",SettingPanel.this);
-//                        if (!StorageHelper.getAllPersonIds(Id, SettingPanel.this).isEmpty()) {
-//                            StorageHelper.clearPersonIds(Id,SettingPanel.this);
-//                        }
-//                        new GetPersonIdsTask().execute(Id);
-//                    }
-//                });
-//
-//                Button btnCancel = (Button) dialog.findViewById(R.id.btnCancel);
-//                btnCancel.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        dialog.dismiss();
-//                    }
-//                });
 
                 dialog.show();
             }

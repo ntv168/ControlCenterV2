@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
 
@@ -73,7 +74,8 @@ public class HttpResponseThread extends Thread {
                 } else if (request.contains(AREA_ATTRIBUTE_REQ)){
                     String[] reqElement  = request.split("/");
                     Log.d(TAG,"area id:  "+reqElement[2]);
-                    if (house.getCurrentState().getId() != ConstManager.NO_BODY_HOME_STATE) {
+                    if (house.getCurrentState().getId() != ConstManager.NO_BODY_HOME_STATE &&
+                            house.getCurrentState().getId() != ConstManager.OWNER_IN_HOUSE_STATE) {
                         response += "config;"+house.getCurrentState().getNoticePattern()+
                                 ";"+house.getCurrentState().getName();
                     } else {
@@ -132,8 +134,9 @@ public class HttpResponseThread extends Thread {
                     }
                 }else if (request.contains(SEND_MESSAGE)) {
                     String[] reqElement = request.split("/");
-                    Log.d(TAG, "message :  " + reqElement[2]);
-                    BotUtils.botReplyToSentence(reqElement[2]);
+                    Log.d(TAG, "h Id :  " + reqElement[2]);
+                    Log.d(TAG, "message :  " + reqElement[3]);
+                    response += BotUtils.botReplyToSentence(reqElement[3]);
                 }else if (request.contains(MODE_TODAY)){
                     for (ScriptEntity script : house.getRunToday()){
                         response += script.getName()+"="+script.getId()+"="+
@@ -161,6 +164,8 @@ public class HttpResponseThread extends Thread {
                         Log.d(TAG, "Code :  " + reqElement[2]);
                         if (reqElement[2].equals(house.getContractId())) {
                             SmartHouse.getInstance().startConfigCmds();
+                            SmartHouse.getInstance().setStateChangedTime(
+                                    (new Date().getTime()) - SmartHouse.getInstance().getCurrentState().getDelaySec()*1000);
                         }
                     }
                 } else if (request.contains(DEACTIVATE_CONFIG)) {

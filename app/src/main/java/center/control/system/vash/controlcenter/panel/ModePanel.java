@@ -83,7 +83,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
         verticalLayout2.setOrientation(LinearLayoutManager.VERTICAL);
         lstToday.setLayoutManager(verticalLayout2);
 
-        todayAdapter = new TodayAdapter(SmartHouse.getInstance().getTodayMode(),this);
+        todayAdapter = new TodayAdapter(SmartHouse.getInstance().getRunToday(),this);
         lstToday.setAdapter(todayAdapter);
 
         scriptAdapter = new ListScriptAdapter(house.getScripts(), this);
@@ -329,7 +329,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
                 ScriptSQLite.upById(scriptEntity.getId(), scriptEntity, listCommmand);
                 SmartHouse.getInstance().updateModeById(scriptEntity.getId(),scriptEntity);
                 scriptAdapter.setScriptEntities(SmartHouse.getInstance().getScripts());
-                todayAdapter.setScriptEntities(SmartHouse.getInstance().getTodayMode());
+                todayAdapter.setScriptEntities(SmartHouse.getInstance().getRunToday());
                 dialog.dismiss();
             }
 
@@ -361,7 +361,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
                         ScriptSQLite.deleteModeById(scriptEntity.getId());
                         SmartHouse.getInstance().removeModeById(scriptEntity.getId());
                         scriptAdapter.setScriptEntities(SmartHouse.getInstance().getScripts());
-                        todayAdapter.setScriptEntities(SmartHouse.getInstance().getTodayMode());
+                        todayAdapter.setScriptEntities(SmartHouse.getInstance().getRunToday());
                     }
 
                 })
@@ -410,6 +410,10 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
     @Override
     protected void onPause() {
         super.onPause();
-        SmartHouse.getInstance().setRunToday(todayAdapter.getScriptEntities());
+        for (ScriptEntity mode  : todayAdapter.getScriptEntities()){
+            if (!mode.isEnabled()){
+                SmartHouse.getInstance().disableToday(mode.getId());
+            }
+        }
     }
 }

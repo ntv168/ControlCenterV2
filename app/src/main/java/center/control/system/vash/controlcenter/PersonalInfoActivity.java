@@ -120,7 +120,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
         txtHouseOwnerPhone.setText(sharedPreferences.getString(ConstManager.OWNER_TEL,""));
 //        txtContractType.setText(sharedPreferences.getString(ConstManager.OWNE,""));
         txtHouseAddress.setText(sharedPreferences.getString(ConstManager.OWNER_ADD,""));
-        txtContractID.setText(sharedPreferences.getString(ConstManager.CONTRACT_ID,""));
+        txtContractID.setText(sharedPreferences.getString(ConstManager.CONTRACT_CODE,""));
         txtActiveDay.setText(sharedPreferences.getString(ConstManager.ACTIVE_DAY,""));
 
     }

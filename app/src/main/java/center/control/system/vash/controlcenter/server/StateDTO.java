@@ -10,6 +10,15 @@ public class StateDTO {
     private int during;
     private String notification;
     private String nextEvent;
+    private int timeoutState;
+
+    public int getTimeoutState() {
+        return timeoutState;
+    }
+
+    public void setTimeoutState(int timeoutState) {
+        this.timeoutState = timeoutState;
+    }
 
     public String getNextEvent() {
         return nextEvent;

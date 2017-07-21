@@ -12,6 +12,7 @@ import com.sonyericsson.extras.liveware.extension.util.control.ControlExtension;
 import com.sonyericsson.extras.liveware.extension.util.control.ControlObjectClickEvent;
 
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.panel.ControlPanel;
 
 
 /**
@@ -57,12 +58,14 @@ public class WatchControl extends ControlExtension {
         }
     }
     private void triggerListenOnMobile(){
-        Intent intent = new Intent(SonyActivity.ACTION_UPDATE_ACTIVITY);
+        Intent intent = new Intent(mContext, ControlPanel.class);
 
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
+        Bundle bun = new Bundle();
+        bun.putString("watch","voice");
+        intent.putExtra("bundle",bun);
         try {
             mContext.startActivity(intent);
         } catch (ActivityNotFoundException e) {
