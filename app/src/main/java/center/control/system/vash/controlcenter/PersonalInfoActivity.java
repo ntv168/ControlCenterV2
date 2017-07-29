@@ -34,6 +34,7 @@ import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
 import center.control.system.vash.controlcenter.nlp.OwnerTrainEntity;
 import center.control.system.vash.controlcenter.nlp.TermSQLite;
 import center.control.system.vash.controlcenter.nlp.TrainVAActivity;
+import center.control.system.vash.controlcenter.panel.ControlPanel;
 import center.control.system.vash.controlcenter.panel.UserSettingPanel;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
@@ -286,7 +287,13 @@ public class PersonalInfoActivity extends AppCompatActivity {
                             DetectIntentSQLite sqlDect = new DetectIntentSQLite();
                             sqLite.clearAll();
                             sqlDect.clearAll();
-
+                            if (response.body().getSocials().size() == 0){
+                                edit = sharedPreferences.edit();
+                                edit.putString(ConstManager.CONTRACT_ID,"");
+                                edit.commit();
+                                Log.d(TAG,"Deeactive sent");
+                                startActivity(new Intent(PersonalInfoActivity.this, MainActivity.class));
+                            }
                             for (SocialIntentDTO soc : response.body().getSocials()) {
                                 sqlDect.insertSocial(new DetectSocialEntity(soc.getId(),
                                         soc.getName(), soc.getQuestion(), soc.getReply()));

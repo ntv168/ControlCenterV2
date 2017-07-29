@@ -124,8 +124,7 @@ public class ControlMonitorService extends Service {
                     sendResult(NEW_UPDATE,-1);
                 }
                 if (smartHouse.getCurrentState()!= null &&
-                        smartHouse.getCurrentState().getId() != ConstManager.NO_BODY_HOME_STATE&&
-                        smartHouse.getCurrentState().getId() != ConstManager.OWNER_IN_HOUSE_STATE){
+                        !smartHouse.isDefaultState()){
                     long waitedTime = ((new Date()).getTime() - smartHouse.getStateChangedTime())/1000;
                     Log.d(TAG,waitedTime+ " Delay:  "+smartHouse.getCurrentState().getDelaySec()+" "+smartHouse.getCurrentState().getDuringSec()+"" +
                             " "+smartHouse.getCurrentState().getName());
@@ -141,7 +140,8 @@ public class ControlMonitorService extends Service {
                         smartHouse.getCurrentState().setActivated(true);
                     } else
                     if ( waitedTime >= (smartHouse.getCurrentState().getDuringSec() + smartHouse.getCurrentState().getDelaySec())
-                            && smartHouse.getCurrentState().getDuringSec() != ConstManager.DURING_MAX){
+                            && smartHouse.getCurrentState().getDuringSec() != ConstManager.DURING_MAX
+                            && !smartHouse.isDefaultState()){
                         Log.d(TAG,smartHouse.getCurrentState().getName()+ " Cấu hình tự động chuyển time out ");
                         smartHouse.revertCmdState();
 //                        int nextStId = smartHouse.getCurrentState().getDefautState();

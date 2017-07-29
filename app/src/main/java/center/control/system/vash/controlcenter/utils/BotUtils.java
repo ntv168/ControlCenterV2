@@ -109,7 +109,7 @@ public class BotUtils {
                 sumTfidfTarget.put(termTarget.getDetectDeviceId(), currentPoint);
                 if (currentPoint > maxTfidf ) {
                     DeviceEntity dev =DeviceSQLite.findById(termTarget.getDetectDeviceId());
-                    if (dev.getAreaId() == areaId || areaId == -1) {
+                    if (dev!= null && (dev.getAreaId() == areaId || areaId == -1)) {
                         maxTfidf = currentPoint;
                         bestDevice = dev;
                     }
@@ -494,13 +494,15 @@ public class BotUtils {
     }
 
     public static String getAttributeByFunction(int functId, AreaEntity area) {
+
         switch (functId){
             case ConstManager.CHECK_SECURITTY:
-                return area.getSafety();
+                return area.getSafetyBot();
             case ConstManager.CHECK_LIGHT:
                 return area.getLight();
             case ConstManager.CHECK_TEMPERATUR:
-                return area.getTemperature();
+                Log.d(TAG,"check nhiet "+area.getTempAmout());
+                return area.getTemperatureBot();
             case ConstManager.CHECK_PERSON:
                 return area.getDetect();
             case ConstManager.CHECK_ELECTRIC:
@@ -525,8 +527,8 @@ public class BotUtils {
         } else {
             Log.d(TAG, "Không thấy gì hết ngoài " + functionIntent.getFunctionName());
             DetectSocialEntity askDevice = BotUtils.getSocialById(ConstManager.SOCIAL_ASK_DEVICEONLY);
-            return completeSentence(askDevice.getQuestionPattern(),
-                    ConstManager.getVerbByIntent(functionIntent.getId()), "");
+            return completeSentence(askDevice.getQuestionPattern(),"",
+                    ConstManager.getVerbByIntent(functionIntent.getId()));
         }
     }
     public static String processDeviceInArea(DetectFunctionEntity functionIntent, List<TargetTernEntity> termTargets){
@@ -540,8 +542,8 @@ public class BotUtils {
                 DetectSocialEntity askWhichDevice = BotUtils.getSocialById(ConstManager.SOCIAL_ASK_DEVICEAREA);
                 current.setDetectSocial(askWhichDevice);
 
-                return completeSentence(askWhichDevice.getQuestionPattern(),
-                        ConstManager.getVerbByIntent(functionIntent.getId()), current.getArea().getName());
+                return completeSentence(askWhichDevice.getQuestionPattern(),"",
+                        ConstManager.getVerbByIntent(functionIntent.getId())+" "+ current.getArea().getName());
             } else {
                 Log.d(TAG, "Tìm thấy cả hai" + device.getName()+current.getArea().getName());
                 current.setScript(null);
@@ -626,7 +628,8 @@ public class BotUtils {
         } else if (functionIntent.getFunctionName().contains("check")){
             AreaEntity area = BotUtils.findBestArea(termTargets);
             if (area != null) {
-                Log.d(TAG,"Thay phong de check"+area.getName());
+                area = SmartHouse.getAreaById(area.getId());
+                Log.d(TAG,"Thay phong de check"+area.getName() + "  "+functionIntent.getId());
                 String resultVal = BotUtils.getAttributeByFunction(functionIntent.getId(),area);
                 String replyComplete ="";
                 if (resultVal == null){
@@ -706,7 +709,7 @@ public class BotUtils {
             case ConstManager.SOCIAL_DENY:
                 if (current.getDetectedFunction() != null ){
                    current.renew();
-                    return socialIntent.getReplyPattern();
+                    return completeSentence(socialIntent.getReplyPattern(),"","");
                 } else {
                     DetectSocialEntity notUnderReply = BotUtils.getSocialById(ConstManager.NOT_UNDERSTD);
                     current.setDetectSocial(notUnderReply);

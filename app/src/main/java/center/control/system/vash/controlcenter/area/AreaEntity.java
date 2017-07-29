@@ -30,7 +30,7 @@ public class AreaEntity extends TargetObject{
     public static final String TEMP_COLD = "co";
     private static final double BURN_TEMP_RANGE = 60.0;
     private static final double HOT_TEMP_RANGE = 38.0;
-    private static final double FRESH_TEMP_RANGE = 27.0;
+    private static final double FRESH_TEMP_RANGE = 25.0;
     private static final String TEMP_FRESH = "fr";
     private static final double COLD_TEMP_RANGE = 16.0;
     private static final String TEMP_FREEZE = "fz";
@@ -40,7 +40,7 @@ public class AreaEntity extends TargetObject{
 
     @SerializedName("temperature")
     private String temperature;
-    private double tempAmout;
+    private double tempAmout = 0;
     @SerializedName("light")
     private String light;
     @SerializedName("safety")
@@ -55,6 +55,14 @@ public class AreaEntity extends TargetObject{
     private boolean hasCamera = true;
     private double detectScore;
     private long updatePerson = -1;
+
+    public void setTempAmout(double tempAmout) {
+        this.tempAmout = tempAmout;
+    }
+
+    public double getTempAmout() {
+        return tempAmout;
+    }
 
     public void setUpdatePerson(long updatePerson) {
         this.updatePerson = updatePerson;
@@ -104,20 +112,17 @@ public class AreaEntity extends TargetObject{
     }
 
     public void setTemperature(String temperature) {
-        if (temperature!=null) {
-            this.tempAmout = Double.parseDouble(temperature);
-            this.tempAmout -= 5; //hard core
-            if (tempAmout >= BURN_TEMP_RANGE) {
-                this.temperature = TEMP_BURN;
-            } else if (tempAmout >= HOT_TEMP_RANGE) {
-                this.temperature = TEMP_WARM;
-            } else if (tempAmout >= FRESH_TEMP_RANGE) {
-                this.temperature = TEMP_FRESH;
-            } else if (tempAmout >= COLD_TEMP_RANGE) {
-                this.temperature = TEMP_COLD;
-            } else {
-                this.temperature = TEMP_FREEZE;
-            }
+//        this.tempAmout -= 7; //hard core
+        if (tempAmout >= BURN_TEMP_RANGE) {
+            this.temperature = TEMP_BURN;
+        } else if (tempAmout >= HOT_TEMP_RANGE) {
+            this.temperature = TEMP_WARM;
+        } else if (tempAmout >= FRESH_TEMP_RANGE) {
+            this.temperature = TEMP_FRESH;
+        } else if (tempAmout >= COLD_TEMP_RANGE) {
+            this.temperature = TEMP_COLD;
+        } else {
+            this.temperature = TEMP_FREEZE;
         }
     }
 
@@ -153,6 +158,17 @@ public class AreaEntity extends TargetObject{
 
     public String getSafety() {
         return safety;
+    }
+
+    public String getSafetyBot() {
+        switch (safety)
+        {
+            case DOOR_OPEN:
+                return " có cửa chưa đóng";
+            case  DOOR_CLOSE:
+                return " đóng hết cửa rồi";
+        }
+        return null;
     }
 
     public void setSafety(String safety) {
@@ -207,6 +223,7 @@ public class AreaEntity extends TargetObject{
             }
         }
         String temperat = "Không khả dụng";
+        this.setTemperature("");
         if (this.getTemperature()!=null) {
             switch (this.getTemperature()) {
                 case TEMP_BURN:
@@ -260,6 +277,7 @@ public class AreaEntity extends TargetObject{
             }
         }
         String temperat = "Không khả dụng";
+        this.setTemperature("");
         if (this.getTemperature()!=null) {
             switch (this.getTemperature()) {
                 case TEMP_BURN:
@@ -303,5 +321,22 @@ public class AreaEntity extends TargetObject{
 
     public String getRawDetect() {
         return detect;
+    }
+    public String getTemperatureBot(){
+
+        this.setTemperature("");
+        switch (temperature){
+            case TEMP_BURN:
+                return " nóng như lửa";
+            case TEMP_COLD:
+                return " lạnh rồi";
+            case TEMP_FREEZE:
+                return " rét lắm";
+            case TEMP_WARM:
+                return " hơi nóng";
+            case TEMP_FRESH:
+                return " mát vừa đủ";
+        }
+        return " có nhiệt độ lạ lắm";
     }
 }

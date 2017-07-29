@@ -18,10 +18,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.SettingPanel;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.script.CommandAdapter;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
+import center.control.system.vash.controlcenter.server.CloudApi;
+import center.control.system.vash.controlcenter.server.ConfigControlCenterDTO;
+import center.control.system.vash.controlcenter.server.EventDTO;
+import center.control.system.vash.controlcenter.server.RetroFitSingleton;
+import center.control.system.vash.controlcenter.server.StateDTO;
+import center.control.system.vash.controlcenter.server.VolleySingleton;
+import center.control.system.vash.controlcenter.utils.ConstManager;
+import center.control.system.vash.controlcenter.utils.MessageUtils;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SetConfigActivity extends AppCompatActivity implements EventAdapter.EventListener{
     private static final String TAG = "Config Thuan Lammmm: ";
@@ -30,16 +42,72 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
     private AlertDialog.Builder selectStateDiag;
     private AlertDialog.Builder selectDefaultDiag;
     private List<StateEntity> stats;
+    private CloudApi configApi;
     private AlertDialog.Builder selectDeviceDiag;
     private AlertDialog.Builder selectAreaDiag;
     private StateEntity currentState;
     private ProgressDialog waitDialog;
     private StateEntity defautlState;
-
+    private ProgressDialog waitDiag;
+    private Button btnSltState;
 
     @Override
     protected void onResume() {
         super.onResume();
+        configApi.getConfig(ConstManager.HOUSE_ID).enqueue(new Callback<ConfigControlCenterDTO>() {
+            @Override
+            public void onResponse(Call<ConfigControlCenterDTO> call, Response<ConfigControlCenterDTO> response) {
+                Log.d(TAG,call.request().url().toString());
+                if (response.body()!=null){
+                    StateConfigurationSQL.removeAll();
+                    for (StateDTO state: response.body().getStates()){
+                        StateEntity statEnt = new StateEntity();
+                        statEnt.setDelaySec(state.getDelay());
+                        statEnt.setNextEvIds(state.getNextEvent());
+                        statEnt.setDuringSec(state.getDuring());
+                        statEnt.setId(state.getId());
+                        statEnt.setName(state.getName());
+                        statEnt.setNoticePattern(state.getNotification());
+                        statEnt.setDefautState(state.getTimeoutState());
+                        StateConfigurationSQL.insertState(statEnt);
+                        ScriptSQLite.clearStateCmd(state.getId());
+                    }
+                    for (EventDTO ev: response.body().getEvents()){
+                        EventEntity eventEnt = new EventEntity();
+                        eventEnt.setId(ev.getId());
+                        eventEnt.setSenValue(ev.getSensorValue());
+                        eventEnt.setSenName(ev.getSensorName());
+                        eventEnt.setNextStateId(ev.getNextState());
+                        eventEnt.setPriority(ev.getPriority());
+                        StateConfigurationSQL.insertEvent(eventEnt);
+                    }
+                    SmartHouse.getInstance().setStates(StateConfigurationSQL.getAll());
+                    SmartHouse.getInstance().setCurrentState(SmartHouse.getInstance().getStateById(ConstManager.NO_BODY_HOME_STATE));
+
+                    waitDiag.dismiss();
+                    selectStateDiag.setAdapter(getStateAdapter(), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            btnSltState.setText(stats.get(which).getName());
+                            cmdAdapter.setScriptEntities(stats.get(which).getCommands());
+                            Log.d(TAG,stats.get(which).getEvents().size()+" s");
+                            eventAdapter.setScriptEntities(stats.get(which).getEvents());
+                            currentState = stats.get(which);
+                            dialog.dismiss();
+                        }
+                    });
+                }else {
+                    waitDiag.dismiss();
+                    MessageUtils.makeText(SetConfigActivity.this, "Không tải được dữ liệu"+ VolleySingleton.SERVER_HOST).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ConfigControlCenterDTO> call, Throwable t) {
+                MessageUtils.makeText(SetConfigActivity.this, "Không kết nối được "+ VolleySingleton.SERVER_HOST).show();
+            }
+        });
+        waitDiag.show();
     }
 
     @Override
@@ -47,6 +115,8 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_config);
 
+
+        configApi = RetroFitSingleton.getInstance().getCloudApi();
         stats = SmartHouse.getInstance().getStates();
         selectStateDiag= new AlertDialog.Builder(SetConfigActivity.this);
         selectStateDiag.setIcon(R.drawable.add);
@@ -54,6 +124,10 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
         selectDefaultDiag= new AlertDialog.Builder(SetConfigActivity.this);
         selectDefaultDiag.setIcon(R.drawable.add);
         selectDefaultDiag.setTitle("Chọn trạng thái mặc định:");
+
+        waitDiag = new ProgressDialog(this);
+        waitDiag.setTitle("Tải dữ liệu");
+        waitDiag.setIndeterminate(true);
 
         RecyclerView lstCmd = (RecyclerView) findViewById(R.id.lstCmd);
         lstCmd .setHasFixedSize(true);
@@ -75,7 +149,7 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
         lstEvent.setAdapter(eventAdapter);
 
 
-        final Button btnSltState = (Button)  findViewById(R.id.btnSelectState);
+         btnSltState = (Button)  findViewById(R.id.btnSelectState);
 //        final Button btnSltDefault = (Button)  findViewById(R.id.btnSelectDefault);
         btnSltState.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,17 +164,7 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
             }
         });
 
-        selectStateDiag.setAdapter(getStateAdapter(), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                btnSltState.setText(stats.get(which).getName());
-                cmdAdapter.setScriptEntities(stats.get(which).getCommands());
-                Log.d(TAG,stats.get(which).getEvents().size()+" s");
-                eventAdapter.setScriptEntities(stats.get(which).getEvents());
-                currentState = stats.get(which);
-                dialog.dismiss();
-            }
-        });
+
         selectAreaDiag = new AlertDialog.Builder(SetConfigActivity.this);
         selectAreaDiag.setIcon(R.drawable.add);
         selectAreaDiag.setTitle("Chọn không gian:");

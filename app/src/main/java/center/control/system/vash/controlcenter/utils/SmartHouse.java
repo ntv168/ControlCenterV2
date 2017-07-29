@@ -88,7 +88,7 @@ public class SmartHouse {
                     if (nextEvId[i].length() > 0) {
                         stat.addEvent(StateConfigurationSQL.findEventById(
                                 Integer.parseInt(nextEvId[i])));
-                        Log.d(TAG,stat.getEvents().get(0)+"  ev");
+                        Log.d(TAG,stat.getEvents().get(i).getNextStateId()+"  ev"+stat.getEvents().get(i).getId());
                     }
                 }
             }
@@ -213,13 +213,11 @@ public class SmartHouse {
                         String[] val = ele[i].split(":");
                          if (val[0].equals(AreaEntity.attrivutesValues[0])){
                             area.setSafety(val[1]);
-                        } else if (val[0].equals(AreaEntity.attrivutesValues[1])){
-                            area.setLight(val[1]);
                         } else if (val[0].equals(AreaEntity.attrivutesValues[2])){
-                            area.setTemperature(val[1]);
-                        } else if (getDeviceByPort(val[0]) != -1){
+                            area.setTempAmout(Double.parseDouble(val[1]));
+                        } else if (getDeviceByPort(val[0],areaId) != -1){
                              Log.d(TAG,val[0]+"   :  "+val[1]);
-                             devices.get(getDeviceByPort(val[0])).setState(val[1]);
+                             devices.get(getDeviceByPort(val[0],areaId)).setState(val[1]);
                         }
                     }
                 }
@@ -228,9 +226,9 @@ public class SmartHouse {
         }
     }
 
-    private int getDeviceByPort(String s) {
+    private int getDeviceByPort(String s,int areaId) {
         for (int i = 0 ; i<this.devices.size();i++){
-            if (devices.get(i).getPort().equals(s)){
+            if (devices.get(i).getPort().equals(s) && devices.get(i).getAreaId() == areaId){
                 return i;
             }
         }
@@ -520,7 +518,7 @@ public class SmartHouse {
             }
         }
         Log.d(TAG," Bug not dfound state "+id);
-        return new StateEntity();
+        return null;
     }
 
 
@@ -611,5 +609,10 @@ public class SmartHouse {
                 return;
             }
         }
+    }
+
+    public boolean isDefaultState() {
+        return currentState.getId() == ConstManager.OWNER_IN_HOUSE_STATE ||
+                currentState.getId()== ConstManager.NO_BODY_HOME_STATE;
     }
 }
