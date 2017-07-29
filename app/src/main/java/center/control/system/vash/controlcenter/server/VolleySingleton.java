@@ -9,8 +9,6 @@ import com.android.volley.toolbox.Volley;
 
 import java.io.UnsupportedEncodingException;
 
-import center.control.system.vash.controlcenter.utils.ConstManager;
-
 /**
  * Created by Thuans on 5/26/2017.
  */
@@ -18,8 +16,8 @@ import center.control.system.vash.controlcenter.utils.ConstManager;
 public class VolleySingleton {
 
     public static final int CHECK_AREA_TIMEOUT = 2000;
-    public static final int CHECK_CAMERA_TIMEOUT = 3000;
-    public static  String SERVER_HOST = ConstManager.SERVER_HOST;
+    public static final int CHECK_CAMERA_TIMEOUT = 4000;
+    public static  String SERVER_HOST = "http://admin.nhatiennghi.com:8080/";
     private static VolleySingleton mInstance;
     private RequestQueue mRequestQueue;
     private static Context context;

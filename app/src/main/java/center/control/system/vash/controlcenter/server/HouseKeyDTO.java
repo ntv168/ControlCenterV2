@@ -11,6 +11,15 @@ import java.util.UUID;
 public class HouseKeyDTO {
     private String username;
     private String password;
+    private String houseId;
+
+    public String getHouseId() {
+        return houseId;
+    }
+
+    public void setHouseId(String houseId) {
+        this.houseId = houseId;
+    }
 
     public String getUsername() {
         return username;

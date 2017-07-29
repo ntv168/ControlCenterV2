@@ -14,22 +14,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.speech.RecognizerIntent;
-import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -39,18 +36,20 @@ import com.microsoft.projectoxford.face.FaceServiceClient;
 import com.microsoft.projectoxford.face.contract.IdentifyResult;
 import com.microsoft.projectoxford.face.contract.TrainingStatus;
 
+import org.w3c.dom.Text;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Map;
 import java.util.UUID;
 
 import center.control.system.vash.controlcenter.App;
@@ -63,12 +62,27 @@ import center.control.system.vash.controlcenter.area.AreaAttributeAdapter;
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.configuration.EventEntity;
+import center.control.system.vash.controlcenter.configuration.StateEntity;
 import center.control.system.vash.controlcenter.device.DeviceAdapter;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
-import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
 import center.control.system.vash.controlcenter.helper.StorageHelper;
 import center.control.system.vash.controlcenter.nlp.CurrentContext;
+import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
+import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
+import center.control.system.vash.controlcenter.nlp.OwnerTrainEntity;
+import center.control.system.vash.controlcenter.nlp.TermEntity;
+import center.control.system.vash.controlcenter.nlp.TermSQLite;
+import center.control.system.vash.controlcenter.script.ScriptEntity;
+import center.control.system.vash.controlcenter.script.ScriptSQLite;
+import center.control.system.vash.controlcenter.server.BotDataCentralDTO;
+import center.control.system.vash.controlcenter.server.CloudApi;
+import center.control.system.vash.controlcenter.server.FunctionIntentDTO;
+import center.control.system.vash.controlcenter.server.RetroFitSingleton;
+import center.control.system.vash.controlcenter.server.SmartHouseRequestDTO;
+import center.control.system.vash.controlcenter.server.SocialIntentDTO;
+import center.control.system.vash.controlcenter.server.VolleySingleton;
+import center.control.system.vash.controlcenter.utils.MessageUtils;
 import center.control.system.vash.controlcenter.voice.VoiceUtils;
 import center.control.system.vash.controlcenter.recognition.Facedetect;
 import center.control.system.vash.controlcenter.recognition.ImageHelper;
@@ -80,13 +94,17 @@ import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import center.control.system.vash.controlcenter.voice.ListeningActivity;
 import center.control.system.vash.controlcenter.voice.VoiceRecognitionListener;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ControlPanel extends ListeningActivity implements AreaAttributeAdapter.AttributeClickListener,
-        AreaAdapter.AreaClickListener,DeviceAdapter.DeviceItemClickListener, TextToSpeech.OnUtteranceCompletedListener {
+        AreaAdapter.AreaClickListener,DeviceAdapter.DeviceItemClickListener, VoiceUtils.OnSpeakFinish {
     private static final String TAG = "Control Panel";
-    public static final String CONTROL_FILTER_RECEIVER = "control filter receiver";
+    public static final String CONTROL_FILTER_RECEIVER = "smart.house.watch.SONY_ACTIVITY";
     public static final String ACTION_TYPE = "control action type receiver";
     public static final String AREA_ID = "service.area.check.id";
+    public static final String WATCH_STT_CONTENT = "receiving_speech_to_text_from_sony";
 
     private SharedPreferences sharedPreferences;
     private String contractId;
@@ -99,74 +117,157 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     private Notification.Builder noticBuilder;
     private AreaAttributeAdapter areaAttributeAdapter;
     private DeviceAdapter deviceAdapter;
-    private DeviceEntity currentDevice;
-    private FaceServiceClient fsClient;
+    private  String aquaintance;
     private boolean detecting;
     private String mPersonGroupId;
     private ProgressDialog waitDialog;
-    private int flagpromt;
-    private boolean isWorking;
+    private AlertDialog stateDialog;
+    private AlertDialog lockDialog;
+    private int cameraAreaId;
+    private AlertDialog configUpdateDialog;
+    private AlertDialog.Builder selectMode;
+    private String sentenceReply;
 
     @Override
     protected void onResume() {
         super.onResume();
-        sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
-        contractId = sharedPreferences.getString(ConstManager.CONTRACT_ID,"");
-        Log.d(TAG,"contractId Id " + contractId);
-        if (contractId.length()<2){
-            startActivity(new Intent(this,MainActivity.class));
-            finish();
+        Log.d(TAG,"on resume");
+        if (DetectIntentSQLite.findSocialById(ConstManager.NOT_UNDERSTD) == null){
+            startActivity(new Intent(this, PersonalInfoActivity.class));
         }
+        Intent webService = new Intent(ControlPanel.this, WebServerService.class);
+        startService(webService);
+
         SmartHouse house = SmartHouse.getInstance();
         if (house.getAreas().size()>0) {
             currentArea = house.getAreas().get(0);
-            areaAttributeAdapter.updateAttribute(currentArea.generateValueArr(),currentArea.getId());
-            Log.d(TAG,house.getDevices().size()+" s >0");
+            areaAttributeAdapter.updateAttribute(currentArea.generateValueArr());
             deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
-            String botRole = sharedPreferences.getString(ConstManager.BOT_ROLE,"");
-            String botName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
-            String ownerName = sharedPreferences.getString(ConstManager.OWNER_NAME,"");
-            String ownerRole = sharedPreferences.getString(ConstManager.OWNER_ROLE,"");
-            if (DetectIntentSQLite.findSocialByName(ConstManager.NOT_UNDERSTD) == null){
-                startActivity(new Intent(this, PersonalInfoActivity.class));
-            }
-            SmartHouse.getInstance().setBotOwnerNameRole(botName,botRole,ownerName,ownerRole);
             startService(new Intent(this, ControlMonitorService.class));
-//            showReply(BotUtils.completeSentence("Xin chào <owner-name>, quán cà phê thông minh xin được phục vụ","",""));
-
         } else {
-            Toast.makeText(this,"Nhân viên chưa cấu hình thiết bị",Toast.LENGTH_SHORT).show();
+            MessageUtils.makeText(this,"Nhân viên chưa cấu hình thiết bị").show();
             startActivity(new Intent(this,MainActivity.class));
             finish();
         }
-        VoiceUtils.initializeInstance(this, this);
-        
-        VoiceRecognitionListener.getInstance().setListener(ControlPanel.this); // Here we set the current listener
+        Bundle bun = getIntent().getBundleExtra("bundle");
+        if (bun!= null) {
+            Log.d(TAG, bun.getString("watch") + "");
+            if (bun.getString("watch") != null &&
+                    bun.getString("watch").equals("voice")) {
+                stopListening();
+                CurrentContext.getInstance().waitOwner();
+                CurrentContext.getInstance().setDetectSocial(BotUtils.getSocialById(ConstManager.SOCIAL_APPEL));
+//            CurrentContext.getInstance().setDetectSocial(social);
+                showReply(BotUtils.completeSentence(CurrentContext.getInstance().getDetectSocial().getReplyPattern(), "", ""));
+                setIntent(new Intent());
+            }
+        }
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
+
+    private void initControl(){
+        SmartHouse.getInstance().setCurrentState(SmartHouse.getInstance().getStateById(ConstManager.OWNER_IN_HOUSE_STATE));
+//        showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(),"",""));
+
         startListening(); // starts listening
-        flagpromt = 1;
-        isWorking = false;
-        Toast.makeText(this,"run done",Toast.LENGTH_SHORT).show();
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Start voice running continuously
-
         setContentView(R.layout.activity_control_panel);
+        sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
+        String botRole = sharedPreferences.getString(ConstManager.BOT_ROLE,"");
+        String botName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
+        String ownerName = sharedPreferences.getString(ConstManager.OWNER_NAME,"");
+        String ownerRole = sharedPreferences.getString(ConstManager.OWNER_ROLE,"");
+        Log.d(TAG,botRole+"  "+botName+"  "+ownerName+"  "+ownerRole);
+        SmartHouse.getInstance().setBotOwnerNameRole(botName,botRole,ownerName,ownerRole);
+        ((TextView) findViewById(R.id.txtOwnerName)).setText(ownerName);
+        contractId = sharedPreferences.getString(ConstManager.CONTRACT_ID,"");
+        Log.d(TAG,"contractId Id " + contractId);
         waitDialog = new ProgressDialog(this);
         waitDialog.setTitle("Vui lòng đợi");
         waitDialog.setIndeterminate(true);
         waitDialog.setCancelable(false);
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setPositiveButton("Xin chào", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                initControl();
+                dialog.dismiss();
+            }
+        });
+        lockDialog = builder.create();
+
+//        lockDialog.show();
+
+        builder.setNegativeButton("Để sau", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                CurrentContext.getInstance().renew();
+                dialog.dismiss();
+            }
+        });
+        builder.setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                updateBot();
+                dialog.dismiss();
+            }
+        });
+        configUpdateDialog = builder.create();
+        configUpdateDialog.setTitle("Cập nhật mới");
+        configUpdateDialog.setCancelable(false);
+
+        selectMode = new AlertDialog.Builder(ControlPanel.this);
+        selectMode.setIcon(R.drawable.icn_mode);
+        selectMode.setTitle("Chọn chế độ");
+
+        ((ImageButton) findViewById(R.id.selectMode)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayAdapter<String> modeName = new ArrayAdapter<String>(ControlPanel.this,android.R.layout.select_dialog_singlechoice);
+
+                for (ScriptEntity sde : SmartHouse.getInstance().getScripts()){
+                    if (sde.getName() != null)
+                        modeName.add(sde.getName());
+                }
+
+                selectMode.setAdapter(modeName,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ScriptEntity mode= SmartHouse.getInstance().getScripts().get(which);
+                                DetectFunctionEntity funct = DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_START_MODE);
+                                CurrentContext.getInstance().setDetectedFunction(funct);
+                                CurrentContext.getInstance().setScript(mode);
+                                for (CommandEntity cmd : ScriptSQLite.getCommandByScriptId(mode.getId())){
+                                    SmartHouse.getInstance().addCommand(cmd);
+                                }
+                                dialog.dismiss();
+                            }
+                        });
+                selectMode.show();
+            }
+        });
+
+        if (contractId.length()<2){
+            startActivity(new Intent(this,MainActivity.class));
+            finish();
+        }
+        context = this.getApplicationContext();
+        VoiceRecognitionListener.getInstance().setListener(this); // Here we set the current listener
 
         final ImageButton currentTab = (ImageButton) findViewById(R.id.tabBtnHome);
         currentTab.setImageResource(R.drawable.tab_home_active);
         currentTab.setBackgroundResource(R.drawable.background_tab_home_active);
-
-        Intent webService = new Intent(ControlPanel.this, WebServerService.class);
-        startService(webService);
-
-        fsClient = Facedetect.getInstance(ControlPanel.this);
-
 
         mPersonGroupId = "29f1ccf6-16a3-4e09-95c7-24e5e31a2acf";
         StorageHelper.setPersonGroupId(mPersonGroupId, "nguoinha", ControlPanel.this);
@@ -178,105 +279,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             StorageHelper.setPersonName("cf784479-a176-4868-af86-7447715357f7","Mỹ", mPersonGroupId, ControlPanel.this);
             StorageHelper.setPersonName("6d639f61-0df1-44b6-b0a3-1c2d1024edf2","Văn", mPersonGroupId, ControlPanel.this);
         }
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String resultType = intent.getStringExtra(ACTION_TYPE);
-//                Toast.makeText(ControlPanel.this, resultType, Toast.LENGTH_SHORT).show();
-                if (resultType.equals(WebServerService.SERVER_SUCCESS)) {
-                    noticBuilder.setContentText(resultType);
-                    noticBuilder.setContentTitle("Server stated port "+8080);
-                    NotificationManager man = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                    man.notify(0,noticBuilder.build());
 
-                } else if (resultType.equals(ControlMonitorService.DEACTIVATE)){
-                    SharedPreferences sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
-                    SharedPreferences.Editor edit = sharedPreferences.edit();
-                    edit.putString(ConstManager.CONTRACT_ID,"");
-                    edit.commit();
-                    Log.d(TAG,"Deeactive sent");
-                    startActivity(new Intent(ControlPanel.this, MainActivity.class));
-                } else if (resultType.equals(ControlMonitorService.WAIT)){
-                    if (!waitDialog.isShowing()) {
-                        waitDialog.show();
-                    }
-                } else if (resultType.equals(ControlMonitorService.CHANGE_STATE)){
-//                    stopService(new Intent(ControlPanel.this,ControlMonitorService.class));
-                    SmartHouse.getInstance().setStateChangedTime((new Date()).getTime());
-                    showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(),"",""));
-
-                }else if (resultType.equals(ControlMonitorService.CONTROL)){
-                    waitDialog.dismiss();
-                    flagpromt = 3;
-                    isWorking = false;
-                    int result = intent.getIntExtra(AREA_ID, -1);
-                    restartListeningService();
-
-                    CurrentContext current = CurrentContext.getInstance();
-                    String target = current.getDevice()!=null?current.getDevice().getName():current.getScript().getName();
-                    if (result == ControlMonitorService.SUCCESS){
-                        showReply(BotUtils.completeSentence(
-                                current.getDetectedFunction().getSuccessPattern(),"",target));
-                        SmartHouse house = SmartHouse.getInstance();
-                        Log.d(TAG,house.getDevices().size()+" succ");
-                        deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
-                    } else if (result == ControlMonitorService.FAIL){
-                        showReply(BotUtils.completeSentence(
-                                current.getDetectedFunction().getFailPattern(),"",target));
-
-                    }
-                } else if (resultType.equals(ControlMonitorService.MONITOR)) {
-                    int areaId = intent.getIntExtra(AREA_ID, -1);
-                    if ( currentArea!=null && areaId == currentArea.getId()) {
-                        areaAttributeAdapter.updateAttribute(SmartHouse.getAreaById(areaId).generateValueArr(),areaId);
-                    }
-//                    Log.d(TAG,SmartHouse.getInstance().getCurrentState().getName()+" ");
-                    if (SmartHouse.getInstance().getCurrentState()!=null) {
-                        checkConfiguration(SmartHouse.getAreaById(areaId));
-                    }
-                } else if (resultType.equals(ControlMonitorService.CAMERA)){
-                    int areaId = intent.getIntExtra(AREA_ID,-1);
-                    if ( currentArea!=null && areaId == currentArea.getId()) {
-                        SmartHouse house = SmartHouse.getInstance();
-                        Bitmap bmImg = house.getBitmapByAreaId(areaId);
-                        ImageView imgFace = (ImageView) cameraDialog.findViewById(R.id.imgFace);
-
-                        if (bmImg!=null){
-                            imgFace.setImageBitmap(bmImg);
-
-                            String root = Environment.getExternalStorageDirectory().toString();
-                            File myDir =  Environment.getExternalStoragePublicDirectory(
-                                    Environment.DIRECTORY_PICTURES);
-                            myDir.mkdirs();
-                            String nameFile = "testSelf.jpg";
-                            File file = new File(myDir, nameFile);
-                            if (file.exists ()) file.delete();
-                            try {
-                                FileOutputStream out = new FileOutputStream(file);
-                                Log.d(TAG,file.getAbsolutePath());
-                                bmImg.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                                out.close();
-                            } catch (IOException e){
-                                Log.d(TAG, e.getMessage());
-                            }
-
-                            Uri uri = Uri.fromFile(file);
-
-                            Bitmap mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
-                                    uri, getContentResolver());
-
-                            detect(mBitmap);
-
-                        } else {
-                            imgFace.setImageResource(R.drawable.close);
-                        }
-                        cameraDialog.show();
-                    }
-                }
-            }
-        };
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
-                new IntentFilter(CONTROL_FILTER_RECEIVER));
 
         noticBuilder = new Notification.Builder(this);
         noticBuilder.setSmallIcon(R.drawable.icon);
@@ -296,6 +299,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         lstAreaName.setLayoutManager(horizonLayout);
 
         LinearLayoutManager horizonLayout2 = new LinearLayoutManager(this);
+        horizonLayout2.setOrientation(LinearLayoutManager.HORIZONTAL);
         horizonLayout2.setOrientation(LinearLayoutManager.HORIZONTAL);
         lstAreaAttribute = (RecyclerView) findViewById(R.id.lstAreaAttribute);
         lstAreaName.setHasFixedSize(true);
@@ -319,62 +323,212 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             atttrr.setName(AreaEntity.attrivutesValues[i]);
             lstAttribute.add(atttrr);
         }
-        areaAttributeAdapter = new AreaAttributeAdapter(lstAttribute,this,house.getAreas().size() >0? house.getAreas().get(0).getId(): -1);
+        areaAttributeAdapter = new AreaAttributeAdapter(lstAttribute,this);
         lstAreaAttribute.setAdapter(areaAttributeAdapter);
 
     }
 
+    private void updateBot() {
+        final CloudApi botApi = RetroFitSingleton.getInstance().getCloudApi();
+        botApi.getDataVA(sharedPreferences.getInt(ConstManager.BOT_TYPE_ID,-1)
+        ).enqueue(new Callback<BotDataCentralDTO>() {
+            @Override
+            public void onResponse(Call<BotDataCentralDTO> call, Response<BotDataCentralDTO> response) {
+                Log.d(TAG,call.request().url()+"");
+                if (response.body() != null) {
+                    TermSQLite sqLite = new TermSQLite();
+                    List<OwnerTrainEntity> trained = sqLite.getOwnerTrain();
+                    Map<String, Map<String, Integer>> updatedFunct = BotUtils.updateFuncts(trained, response.body().getFunctionMap());
+                    DetectIntentSQLite sqlDect = new DetectIntentSQLite();
+                    sqLite.clearAll();
+                    sqlDect.clearAll();
+
+                    for (SocialIntentDTO soc : response.body().getSocials()) {
+                        sqlDect.insertSocial(new DetectSocialEntity(soc.getId(),
+                                soc.getName(), soc.getQuestion(), soc.getReply()));
+                    }
+                    for (FunctionIntentDTO funct : response.body().getFunctions()) {
+                        sqlDect.insertFunction(new DetectFunctionEntity(funct.getId(),
+                                funct.getName(), funct.getSuccess(), funct.getFail(), funct.getRemind()));
+                    }
+                    SmartHouse house = SmartHouse.getInstance();
+                    BotUtils bot = new BotUtils();
+                    bot.saveFunctionTFIDFTerm(updatedFunct);
+                    bot.saveSocialTFIDFTerm(response.body().getSocialMap());
+                    bot.saveDeviceTFIDFTerm(house.getDevices());
+                    bot.saveAreaTFIDFTerm(house.getAreas());
+                    bot.saveScriptTFIDFTerm(house.getScripts());
+                    showReply(BotUtils.completeSentence(CurrentContext.getInstance().getDetectSocial().getReplyPattern(),"",""));
+                } else {
+                    showReply(BotUtils.completeSentence("Không kết nối được <owner-role> vui lòng tự cập nhật","",""));
+                }
+                waitDialog.dismiss();
+                restartListeningService();
+
+            }
+
+            @Override
+            public void onFailure(Call<BotDataCentralDTO> call, Throwable t) {
+                Log.d(TAG,"down load bot data failed");
+                showReply(BotUtils.completeSentence("Không kết nối được <owner-role> vui lòng tự cập nhật","",""));
+                waitDialog.dismiss();
+                restartListeningService();
+            }
+        });
+        waitDialog.show();
+    }
+    private void updateConfig() {
+        final CloudApi botApi = RetroFitSingleton.getInstance().getCloudApi();
+        SmartHouseRequestDTO request = new SmartHouseRequestDTO();
+        request.setContractId(contractId);
+        request.setRequestContent("Yêu cầu nhân viên cập nhật cấu hình");
+        request.setRequestDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
+        botApi.sendRequest(request).enqueue(new Callback<SmartHouseRequestDTO>() {
+            @Override
+            public void onResponse(Call<SmartHouseRequestDTO> call, Response<SmartHouseRequestDTO> response) {
+                waitDialog.dismiss();
+                Log.d(TAG,call.request().url()+"");
+                showReply(BotUtils.completeSentence(CurrentContext.getInstance().getDetectSocial().getReplyPattern(),"",""));
+                restartListeningService();
+            }
+
+            @Override
+            public void onFailure(Call<SmartHouseRequestDTO> call, Throwable t) {
+                waitDialog.dismiss();
+                Log.d(TAG,call.request().url()+"");
+                showReply(BotUtils.completeSentence("Không kết nối được <owner-role> vui lòng tự cập nhật","",""));
+                restartListeningService();
+            }
+        });
+        waitDialog.show();
+    }
+
     private void checkConfiguration(AreaEntity area) {
-        Log.d(TAG, SmartHouse.getInstance().getCurrentState().getEvents().size()+" s");
-        SmartHouse house = SmartHouse.getInstance();
+        EventEntity nextEv = null;
+        int maxPrio = -2;
+        String result = "";
         for (EventEntity ev : SmartHouse.getInstance().getCurrentState().getEvents()){
             Log.d(TAG, ev.getAreaId()+" "+ev.getSenName()+" "+ev.getSenValue() );
             if (ev.getAreaId() == area.getId()){
                 if (ev.getSenName().equals(AreaEntity.attrivutesValues[0]) &&
                         ev.getSenValue().equals(area.getSafety())){
-                    Log.d(TAG, ev.getNextStateId()+" " );
-                    house.setCurrentState(SmartHouse.getInstance().getStateById(ev.getNextStateId()));
-                    house.setStateChangedTime((new Date()).getTime());
-                    showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(),"",""));
+                    if (ev.getPriority() >maxPrio){
+                        Log.d(TAG, ev.getNextStateId()+" " );
+                        maxPrio = ev.getPriority();
+                        nextEv = ev;
+                        result = area.getName();
+                    }
                 } else if (ev.getSenName().equals(AreaEntity.attrivutesValues[1]) &&
-                        ev.getSenValue().equals(area.getLight())){
-                    Log.d(TAG, ev.getNextStateId()+" " );
-                    house.setCurrentState(SmartHouse.getInstance().getStateById(ev.getNextStateId()));
-                    house.setStateChangedTime((new Date()).getTime());
-                    showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(),"",""));
-//                }else if (ev.getSenName().equals(AreaEntity.attrivutesValues[2]) &&
-//                        ev.getSenValue().equals(area.getTemperature())){
-//                    Log.d(TAG, ev.getNextStateId()+" " );
-//                    house.setCurrentState(SmartHouse.getInstance().getStateById(ev.getNextStateId()));
-//                    house.setStateChangedTime((new Date()).getTime());
-//                    showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(),"",""));
+                        ev.getSenValue().equals(area.getBright())){
+                    if (ev.getPriority() >maxPrio){
+                        Log.d(TAG, ev.getNextStateId()+" " );
+                        maxPrio = ev.getPriority();
+                        result = area.getName();
+                        nextEv = ev;
+                    }
+                }else if (ev.getSenName().equals(AreaEntity.attrivutesValues[2]) &&
+                        ev.getSenValue().equals(area.getTemperature())){
+                    if (ev.getPriority() >maxPrio){
+                        Log.d(TAG, ev.getNextStateId()+" " );
+                        maxPrio = ev.getPriority();
+                        result = area.getName();
+                        nextEv = ev;
+                    }
                 } else if (ev.getSenName().equals(AreaEntity.attrivutesValues[3]) &&
-                        ev.getSenValue().equals(area.getDetect())){
-                    Log.d(TAG, ev.getNextStateId()+" " );
-                    house.setCurrentState(SmartHouse.getInstance().getStateById(ev.getNextStateId()));
-                    house.setStateChangedTime((new Date()).getTime());
-                    showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(),"",""));
+                        area.getRawDetect().contains(ev.getSenValue())){
+                    if (ev.getPriority() >maxPrio){
+                        Log.d(TAG, ev.getNextStateId()+" " );
+                        maxPrio = ev.getPriority();
+                        result = aquaintance;
+                        nextEv = ev;
+                    }
                 }
             }
         }
+        if (nextEv != null)
+        changeState(nextEv,result);
+    }
+    private void changeState(EventEntity ev,String resultValue){
+        SmartHouse house = SmartHouse.getInstance();
+        house.setCurrentState(SmartHouse.getInstance().getStateById(ev.getNextStateId()));
+        Log.d(TAG,house.getCurrentState().getName())
+        ;
+        house.setStateChangedTime((new Date()).getTime());
+
+        if (house.getCurrentState().getId()!= ConstManager.NO_BODY_HOME_STATE &&
+                house.getCurrentState().getId() != ConstManager.OWNER_IN_HOUSE_STATE) {
+            showAlertState(house.getCurrentState(), resultValue);
+
+            showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(), resultValue, ""));
+        }  else
+        if (stateDialog!= null &&stateDialog.isShowing()){
+            stateDialog.dismiss();
+        }
+    }
+
+    private void showAlertState(StateEntity state, String resultValue) {
+        if (stateDialog == null) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (SmartHouse.getInstance().getCurrentState().isActivated()){
+                        SmartHouse.getInstance().revertCmdState();
+                    }
+                    SmartHouse.getInstance().resetStateToDefault();
+                    startListening();
+                    dialog.dismiss();
+                }
+            });
+            builder.setPositiveButton("Kích hoạt NGAY", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    SmartHouse.getInstance().startConfigCmds();
+                    CurrentContext.getInstance().setScript(null);
+                    SmartHouse.getInstance().setStateChangedTime(
+                            (new Date().getTime()) - SmartHouse.getInstance().getCurrentState().getDelaySec()*1000);
+                    startListening();
+                    dialog.dismiss();
+                }
+            });
+            stateDialog = builder.create();
+        }
+        if (stateDialog.isShowing()){
+            stateDialog.dismiss();
+        }
+        stateDialog.setTitle(state.getName());
+        stateDialog.setMessage(BotUtils.completeSentence(state.getNoticePattern(),resultValue,"")+
+                "\n"+"Tự động kích hoat sau "+state.getDelaySec()+" giây");
+        stateDialog.setCancelable(false);
+        stateDialog.show();
     }
 
     public void clicktoModePanel(View view) {
         startActivity(new Intent(this, ModePanel.class));
+        finish();
     }
 
     public void clicktoSettingPanel(View view) {
         startActivity(new Intent(this, UserSettingPanel.class));
+        finish();
     }
 
     public void clicktoVAPanel(View view) {
-        promptSpeechInput();
+        promptSpeechInput("");
     }
 
+    @Override
+    public void onInitFinish() {
+        waitDialog.dismiss();
+        lockDialog.show();
+    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        VoiceUtils.stopSpeakApi();
         stopService(new Intent(getApplicationContext(),WebServerService.class));
         Log.d(TAG," destroy ");
     }
@@ -383,9 +537,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     @Override
     public void onAreaClick(AreaEntity area) {
         currentArea = area;
-        areaAttributeAdapter.updateAttribute(area.generateValueArr(),area.getId());
+        areaAttributeAdapter.updateAttribute(area.generateValueArr());
         SmartHouse house = SmartHouse.getInstance();
-        Log.d(TAG,house.getDevices().size()+" s click");
         deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(area.getId()));
     }
     @Override
@@ -395,7 +548,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
     @Override
     public void onDeviceClick(final DeviceEntity device) {
-        currentDevice = device;
+        CurrentContext.getInstance().stopWaitOwner();
         ((TextView) remoteDialog.findViewById(R.id.txtRemoteName)).setText(device.getName()+" ở "+currentArea.getName()+ " ");
         if (DeviceEntity.remoteTypes.contains(device.getType())){
 
@@ -403,15 +556,12 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             btnOnOff.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    CurrentContext.getInstance().setDevice(device);
                     CurrentContext.getInstance().setScript(null);
                     if (device.getState().equals("on")) {
-                        CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionByName(ConstManager.FUNCTION_TURN_OFF));
-                        SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(), "off"));
+                         SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(), "off"));
                         waitDialog.show();
                     } else if (device.getState().equals("off")) {
-                        CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionByName(ConstManager.FUNCTION_TURN_ON));
-                        SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(), "on"));
+                         SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(), "on"));
                         waitDialog.show();
                     }
                 }
@@ -422,7 +572,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 public void onClick(View v) {
                     CurrentContext.getInstance().setDevice(device);
                     CurrentContext.getInstance().setScript(null);
-                    CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionByName(ConstManager.FUNCTION_DEC_TEMP));
+                    CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_DEC_TEMP));
                     SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"inc"));
                     waitDialog.show();
                 }
@@ -433,21 +583,18 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 public void onClick(View v) {
                     CurrentContext.getInstance().setDevice(device);
                     CurrentContext.getInstance().setScript(null);
-                    CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionByName(ConstManager.FUNCTION_DEC_TEMP));
+                    CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_DEC_TEMP));
                     SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"dec"));
                     waitDialog.show();
                 }
             });
             remoteDialog.show();
         } else {
-            CurrentContext.getInstance().setDevice(device);
             CurrentContext.getInstance().setScript(null);
             if (device.getState().equals("on")){
-                CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionByName(ConstManager.FUNCTION_TURN_OFF));
                 SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"off"));
                 waitDialog.show();
             } else {
-                CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionByName(ConstManager.FUNCTION_TURN_ON));
                 SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"on"));
                 waitDialog.show();
             }
@@ -467,10 +614,13 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         new DetectionTask().execute(inputStream);
     }
 
+
     @Override
-    public void onUtteranceCompleted(String utteranceId) {
-        Log.d(TAG,"Utter "+utteranceId);
-        waitDialog.dismiss();
+    public void onFinish() {
+        Log.d(TAG, CurrentContext.getInstance().isWaitingOwnerSpeak()+ "  ");
+        if (CurrentContext.getInstance().isWaitingOwnerSpeak()) {
+            promptSpeechInput(sentenceReply);
+        }
     }
 
     private class DetectionTask extends AsyncTask<InputStream, String, com.microsoft.projectoxford.face.contract.Face[]> {
@@ -520,7 +670,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
                 if (result.length == 0) {
                     detecting= false;
-                    setInfo(AreaEntity.NOBODY);
+                    setDetectMessage(AreaEntity.NOBODY);
                 } else {
                     detecting= true;
 
@@ -540,7 +690,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                         Log.d("-------", "identify: facezise" + faceIds.size());
                     } else {
                         // Not detectingor person group exists.
-                        setInfo(AreaEntity.DETECT_NOT_AVAILABLE);
+                        Log.d(TAG,AreaEntity.DETECT_NOT_AVAILABLE + " khong detect diuoc");
                     }
                 }
             } else {
@@ -614,6 +764,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             if (result != null) {
 
                 String message = AreaEntity.DETECT_AQUAINTANCE +" ";
+                aquaintance = "";
                 Boolean hasAqua = false;
                 int stranger = 0;
                 for (IdentifyResult identifyResult: result) {
@@ -624,6 +775,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                                     personId, mPersonGroupId, ControlPanel.this);
 
                             message += personName+" ";
+                            aquaintance += personName+" ";
+
                             hasAqua = true;
                         } else {
                             stranger++;
@@ -632,15 +785,11 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                         stranger++;
                     }
                 }
-//                if (hasAqua) {
-//                    message += " trở lại quán ạ";
-//                }
                 if (!hasAqua) {
                     message = AreaEntity.DETECT_STRANGE;
                 }
 
-                showReply(message);
-                setInfo(message);
+                setDetectMessage(message);
 
             }
         }
@@ -650,69 +799,276 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     public void clicktoControlPanel(View v){
     }
 
-    private void setInfo(String info) {
-        currentArea = SmartHouse.getAreaById(currentArea.getId());
-        currentArea.setDetect(info);
-        SmartHouse.getInstance().updateAreaById(currentArea.getId(),currentArea);
-        TextView txtResult = (TextView) cameraDialog.findViewById(R.id.txtFaceResult);
-        txtResult.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cameraDialog.dismiss();
-            }
-        });
-        txtResult.setText(info);
-        if (SmartHouse.getInstance().getCurrentState()!=null) {
-            checkConfiguration(currentArea);
+    private void setDetectMessage(String info) {
+        startService(new Intent(this,ControlMonitorService.class));
+        AreaEntity camArea = SmartHouse.getAreaById(cameraAreaId);
+        camArea.setDetect(info);
+        camArea.setUpdatePerson((new Date()).getTime());
+        SmartHouse.getInstance().updateAreaById(cameraAreaId,camArea);
+        Log.d(TAG,camArea.getName()+"  "+info+"  detect nguoi");
+
+        checkConfiguration(camArea);
+
+//        showReply(BotUtils.completeSentence(camArea.getDetect(),info.substring(4,info.length()-1),""));
+        cameraDialog.dismiss();
+        if (currentArea.getId() == cameraAreaId) {
+            areaAttributeAdapter.updateAttribute(currentArea.generateValueArr());
         }
+        restartListeningService();
     }
 
     private void showReply(String sentenceReply){
-//        if (flagpromt < 3 && !sentenceReply.equals("") && !sentenceReply.contains("ác nhậ")) {
-//
-//            isWorking = true;
-//            stopListening();
-//            flagpromt +=1;
-//        } else {
-//            flagpromt = 1;
-//        }
-        VoiceUtils.speak(sentenceReply);
-
+        this.sentenceReply = sentenceReply;
         if (sentenceReply.contains("ác nhậ")){
-            isWorking = true;
-        } else {
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    promptSpeechInput();
+            CurrentContext.getInstance().stopWaitOwner();
+            stopListening();
+        }else if (sentenceReply.contains("Đang lấy hình")){
+            SmartHouse house = SmartHouse.getInstance();
+            Bitmap bmImg = house.getBitmapByAreaId(currentArea.getId());
+            ImageView imgFace = (ImageView) cameraDialog.findViewById(R.id.imgFace);
+
+            if (bmImg!=null){
+                stopListening();
+                imgFace.setImageBitmap(bmImg);
+                File myDir =  Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES);
+                myDir.mkdirs();
+                String nameFile = "testSelf.jpg";
+                File file = new File(myDir, nameFile);
+                if (file.exists ()) file.delete();
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+//                                Log.d(TAG,file.getAbsolutePath());
+                    bmImg.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    out.close();
+                } catch (IOException e){
+                    Log.d(TAG, e.getMessage());
                 }
-            },800);
+
+                Uri uri = Uri.fromFile(file);
+                Bitmap mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
+                        uri, getContentResolver());
+                detect(mBitmap);
+                cameraDialog.show();
+                sentenceReply = "";
+            } else {
+                 sentenceReply = BotUtils.completeSentence(
+                         CurrentContext.getInstance().getDetectedFunction().getFailPattern(), "", currentArea.getName());
+            }
+        }else if (CurrentContext.getInstance().getDetectSocial()!= null &&
+                (CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SAY_BYE ||
+                CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.NOT_UNDERSTD||
+                        CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_THANK)) {
+            restartListeningService();
+            CurrentContext.getInstance().stopWaitOwner();
+        } else if (CurrentContext.getInstance().getDetectSocial()!= null &&(
+                CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_AGREE ||
+                CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_DENY ) &&
+                SmartHouse.getInstance().getCurrentState().getId() == ConstManager.NO_BODY_HOME_STATE) {
+            stopListening();
+            lockDialog.show();
+            CurrentContext.getInstance().stopWaitOwner();
         }
-//
-//        Log.d(TAG, "showReply: ----------------" + sentenceReply);
-        Toast.makeText(this, sentenceReply, Toast.LENGTH_SHORT).show();
+        VoiceUtils.speak(sentenceReply);
+        Log.d(TAG, sentenceReply + "  " +CurrentContext.getInstance().isWaitingOwnerSpeak());
     }
     @Override
     protected void onPause() {
         super.onPause();
+//        waitDialog.show();
+
+        Log.i(TAG, "on pause called");
+        if(sr!=null){
+            sr.stopListening();
+            sr.cancel();
+            sr.destroy();
+
+        }
+        sr = null;
         stopService(new Intent(this,ControlMonitorService.class));
     }
-    private void promptSpeechInput() {
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (receiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+            receiver = null;
+//            waitDialog.dismiss();
+        }
+        stopListening();
+        stopService(new Intent(ControlPanel.this,ControlMonitorService.class));
+        Log.d(TAG,"on stop");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+//        restartListeningService();
+        if(VoiceUtils.getInstance() == null) {
+            VoiceUtils.initializeInstance(this, this);
+            waitDialog.show();
+            Log.d(TAG,"init voice");
+        }
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String resultType = intent.getStringExtra(ACTION_TYPE);
+                Log.d(TAG,resultType);
+                if (SmartHouse.getInstance().getCurrentState().getId()==ConstManager.NO_BODY_HOME_STATE) {
+                    if (stateDialog!= null && stateDialog.isShowing()){
+                        stateDialog.dismiss();
+                    }
+                }
+                if (resultType.equals(ControlMonitorService.BOT_UPDATE)){
+                    CurrentContext currentContext = CurrentContext.getInstance();
+                    currentContext.setDetectSocial(BotUtils.getSocialById(ConstManager.UPDATE_BRAIN));
+                    String sentence = BotUtils.completeSentence(
+                            currentContext.getDetectSocial().getQuestionPattern(),"","");
+                    configUpdateDialog.setMessage(sentence);
+                    showReply(sentence);
+                    SmartHouse.getInstance().setRequireBotUpdate(false);
+                    configUpdateDialog.show();
+                } else if (resultType.equals(ControlMonitorService.NEW_UPDATE)){
+                    CurrentContext currentContext = CurrentContext.getInstance();
+                    currentContext.setDetectSocial(BotUtils.getSocialById(ConstManager.UPDATE_CONFIG));
+                    String sentence = BotUtils.completeSentence(
+                            currentContext.getDetectSocial().getQuestionPattern(),"","");
+                    configUpdateDialog.setMessage(sentence);
+                    showReply(sentence);
+                    configUpdateDialog.show();
+                    SmartHouse.getInstance().setRequireUpdate(false);
+                } else
+                if (resultType.equals(WebServerService.SERVER_SUCCESS)) {
+                    noticBuilder.setContentText(resultType);
+                    noticBuilder.setContentTitle("Server stated port 8080");
+                    NotificationManager man = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                    man.notify(0,noticBuilder.build());
+
+                }  else if (resultType.equals(ControlMonitorService.SCHEDULER) && CurrentContext.getInstance().getDetectedFunction() != null) {
+                    Log.d(TAG,"scheduler sent");
+                    CurrentContext cont = CurrentContext.getInstance();
+                    showReply(BotUtils.completeSentence(cont.getDetectedFunction().getRemindPattern(),"",cont.getScript().getName()));
+//                    cont.waitOwner();
+
+                }else if (resultType.equals(ControlMonitorService.DEACTIVATE)){
+                    sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
+                    SharedPreferences.Editor edit = sharedPreferences.edit();
+                    edit.putString(ConstManager.CONTRACT_ID,"");
+                    edit.commit();
+                    Log.d(TAG,"Deeactive sent");
+                    startActivity(new Intent(ControlPanel.this, MainActivity.class));
+                } else if (resultType.equals(ControlMonitorService.WAIT)){
+                    Log.d(TAG,waitDialog.isShowing()+" stae diaalog");
+                    if (!waitDialog.isShowing()) {
+//                        waitDialog = new ProgressDialog(ControlPanel.this);
+//                        waitDialog.setTitle("Vui lòng đợi");
+//                        waitDialog.setIndeterminate(true);
+//                        waitDialog.setCancelable(true);
+                        waitDialog.show();
+                    }
+                } else if (resultType.equals(ControlMonitorService.CHANGE_STATE)){
+                    SmartHouse house =SmartHouse.getInstance();
+                    if (house.getCurrentState().getId()!= ConstManager.NO_BODY_HOME_STATE &&
+                            house.getCurrentState().getId() != ConstManager.OWNER_IN_HOUSE_STATE) {
+                        showAlertState(house.getCurrentState(), "");
+                        showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(), "", ""));
+                    }  else
+                    if (stateDialog!= null &&stateDialog.isShowing()){
+                        stateDialog.dismiss();
+                    }
+                    CurrentContext.getInstance().stopWaitOwner();
+                }else if (resultType.equals(ControlMonitorService.CONTROL)){
+                    waitDialog.dismiss();
+                    CurrentContext.getInstance().stopWaitOwner();
+                    int result = intent.getIntExtra(AREA_ID, -1);
+                    restartListeningService();
+
+                    CurrentContext current = CurrentContext.getInstance();
+                    String target = current.getDevice()!=null?current.getDevice().getName():current.getScript().getName();
+                    if (result == ControlMonitorService.SUCCESS){
+                        showReply(BotUtils.completeSentence(
+                                current.getDetectedFunction().getSuccessPattern(),"",target));
+                        SmartHouse house = SmartHouse.getInstance();
+                        Log.d(TAG,house.getDevices().size()+" succ");
+                        deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
+                    } else if (result == ControlMonitorService.FAIL){
+                        showReply(BotUtils.completeSentence(
+                                current.getDetectedFunction().getFailPattern(),"",target));
+
+                    }
+                } else if (resultType.equals(ControlMonitorService.MONITOR)) {
+                    int areaId = intent.getIntExtra(AREA_ID, -1);
+                    if ( currentArea!=null && areaId == currentArea.getId()) {
+                        areaAttributeAdapter.updateAttribute(currentArea.generateValueArr());
+                        SmartHouse house = SmartHouse.getInstance();
+                        deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
+                    }
+                    if (SmartHouse.getInstance().getCurrentState()!=null) {
+                        checkConfiguration(SmartHouse.getAreaById(areaId));
+                    }
+                } else if (resultType.equals(ControlMonitorService.CAMERA)){
+                    cameraAreaId = intent.getIntExtra(AREA_ID,-1);
+                    SmartHouse house = SmartHouse.getInstance();
+                    Bitmap bmImg = house.getBitmapByAreaId(cameraAreaId);
+                    ImageView imgFace = (ImageView) cameraDialog.findViewById(R.id.imgFace);
+
+                    if (bmImg!=null){
+                        imgFace.setImageBitmap(bmImg);
+                        File myDir =  Environment.getExternalStoragePublicDirectory(
+                                Environment.DIRECTORY_PICTURES);
+                        myDir.mkdirs();
+                        String nameFile = "testSelf.jpg";
+                        File file = new File(myDir, nameFile);
+                        if (file.exists ()) file.delete();
+                        try {
+                            FileOutputStream out = new FileOutputStream(file);
+//                                Log.d(TAG,file.getAbsolutePath());
+                            bmImg.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                            out.close();
+                        } catch (IOException e){
+                            Log.d(TAG, e.getMessage());
+                        }
+
+                        Uri uri = Uri.fromFile(file);
+                        Bitmap mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
+                                uri, getContentResolver());
+
+                        stopService(new Intent(ControlPanel.this,ControlMonitorService.class));
+                        detect(mBitmap);
+                    } else {
+                        imgFace.setImageResource(R.drawable.close);
+                    }
+                    ((TextView) cameraDialog.findViewById(R.id.txtFaceResult)).setText("Hình từ "+SmartHouse.getAreaById(cameraAreaId).getName());
+                    cameraDialog.show();
+
+                }
+            }
+        };
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
+                new IntentFilter(CONTROL_FILTER_RECEIVER));
+
+        Log.d(TAG,"on start");
+    }
+
+    private void promptSpeechInput(String message) {
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"vi");
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,message);
         try {
             startActivityForResult(intent, VAPanel.REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
-            Toast.makeText(this,"Fail to nhận diện giọng nói",Toast.LENGTH_SHORT).show();
+            MessageUtils.makeText(this,"Không kết nối được nhận diện giọng nói").show();
         }
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG,requestCode+"--" );
+        Log.d(TAG,"onAct Result: " +requestCode+"--" );
         switch (requestCode) {
             case VAPanel.REQ_CODE_SPEECH_INPUT: {
                 if (resultCode == -1 && null != data) {
@@ -720,10 +1076,15 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     Log.d(TAG,result.get(0));
                     showReply(BotUtils.botReplyToSentence(result.get(0)));
+                } else {
+                    restartListeningService();
                 }
                 break;
             }
+            case Activity.RESULT_CANCELED:{
 
+                Log.d(TAG,"onAct Result: nát nát nát--" );
+            }
         }
     }
 
@@ -731,12 +1092,55 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     @Override
     public void processVoiceCommands(String... voiceCommands) {
 
-        Log.d("-----------", "processVoiceCommands: "+ voiceCommands[0].toString());
-        if (voiceCommands[0].contains(" ơi")) {
+        Log.d(TAG, "processVoiceCommands: "+ voiceCommands[0].toString());
+        List<TermEntity> terms = (new TermSQLite()).getHumanIntentInSentence(" "+voiceCommands[0]+" ");
+        DetectSocialEntity social = BotUtils.findBestSocialDetected(terms);
+        SmartHouse house = SmartHouse.getInstance();
+        if (social!=null) {
+            Log.d(TAG, social.getName());
+        }
+        if (social != null && social.getId() == ConstManager.SOCIAL_APPEL) {
             stopListening();
-            showReply(BotUtils.completeSentence("Dạ <bot-role> nghe","",""));
-            promptSpeechInput();
-        }else {
+            CurrentContext.getInstance().waitOwner();
+            CurrentContext.getInstance().setDetectSocial(social);
+            showReply(BotUtils.completeSentence(social.getReplyPattern(),"",""));
+        }else if (social!= null && social.getId() == ConstManager.SOCIAL_AGREE && CurrentContext.getInstance().getDetectSocial() !=null) {
+            if (configUpdateDialog.isShowing()){
+                configUpdateDialog.dismiss();
+            }
+            if (CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.UPDATE_BRAIN) {
+                stopListening();
+                updateBot();
+            }
+            if (CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.UPDATE_CONFIG){
+                stopListening();
+                updateConfig();
+            }
+        }
+        else if (social!= null && social.getId() == ConstManager.SOCIAL_AGREE &&
+                house.getCurrentState().getId() !=ConstManager.NO_BODY_HOME_STATE&&
+                house.getCurrentState().getId() !=ConstManager.OWNER_IN_HOUSE_STATE) {
+            Log.d(TAG,"kich hoat cau hinh "+house.getCurrentState().getName());
+            CurrentContext.getInstance().setScript(null);
+            house.startConfigCmds();
+            house.setStateChangedTime(
+                    (new Date().getTime()) - house.getCurrentState().getDelaySec()*1000);
+            if (stateDialog.isShowing()){
+                stateDialog.dismiss();
+            }
+        } else if (social!= null && social.getId() == ConstManager.SOCIAL_DENY) {
+            if (configUpdateDialog != null &&configUpdateDialog.isShowing()){
+                configUpdateDialog.dismiss();
+            }
+            if (stateDialog!= null && stateDialog.isShowing()){
+                stateDialog.dismiss();
+            }
+            house.setRequireBotUpdate(false);
+            house.setRequireUpdate(false);
+            house.resetStateToDefault();
+            CurrentContext.getInstance().renew();
+            restartListeningService();
+        } else {
             restartListeningService();
         }
         Toast.makeText(this, voiceCommands[0], Toast.LENGTH_SHORT).show();

@@ -24,7 +24,25 @@ public class ScriptEntity extends TargetObject{
     private int minute;
     @SerializedName("weekDay")
     private String weekDay;
-    Set<Integer> weeksDay;
+    private Set<Integer> weeksDay;
+    private boolean onlyOneTime;
+    private boolean enabled;
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public void setOnlyOneTime(boolean onlyOneTime) {
+        this.onlyOneTime = onlyOneTime;
+    }
+
+    public boolean isOnlyOneTime() {
+        return onlyOneTime;
+    }
 
     private double detectScore;
 

@@ -1,6 +1,9 @@
 
 package center.control.system.vash.controlcenter.server;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -19,11 +22,16 @@ public class RetroFitSingleton {
     public static RetroFitSingleton getInstance() {
         if(retroFitSingleton == null) {
             synchronized(RetroFitSingleton.class) {
+
                 if(retroFitSingleton == null) {
+                    Gson gson = new GsonBuilder()
+                            .setLenient()
+                            .create();
+
                     retroFitSingleton= new RetroFitSingleton();
                     retroFitSingleton.retrofit = new Retrofit.Builder()
                             .baseUrl(VolleySingleton.SERVER_HOST)
-                            .addConverterFactory(GsonConverterFactory.create())
+                            .addConverterFactory(GsonConverterFactory.create(gson))
                             .build();
 
                     retroFitSingleton.cloudApi = retroFitSingleton.retrofit.create(CloudApi.class);
