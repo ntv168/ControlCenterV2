@@ -225,10 +225,17 @@ public class PersonalInfoActivity extends AppCompatActivity {
                             loginStaffApi.changePass(passDto).enqueue(new Callback<LoginSmarthouseDTO>() {
                                 @Override
                                 public void onResponse(Call<LoginSmarthouseDTO> call, Response<LoginSmarthouseDTO> response) {
+                                    Log.d(TAG,call.request().url()+"");
                                     if (response.body().getNewPassword().equals("success")){
                                         passDiag.dismiss();
+//                                        MessageUtils.makeText(PersonalInfoActivity.this,"Đổi mật khẩu thành công").show();
+                                        sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
+                                        SharedPreferences.Editor edit = sharedPreferences.edit();
+                                        edit.putString(ConstManager.CONTRACT_ID,"");
+                                        edit.commit();
+                                        startActivity(new Intent(PersonalInfoActivity.this, MainActivity.class));
                                     } else {
-                                        MessageUtils.makeText(PersonalInfoActivity.this,response.body().getNewPassword()).show();
+                                        MessageUtils.makeText(PersonalInfoActivity.this,"Đổi mật khẩu thất bại").show();
                                     }
                                     waitDialog.dismiss();
                                 }
@@ -242,6 +249,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
                             waitDialog.show();
                         }else {
                             MessageUtils.makeText(PersonalInfoActivity.this,"Mật khẩu xác nhận không giống mật khẩu mới").show();
+                            waitDialog.dismiss();
                         }
 
                     }

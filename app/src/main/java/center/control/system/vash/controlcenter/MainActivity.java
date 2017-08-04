@@ -103,7 +103,7 @@ public class MainActivity extends Activity {
 
                     }
                 });
-        modHost.show();
+//        modHost.show();
     }
 
     private void loginStaffCode() {

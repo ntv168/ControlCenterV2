@@ -525,8 +525,9 @@ public class BotUtils {
             current.setArea(area);
             return completeSentence(functionIntent.getRemindPattern(), "", target);
         } else {
-            Log.d(TAG, "Không thấy gì hết ngoài " + functionIntent.getFunctionName());
+            Log.d(TAG, "Khong thấy gì hết ngoài " + functionIntent.getFunctionName());
             DetectSocialEntity askDevice = BotUtils.getSocialById(ConstManager.SOCIAL_ASK_DEVICEONLY);
+            current.setDetectSocial(askDevice);
             return completeSentence(askDevice.getQuestionPattern(),"",
                     ConstManager.getVerbByIntent(functionIntent.getId()));
         }
@@ -563,21 +564,35 @@ public class BotUtils {
         TermSQLite termSQLite = new TermSQLite();
         List<TargetTernEntity> termTargets = TermSQLite.getTargetInSentence(humanSay);
         DetectSocialEntity currentSocial = CurrentContext.getInstance().getDetectSocial();
+        DetectFunctionEntity currentFunct = CurrentContext.getInstance().getDetectedFunction();
+        AreaEntity area = BotUtils.findBestArea(termTargets);
+
         if (currentSocial!= null && currentSocial.getId() == ConstManager.SOCIAL_ASK_DEVICEAREA){
             return processDeviceInArea(CurrentContext.getInstance().getDetectedFunction(),termTargets);
         } else if (currentSocial!= null && currentSocial.getId() == ConstManager.SOCIAL_ASK_DEVICEONLY){
             return processDeviceOnly(CurrentContext.getInstance().getDetectedFunction(),termTargets);
         } else if (currentSocial!= null && currentSocial.getId() == ConstManager.SOCIAL_ASK_MODE){
             return processMode(CurrentContext.getInstance().getDetectedFunction(),termTargets);
-        } else {
+        } else if (currentFunct!= null && currentFunct.getFunctionName().contains("check") && area!=null){
+            String resultVal = BotUtils.getAttributeByFunction(currentFunct.getId(),area);
+            String replyComplete ="";
+            if (resultVal == null){
+                replyComplete=completeSentence(currentFunct.getFailPattern(), resultVal, area.getName());
+            } else {
+                replyComplete=completeSentence(currentFunct.getSuccessPattern(), resultVal, area.getName());
+            }
+            return replyComplete;
+        }  else {
             List<TermEntity> terms = termSQLite.getHumanIntentInSentence(humanSay);
 //        Log.d(TAG,termSQLite.getAllTerms().size()+" s");
             DetectFunctionEntity functFound = BotUtils.findBestFunctDetected(terms);
             DetectSocialEntity socialFound = BotUtils.findBestSocialDetected(terms);
             if (functFound != null && socialFound != null) {
                 double functionTfidf = functFound.getDetectScore();
-                functionTfidf += BotUtils.findBestArreaTfidf(termTargets) + BotUtils.findBestDeviceTfidf(termTargets)
-                        + BotUtils.findBestScriptTfidf(termTargets);
+                if (functFound.getId() == ConstManager.FUNCTION_START_MODE)
+                    functionTfidf +=  BotUtils.findBestScriptTfidf(termTargets);
+                else
+                functionTfidf += BotUtils.findBestArreaTfidf(termTargets) + BotUtils.findBestDeviceTfidf(termTargets);
                 Log.d(TAG, "funct point: " + functionTfidf + " soc point " + socialFound.getDetectScore());
                 if (functionTfidf > socialFound.getDetectScore()) {
                     return processFunction(termTargets, functFound);
@@ -641,13 +656,15 @@ public class BotUtils {
                 //
             }  
             Log.d(TAG,"Khong tim thay phong");
+            Log.d(TAG,functionIntent.getRemindPattern() +"");
             return completeSentence(functionIntent.getRemindPattern(),"",""); 
         } else if (functionIntent.getId() == ConstManager.SHOW_CAMERA) {
             AreaEntity area = BotUtils.findBestArea(termTargets);
             if (area != null) {
+                current.setArea(area);
                 Log.d(TAG,"Thay phong de check"+area.getName());
-                return "Đang lấy hình";
-                //
+
+                return "Hình từ "+area.getName()+" đây";
             }
             Log.d(TAG,"Khong tim thay phong");
             return completeSentence(functionIntent.getRemindPattern(),"","");

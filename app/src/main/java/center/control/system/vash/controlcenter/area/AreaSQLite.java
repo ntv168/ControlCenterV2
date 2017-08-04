@@ -57,7 +57,6 @@ public class AreaSQLite {
         // Inserting Row
         int newId  = (int) db.insert(TABLE_AREA, null, values);
         SQLiteManager.getInstance().closeDatabase();
-
         return newId;
     }
 

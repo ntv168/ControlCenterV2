@@ -36,7 +36,7 @@ public class AreaEntity extends TargetObject{
     private static final String TEMP_FREEZE = "fz";
     private static final String LIGHT_BRIGHT = "br";
     private static final String LIGHT_DARK = "dk";
-    public static final long HOLD_PERSON = 11000;
+    public static final long HOLD_PERSON = 9000;
 
     @SerializedName("temperature")
     private String temperature;
@@ -136,7 +136,11 @@ public class AreaEntity extends TargetObject{
                 }
             }
         }
-        return  "Có "+ lightin + " đèn bật";
+
+        if (lightin == 0 ){
+            return "không có đèn nào sáng";
+        } else
+        return  "có "+ lightin + " đèn bật";
     }
     public String getBright() {
         int lightin = 0;
@@ -186,7 +190,10 @@ public class AreaEntity extends TargetObject{
                 }
             }
         }
-        return usingDev + " thiết bị sử dụng điện";
+        if (usingDev == 0){
+            return "Không có thiết bị nào sử dụng điện";
+        }
+        return "có "+usingDev + " thiết bị sử dụng điện";
     }
 
     public void setElectricUsing(String electricUsing) {
@@ -253,7 +260,11 @@ public class AreaEntity extends TargetObject{
                 }
             }
         }
-        String lighting = "Có "+ lightin + " đèn bật";
+        String lighting = "";
+        if (lightin == 0 ){
+            lighting =  "không có đèn nào sáng";
+        } else
+        lighting = "Có "+ lightin + " đèn bật";
 
         String[] result = new String[]{
                 safetyRes,
@@ -335,7 +346,7 @@ public class AreaEntity extends TargetObject{
             case TEMP_WARM:
                 return " hơi nóng";
             case TEMP_FRESH:
-                return " mát vừa đủ";
+                return " mát rồi";
         }
         return " có nhiệt độ lạ lắm";
     }
