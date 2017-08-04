@@ -31,17 +31,23 @@ import android.widget.TimePicker;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.nlp.CurrentContext;
 import center.control.system.vash.controlcenter.nlp.DetectFunctionEntity;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
+import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
+import center.control.system.vash.controlcenter.nlp.OwnerTrainEntity;
+import center.control.system.vash.controlcenter.nlp.TermSQLite;
 import center.control.system.vash.controlcenter.script.CommandAdapter;
 import center.control.system.vash.controlcenter.script.ListScriptAdapter;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.script.TodayAdapter;
+import center.control.system.vash.controlcenter.server.FunctionIntentDTO;
+import center.control.system.vash.controlcenter.server.SocialIntentDTO;
 import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
@@ -376,7 +382,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
 
     @Override
     public void activaScript(ScriptEntity item) {
-        DetectFunctionEntity funct = DetectIntentSQLite.findFunctionByName(ConstManager.FUNCTION_START_MODE);
+        DetectFunctionEntity funct = DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_START_MODE);
         CurrentContext.getInstance().setDetectedFunction(funct);
         CurrentContext.getInstance().setScript(item);
         BotUtils.implementCommand(funct,null,item);
@@ -415,5 +421,12 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
                 SmartHouse.getInstance().disableToday(mode.getId());
             }
         }
+        TermSQLite sqLite = new TermSQLite();
+        sqLite.clearTargweAll();
+        SmartHouse house = SmartHouse.getInstance();
+        BotUtils bot = new BotUtils();
+        bot.saveDeviceTFIDFTerm(house.getDevices());
+        bot.saveAreaTFIDFTerm(house.getAreas());
+        bot.saveScriptTFIDFTerm(house.getScripts());
     }
 }

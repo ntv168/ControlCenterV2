@@ -2,7 +2,6 @@ package center.control.system.vash.controlcenter.area;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,8 +40,6 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaHolder> {
 
     @Override
     public void onBindViewHolder(final AreaHolder holder, final int position) {
-        Log.d(TAG, areaEntities.get(position).getName() + " bind");
-        Log.d(TAG, "Focus item: " + focusedItem);
         holder.name.setText(areaEntities.get(position).getName());
         if (position == focusedItem){
             holder.linArea.setBackgroundResource(R.drawable.background_area_active);

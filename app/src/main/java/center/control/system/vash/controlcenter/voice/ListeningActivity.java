@@ -38,7 +38,9 @@ public abstract class ListeningActivity extends Activity implements IVoiceContro
 		                "com.dummy");
 		    }
 			sr.startListening(intent);
+
 		} catch(Exception ex) {
+			Log.d("COn bot nghe",ex.getMessage());
 			ex.getMessage();
 		}
 	}
@@ -49,6 +51,7 @@ public abstract class ListeningActivity extends Activity implements IVoiceContro
 			sr.stopListening();
         	sr.cancel();
         	sr.destroy();
+
         }
 		sr = null;
 	}

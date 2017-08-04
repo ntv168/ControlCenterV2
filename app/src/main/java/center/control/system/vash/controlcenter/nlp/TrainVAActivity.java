@@ -90,6 +90,50 @@ public class TrainVAActivity extends AppCompatActivity {
                         TermSQLite.insertOrUpdateTrain(train);
                         txtSenten.setText("");
 
+                        final CloudApi botApi = RetroFitSingleton.getInstance().getCloudApi();
+                        SharedPreferences sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
+                        botApi.getDataVA(sharedPreferences.getInt(ConstManager.BOT_TYPE_ID,-1)
+                        ).enqueue(new Callback<BotDataCentralDTO>() {
+                            @Override
+                            public void onResponse(Call<BotDataCentralDTO> call, Response<BotDataCentralDTO> response) {
+                                Log.d(TAG,call.request().url()+"");
+                                if (response.body() != null) {
+                                    TermSQLite sqLite = new TermSQLite();
+                                    List<OwnerTrainEntity> trained = sqLite.getOwnerTrain();
+                                    Map<String, Map<String, Integer>> updatedFunct = BotUtils.updateFuncts(trained, response.body().getFunctionMap());
+                                    DetectIntentSQLite sqlDect = new DetectIntentSQLite();
+                                    sqLite.clearAll();
+                                    sqlDect.clearAll();
+
+                                    for (SocialIntentDTO soc : response.body().getSocials()) {
+                                        sqlDect.insertSocial(new DetectSocialEntity(soc.getId(),
+                                                soc.getName(), soc.getQuestion(), soc.getReply()));
+                                    }
+                                    for (FunctionIntentDTO funct : response.body().getFunctions()) {
+                                        sqlDect.insertFunction(new DetectFunctionEntity(funct.getId(),
+                                                funct.getName(), funct.getSuccess(), funct.getFail(), funct.getRemind()));
+                                    }
+                                    SmartHouse house = SmartHouse.getInstance();
+                                    BotUtils bot = new BotUtils();
+                                    bot.saveFunctionTFIDFTerm(updatedFunct);
+                                    bot.saveSocialTFIDFTerm(response.body().getSocialMap());
+                                    bot.saveDeviceTFIDFTerm(house.getDevices());
+                                    bot.saveAreaTFIDFTerm(house.getAreas());
+                                    bot.saveScriptTFIDFTerm(house.getScripts());
+                                    Log.d(TAG,"Day thanh cong");
+                                    waitDialog.dismiss();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<BotDataCentralDTO> call, Throwable t) {
+                                Log.d(TAG,call.request().url()+"");
+                                Log.d(TAG,"down load bot data failed");
+                                waitDialog.dismiss();
+                                MessageUtils.makeText(TrainVAActivity.this,"Dạy trợ lý thất bại");
+                            }
+                        });
+                        waitDialog.show();
                     }
                 } else {
                     MessageUtils.makeText(TrainVAActivity.this,"Vui lòng nhập câu").show();
@@ -101,49 +145,5 @@ public class TrainVAActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        final CloudApi botApi = RetroFitSingleton.getInstance().getCloudApi();
-        SharedPreferences sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
-        botApi.getDataVA(sharedPreferences.getInt(ConstManager.BOT_TYPE_ID,-1)
-        ).enqueue(new Callback<BotDataCentralDTO>() {
-            @Override
-            public void onResponse(Call<BotDataCentralDTO> call, Response<BotDataCentralDTO> response) {
-                Log.d(TAG,call.request().url()+"");
-                if (response.body() != null) {
-                    TermSQLite sqLite = new TermSQLite();
-                    List<OwnerTrainEntity> trained = sqLite.getOwnerTrain();
-                    Map<String, Map<String, Integer>> updatedFunct = BotUtils.updateFuncts(trained, response.body().getFunctionMap());
-                    DetectIntentSQLite sqlDect = new DetectIntentSQLite();
-                    sqLite.clearAll();
-                    sqlDect.clearAll();
-
-                    for (SocialIntentDTO soc : response.body().getSocials()) {
-                        sqlDect.insertSocial(new DetectSocialEntity(soc.getId(),
-                                soc.getName(), soc.getQuestion(), soc.getReply()));
-                    }
-                    for (FunctionIntentDTO funct : response.body().getFunctions()) {
-                        sqlDect.insertFunction(new DetectFunctionEntity(funct.getId(),
-                                funct.getName(), funct.getSuccess(), funct.getFail(), funct.getRemind()));
-                    }
-                    SmartHouse house = SmartHouse.getInstance();
-                    BotUtils bot = new BotUtils();
-                    bot.saveFunctionTFIDFTerm(updatedFunct);
-                    bot.saveSocialTFIDFTerm(response.body().getSocialMap());
-                    bot.saveDeviceTFIDFTerm(house.getDevices());
-                    bot.saveAreaTFIDFTerm(house.getAreas());
-                    bot.saveScriptTFIDFTerm(house.getScripts());
-                    Log.d(TAG,"Day thanh cong");
-                    waitDialog.dismiss();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<BotDataCentralDTO> call, Throwable t) {
-                Log.d(TAG,call.request().url()+"");
-                Log.d(TAG,"down load bot data failed");
-                waitDialog.dismiss();
-                MessageUtils.makeText(TrainVAActivity.this,"Dạy trợ lý thất bại");
-            }
-        });
-        waitDialog.show();
     }
 }
