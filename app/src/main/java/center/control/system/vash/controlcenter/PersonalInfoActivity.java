@@ -228,7 +228,12 @@ public class PersonalInfoActivity extends AppCompatActivity {
                                     Log.d(TAG,call.request().url()+"");
                                     if (response.body().getNewPassword().equals("success")){
                                         passDiag.dismiss();
-                                        MessageUtils.makeText(PersonalInfoActivity.this,"Đổi mật khẩu thành công").show();
+                                        SharedPreferences.Editor edit = sharedPreferences.edit();
+                                        edit = sharedPreferences.edit();
+                                        edit.putString(ConstManager.CONTRACT_ID,"");
+                                        edit.commit();
+                                        Log.d(TAG,"Deeactive sent");
+                                        startActivity(new Intent(PersonalInfoActivity.this, MainActivity.class));
                                     } else {
                                         MessageUtils.makeText(PersonalInfoActivity.this,"Đổi mật khẩu thất bại").show();
                                     }

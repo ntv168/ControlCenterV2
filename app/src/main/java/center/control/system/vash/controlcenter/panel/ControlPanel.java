@@ -659,12 +659,12 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             promptSpeechInput(sentenceReply);
         }
 
-//        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-//        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
-//        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
-//        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
-//        amanager.setStreamMute(AudioManager.STREAM_RING, true);
-//        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
+        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+        amanager.setStreamMute(AudioManager.STREAM_RING, true);
+        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
     }
 
     private class DetectionTask extends AsyncTask<InputStream, String, com.microsoft.projectoxford.face.contract.Face[]> {
@@ -1232,7 +1232,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         } else {
             restartListeningService();
         }
-        Toast.makeText(this, voiceCommands[0], Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, voiceCommands[0], Toast.LENGTH_SHORT).show();
     }
 
 }
