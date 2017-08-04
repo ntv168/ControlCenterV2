@@ -1,6 +1,6 @@
 [
     {
-        "outputFile": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-ja\\values-ja.xml",
+        "outputFile": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-ja\\values-ja.xml",
         "map": [
             {
                 "to": {
@@ -11,13 +11,13 @@
                     "endOffset": 103
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values-ja\\headset_pro.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values-ja\\headset_pro.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
-                        "startOffset": 139,
+                        "startOffset": 136,
                         "endColumn": 52,
-                        "endOffset": 187
+                        "endOffset": 184
                     }
                 }
             }

@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/controlcenter.iml" filepath="$PROJECT_DIR$/controlcenter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ControlCenter.iml" filepath="$PROJECT_DIR$/ControlCenter.iml" />
       <module fileurl="file://$PROJECT_DIR$/smartExtensionAPI/smartExtensionAPI.iml" filepath="$PROJECT_DIR$/smartExtensionAPI/smartExtensionAPI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/smartExtensionUtils/smartExtensionUtils.iml" filepath="$PROJECT_DIR$/smartExtensionUtils/smartExtensionUtils.iml" />
     </modules>
   </component>

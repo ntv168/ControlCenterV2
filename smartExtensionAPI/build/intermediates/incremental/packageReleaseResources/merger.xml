@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main$Generated" generated="true"><source path="D:\Source\android\controlcenter\smartExtensionAPI\src\main\res"/><source path="D:\Source\android\controlcenter\smartExtensionAPI\build\generated\res\rs\release"/><source path="D:\Source\android\controlcenter\smartExtensionAPI\build\generated\res\resValues\release"/></dataSet><dataSet config="release$Generated" generated="true"><source path="D:\Source\android\controlcenter\smartExtensionAPI\src\release\res"/></dataSet><dataSet config="main" generated-set="main$Generated"><source path="D:\Source\android\controlcenter\smartExtensionAPI\src\main\res"><file path="D:\Source\android\controlcenter\smartExtensionAPI\src\main\res\values\strings.xml" qualifiers=""><string name="app_name">SmartExtensionAPI</string></file><file path="D:\Source\android\controlcenter\smartExtensionAPI\src\main\res\values\widget_attrs.xml" qualifiers=""><declare-styleable name="TimeView">
+<merger version="3"><dataSet config="main$Generated" generated="true"><source path="D:\Project\Android\ControlCenter\SmartExtensionAPI\res"/><source path="D:\Project\Android\ControlCenter\SmartExtensionAPI\build\generated\res\rs\release"/><source path="D:\Project\Android\ControlCenter\SmartExtensionAPI\build\generated\res\resValues\release"/></dataSet><dataSet config="release$Generated" generated="true"><source path="D:\Project\Android\ControlCenter\SmartExtensionAPI\src\release\res"/></dataSet><dataSet config="main" generated-set="main$Generated"><source path="D:\Project\Android\ControlCenter\SmartExtensionAPI\res"><file path="D:\Project\Android\ControlCenter\SmartExtensionAPI\res\values\strings.xml" qualifiers=""><string name="app_name">SmartExtensionAPI</string></file><file path="D:\Project\Android\ControlCenter\SmartExtensionAPI\res\values\widget_attrs.xml" qualifiers=""><declare-styleable name="TimeView">
         
         <attr format="dimension" name="textSize">
             
@@ -94,7 +94,7 @@
         </attr>
         
         <attr format="integer" name="timeOffset"/>
-    </declare-styleable></file></source><source path="D:\Source\android\controlcenter\smartExtensionAPI\build\generated\res\rs\release"/><source path="D:\Source\android\controlcenter\smartExtensionAPI\build\generated\res\resValues\release"/></dataSet><dataSet config="release" generated-set="release$Generated"><source path="D:\Source\android\controlcenter\smartExtensionAPI\src\release\res"/></dataSet><mergedItems><configuration qualifiers=""><declare-styleable name="TimeLayout"><attr name="gravity">
+    </declare-styleable></file></source><source path="D:\Project\Android\ControlCenter\SmartExtensionAPI\build\generated\res\rs\release"/><source path="D:\Project\Android\ControlCenter\SmartExtensionAPI\build\generated\res\resValues\release"/></dataSet><dataSet config="release" generated-set="release$Generated"><source path="D:\Project\Android\ControlCenter\SmartExtensionAPI\src\release\res"/></dataSet><mergedItems><configuration qualifiers=""><declare-styleable name="TimeLayout"><attr name="gravity">
             
             <flag name="top" value="0x30"/>
             

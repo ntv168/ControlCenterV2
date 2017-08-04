@@ -1,6 +1,6 @@
 [
     {
-        "outputFile": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values\\values.xml",
+        "outputFile": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values\\values.xml",
         "map": [
             {
                 "to": {
@@ -11,13 +11,13 @@
                     "endOffset": 116
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 19,
                         "startColumn": 4,
-                        "startOffset": 734,
+                        "startOffset": 715,
                         "endColumn": 65,
-                        "endOffset": 795
+                        "endOffset": 776
                     }
                 }
             },
@@ -30,13 +30,13 @@
                     "endOffset": 184
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 20,
                         "startColumn": 4,
-                        "startOffset": 801,
+                        "startOffset": 781,
                         "endColumn": 67,
-                        "endOffset": 864
+                        "endOffset": 844
                     }
                 }
             },
@@ -49,13 +49,13 @@
                     "endOffset": 251
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 21,
                         "startColumn": 4,
-                        "startOffset": 870,
+                        "startOffset": 849,
                         "endColumn": 66,
-                        "endOffset": 932
+                        "endOffset": 911
                     }
                 }
             },
@@ -68,13 +68,13 @@
                     "endOffset": 315
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 24,
                         "startColumn": 4,
-                        "startOffset": 1207,
+                        "startOffset": 1183,
                         "endColumn": 63,
-                        "endOffset": 1266
+                        "endOffset": 1242
                     }
                 }
             },
@@ -87,13 +87,13 @@
                     "endOffset": 381
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 25,
                         "startColumn": 4,
-                        "startOffset": 1272,
+                        "startOffset": 1247,
                         "endColumn": 65,
-                        "endOffset": 1333
+                        "endOffset": 1308
                     }
                 }
             },
@@ -106,13 +106,13 @@
                     "endOffset": 446
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 26,
                         "startColumn": 4,
-                        "startOffset": 1339,
+                        "startOffset": 1313,
                         "endColumn": 64,
-                        "endOffset": 1399
+                        "endOffset": 1373
                     }
                 }
             },
@@ -125,13 +125,13 @@
                     "endOffset": 3110
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\headset_pro.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\headset_pro.xml",
                     "position": {
                         "startLine": 5,
                         "startColumn": 4,
-                        "startOffset": 222,
+                        "startOffset": 217,
                         "endColumn": 57,
-                        "endOffset": 275
+                        "endOffset": 270
                     }
                 }
             },
@@ -144,13 +144,13 @@
                     "endOffset": 3168
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\headset_pro.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\headset_pro.xml",
                     "position": {
                         "startLine": 4,
                         "startColumn": 4,
-                        "startOffset": 163,
+                        "startOffset": 159,
                         "endColumn": 57,
-                        "endOffset": 216
+                        "endOffset": 212
                     }
                 }
             },
@@ -163,13 +163,13 @@
                     "endOffset": 3221
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\headset_pro.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\headset_pro.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
-                        "startOffset": 109,
+                        "startOffset": 106,
                         "endColumn": 52,
-                        "endOffset": 157
+                        "endOffset": 154
                     }
                 }
             },
@@ -182,13 +182,13 @@
                     "endOffset": 3282
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 5,
                         "startColumn": 4,
-                        "startOffset": 158,
+                        "startOffset": 153,
                         "endColumn": 60,
-                        "endOffset": 214
+                        "endOffset": 209
                     }
                 }
             },
@@ -201,13 +201,13 @@
                     "endOffset": 3342
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 4,
                         "startColumn": 4,
-                        "startOffset": 97,
+                        "startOffset": 93,
                         "endColumn": 59,
-                        "endOffset": 152
+                        "endOffset": 148
                     }
                 }
             },
@@ -220,13 +220,13 @@
                     "endOffset": 3404
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 7,
                         "startColumn": 4,
-                        "startOffset": 226,
+                        "startOffset": 219,
                         "endColumn": 61,
-                        "endOffset": 283
+                        "endOffset": 276
                     }
                 }
             },
@@ -239,13 +239,13 @@
                     "endOffset": 3465
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 15,
                         "startColumn": 4,
-                        "startOffset": 545,
+                        "startOffset": 530,
                         "endColumn": 60,
-                        "endOffset": 601
+                        "endOffset": 586
                     }
                 }
             },
@@ -258,13 +258,13 @@
                     "endOffset": 3527
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 16,
                         "startColumn": 4,
-                        "startOffset": 607,
+                        "startOffset": 591,
                         "endColumn": 61,
-                        "endOffset": 664
+                        "endOffset": 648
                     }
                 }
             },
@@ -277,13 +277,13 @@
                     "endOffset": 3588
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 17,
                         "startColumn": 4,
-                        "startOffset": 670,
+                        "startOffset": 653,
                         "endColumn": 60,
-                        "endOffset": 726
+                        "endOffset": 709
                     }
                 }
             },
@@ -296,13 +296,13 @@
                     "endOffset": 3652
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 13,
                         "startColumn": 4,
-                        "startOffset": 478,
+                        "startOffset": 465,
                         "endColumn": 63,
-                        "endOffset": 537
+                        "endOffset": 524
                     }
                 }
             },
@@ -315,13 +315,13 @@
                     "endOffset": 3715
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 12,
                         "startColumn": 4,
-                        "startOffset": 414,
+                        "startOffset": 402,
                         "endColumn": 62,
-                        "endOffset": 472
+                        "endOffset": 460
                     }
                 }
             },
@@ -334,13 +334,13 @@
                     "endOffset": 3775
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 10,
                         "startColumn": 4,
-                        "startOffset": 351,
+                        "startOffset": 341,
                         "endColumn": 59,
-                        "endOffset": 406
+                        "endOffset": 396
                     }
                 }
             },
@@ -353,13 +353,13 @@
                     "endOffset": 3834
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch_2.xml",
                     "position": {
                         "startLine": 9,
                         "startColumn": 4,
-                        "startOffset": 291,
+                        "startOffset": 282,
                         "endColumn": 58,
-                        "endOffset": 345
+                        "endOffset": 336
                     }
                 }
             },
@@ -372,13 +372,13 @@
                     "endOffset": 3893
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 4,
                         "startColumn": 4,
-                        "startOffset": 152,
+                        "startOffset": 148,
                         "endColumn": 58,
-                        "endOffset": 206
+                        "endOffset": 202
                     }
                 }
             },
@@ -391,13 +391,13 @@
                     "endOffset": 3951
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
-                        "startOffset": 93,
+                        "startOffset": 90,
                         "endColumn": 57,
-                        "endOffset": 146
+                        "endOffset": 143
                     }
                 }
             },
@@ -410,13 +410,13 @@
                     "endOffset": 4011
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 14,
                         "startColumn": 4,
-                        "startOffset": 654,
+                        "startOffset": 640,
                         "endColumn": 59,
-                        "endOffset": 709
+                        "endOffset": 695
                     }
                 }
             },
@@ -429,13 +429,13 @@
                     "endOffset": 4070
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 15,
                         "startColumn": 4,
-                        "startOffset": 715,
+                        "startOffset": 700,
                         "endColumn": 58,
-                        "endOffset": 769
+                        "endOffset": 754
                     }
                 }
             },
@@ -448,13 +448,13 @@
                     "endOffset": 4136
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 22,
                         "startColumn": 4,
-                        "startOffset": 1138,
+                        "startOffset": 1116,
                         "endColumn": 65,
-                        "endOffset": 1199
+                        "endOffset": 1177
                     }
                 }
             },
@@ -467,13 +467,13 @@
                     "endOffset": 4232
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 17,
                         "startColumn": 4,
-                        "startOffset": 777,
+                        "startOffset": 760,
                         "endColumn": 95,
-                        "endOffset": 868
+                        "endOffset": 851
                     }
                 }
             },
@@ -486,13 +486,13 @@
                     "endOffset": 4327
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 19,
                         "startColumn": 4,
-                        "startOffset": 970,
+                        "startOffset": 951,
                         "endColumn": 94,
-                        "endOffset": 1060
+                        "endOffset": 1041
                     }
                 }
             },
@@ -505,13 +505,13 @@
                     "endOffset": 4422
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 18,
                         "startColumn": 4,
-                        "startOffset": 874,
+                        "startOffset": 856,
                         "endColumn": 94,
-                        "endOffset": 964
+                        "endOffset": 946
                     }
                 }
             },
@@ -524,13 +524,13 @@
                     "endOffset": 4485
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 9,
                         "startColumn": 4,
-                        "startOffset": 406,
+                        "startOffset": 397,
                         "endColumn": 62,
-                        "endOffset": 464
+                        "endOffset": 455
                     }
                 }
             },
@@ -543,13 +543,13 @@
                     "endOffset": 4549
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 7,
                         "startColumn": 4,
-                        "startOffset": 278,
+                        "startOffset": 271,
                         "endColumn": 63,
-                        "endOffset": 337
+                        "endOffset": 330
                     }
                 }
             },
@@ -562,13 +562,13 @@
                     "endOffset": 4622
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 12,
                         "startColumn": 4,
-                        "startOffset": 578,
+                        "startOffset": 566,
                         "endColumn": 72,
-                        "endOffset": 646
+                        "endOffset": 634
                     }
                 }
             },
@@ -581,13 +581,13 @@
                     "endOffset": 4727
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 11,
                         "startColumn": 4,
-                        "startOffset": 472,
+                        "startOffset": 461,
                         "endColumn": 104,
-                        "endOffset": 572
+                        "endOffset": 561
                     }
                 }
             },
@@ -600,13 +600,13 @@
                     "endOffset": 4789
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 8,
                         "startColumn": 4,
-                        "startOffset": 343,
+                        "startOffset": 335,
                         "endColumn": 61,
-                        "endOffset": 400
+                        "endOffset": 392
                     }
                 }
             },
@@ -619,13 +619,13 @@
                     "endOffset": 4852
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values\\smart_watch.xml",
                     "position": {
                         "startLine": 6,
                         "startColumn": 4,
-                        "startOffset": 214,
+                        "startOffset": 208,
                         "endColumn": 62,
-                        "endOffset": 272
+                        "endOffset": 266
                     }
                 }
             },
@@ -638,7 +638,7 @@
                     "endOffset": 4907
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionAPI\\build\\intermediates\\bundles\\default\\res\\values\\values.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\SmartExtensionAPI\\build\\intermediates\\bundles\\default\\res\\values\\values.xml",
                     "position": {
                         "startLine": 78,
                         "startColumn": 4,

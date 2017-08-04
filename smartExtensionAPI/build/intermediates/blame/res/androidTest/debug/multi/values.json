@@ -1,6 +1,6 @@
 [
     {
-        "outputFile": "D:\\Source\\android\\controlcenter\\smartExtensionAPI\\build\\intermediates\\incremental\\mergeDebugAndroidTestResources\\merged.dir\\values\\values.xml",
+        "outputFile": "D:\\Project\\Android\\ControlCenter\\SmartExtensionAPI\\build\\intermediates\\incremental\\mergeDebugAndroidTestResources\\merged.dir\\values\\values.xml",
         "map": [
             {
                 "to": {
@@ -11,7 +11,7 @@
                     "endOffset": 2711
                 },
                 "from": {
-                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionAPI\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "file": "D:\\Project\\Android\\ControlCenter\\SmartExtensionAPI\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 78,
                         "startColumn": 4,
