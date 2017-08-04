@@ -25,25 +25,10 @@ public class CurrentContext {
     private DeviceEntity device;
     private ScriptEntity script;
     private String sentence;
-    private boolean schedulerMode;
-    private boolean waitingOwnerSpeak;
+    private long lastConnect;
 
-    public boolean isWaitingOwnerSpeak() {
-        return this.waitingOwnerSpeak;
-    }
-    public void stopWaitOwner(){
-        this.waitingOwnerSpeak = false;
-    }
-    public void waitOwner(){
-        this.waitingOwnerSpeak = true;
-    }
-
-    public boolean isSchedulerMode() {
-        return schedulerMode;
-    }
-
-    public void setSchedulerMode(boolean schedulerMode) {
-        this.schedulerMode = schedulerMode;
+    public long getLastConnect() {
+        return lastConnect;
     }
 
     public static void setInstance(CurrentContext instance) {
@@ -81,8 +66,6 @@ public class CurrentContext {
             synchronized(CurrentContext.class) {
                 if(instance == null) {
                     instance= new CurrentContext();
-                    instance.schedulerMode = false;
-                    instance.waitingOwnerSpeak =false;
                 }
             }
 
@@ -132,7 +115,7 @@ public class CurrentContext {
     }
 
     public boolean finishCurrentScript(int devId) {
-        if (detectedFunction != null && ConstManager.FUNCTION_FOR_SCRIPT.contains(detectedFunction.getFunctionName())){
+        if (ConstManager.FUNCTION_FOR_SCRIPT.contains(detectedFunction.getFunctionName())){
             List<CommandEntity> cmds  = ScriptSQLite.getCommandByScriptId(script.getId());
             if (cmds.size()>0) {
                 Log.d("Context", cmds.get(cmds.size() - 1).getDeviceName() + "");

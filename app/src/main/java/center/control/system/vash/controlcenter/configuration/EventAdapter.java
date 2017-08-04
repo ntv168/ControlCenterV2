@@ -1,7 +1,6 @@
 package center.control.system.vash.controlcenter.configuration;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +40,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.item = eventEntities.get(position);
-        Log.d("adapter event",eventEntities.size()+" "+position+" "+eventEntities.get(0));
         SmartHouse house = SmartHouse.getInstance();
         holder.nextState.setText(house.getStateById(holder.item.getNextStateId()).getName());
         holder.senVal.setText(holder.item.getSenValue());
@@ -71,6 +69,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
     public interface EventListener{
         public void onClick(int id);
+    }
+    public void addScripDev(EventEntity commandEntity) {
+        eventEntities.add(commandEntity);
+        this.notifyDataSetChanged();
     }
 
 

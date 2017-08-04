@@ -48,7 +48,16 @@ public class SmartHouse {
     private List<StateEntity> states;
     private List<ScriptEntity> runToday;
     private boolean requireUpdate;
+    private boolean requirePersonUpdate;
     private boolean stateStarted;
+
+    public void setRequirePersonUpdate(boolean requirePersonUpdate) {
+        this.requirePersonUpdate = requirePersonUpdate;
+    }
+
+    public boolean isRequirePersonUpdate() {
+        return requirePersonUpdate;
+    }
 
     public boolean isRequireBotUpdate() {
         return requireBotUpdate;
@@ -88,7 +97,7 @@ public class SmartHouse {
                     if (nextEvId[i].length() > 0) {
                         stat.addEvent(StateConfigurationSQL.findEventById(
                                 Integer.parseInt(nextEvId[i])));
-                        Log.d(TAG,stat.getEvents().get(i).getNextStateId()+"  ev"+stat.getEvents().get(i).getId());
+//                        Log.d(TAG,stat.getEvents().get(i).getNextStateId()+"  ev"+stat.getEvents().get(i).getId());
                     }
                 }
             }
@@ -104,9 +113,11 @@ public class SmartHouse {
         this.currentState = currentState;
     }
     public void resetStateToDefault(){
-        this.currentState = this.getStateById(this.currentState.getDefautState());
-        this.stateChangedTime = (new Date()).getTime();
-        Log.d(TAG,"chuyen default "+currentState.getName());
+        if (this.getStateById(this.currentState.getDefautState())!=null) {
+            this.currentState = this.getStateById(this.currentState.getDefautState());
+            this.stateChangedTime = (new Date()).getTime();
+            Log.d(TAG, "chuyen default " + currentState.getName());
+        }
     }
 
     public StateEntity getCurrentState() {
@@ -158,6 +169,7 @@ public class SmartHouse {
                     houseInstance.setStates(StateConfigurationSQL.getAll());
                     houseInstance.requireUpdate = false;
                     houseInstance.requireBotUpdate = false;
+                    houseInstance.requirePersonUpdate = false;
                     houseInstance.stateStarted = false;
                     houseInstance.currentState = houseInstance.getStateById(ConstManager.NO_BODY_HOME_STATE);
                 }
@@ -168,7 +180,9 @@ public class SmartHouse {
     }
     public void addCommand(CommandEntity command){
         try {
-            this.ownerCommand.put(command);
+            if (getDeviceById(command.getDeviceId()).getState() != command.getDeviceState()) {
+                this.ownerCommand.put(command);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

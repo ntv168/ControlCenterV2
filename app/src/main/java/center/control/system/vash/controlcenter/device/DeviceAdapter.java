@@ -40,7 +40,11 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
     public void onBindViewHolder(DeviceAdapter.ViewHolder holder, final int position) {
         holder.item = deviceEntities.get(position);
         holder.deviceName.setText(holder.item.getName());
-        holder.deviceStatus.setText(holder.item.getState());
+        if (holder.item.getState().equals("on")) {
+            holder.deviceStatus.setText("đang bật");
+        }else {
+            holder.deviceStatus.setText("đang tắt");
+        }
         if (holder.item.getState().equals("on")){
             holder.view.setBackgroundResource(R.drawable.background_device_active);
             holder.deviceName.setTextColor(holder.view.getResources().getColor(R.color.nGreen1));

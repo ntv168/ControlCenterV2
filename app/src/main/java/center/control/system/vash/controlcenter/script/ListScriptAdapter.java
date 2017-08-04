@@ -90,10 +90,6 @@ public class ListScriptAdapter extends RecyclerView.Adapter<ListScriptAdapter.Vi
         this.notifyDataSetChanged();
     }
 
-    public List<ScriptEntity> getScriptEntities() {
-        return scriptEntities;
-    }
-
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public final TextView name;

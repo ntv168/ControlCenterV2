@@ -65,6 +65,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
     private ListAreaAdapter areaAdapter;
     private DeviceEntity currentDevice;
     private AreaEntity currentArea;
+    private android.app.AlertDialog.Builder editNickNameDiag;
     private Dialog deviceDialog;
     private EditText ipArea;
 
@@ -74,6 +75,8 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
         setContentView(R.layout.activity_manage_device);
         RecyclerView lstAreaManage = (RecyclerView) findViewById(R.id.listItemLeft);
         lstAreaManage.setHasFixedSize(true);
+        editNickNameDiag = new android.app.AlertDialog.Builder(ManageDeviceActivity.this);
+        editNickNameDiag.setCancelable(false);
         LinearLayoutManager verticalLayout = new LinearLayoutManager(this);
         verticalLayout.setOrientation(LinearLayoutManager.VERTICAL);
         lstAreaManage.setLayoutManager(verticalLayout);
@@ -138,7 +141,6 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                                             currentArea = saveArea(areaName.getText().toString(),
                                                     areaNickName.getText().toString(),
                                                     ipArea.getText().toString());
-                                            Log.d(TAG,encodedResp);
                                             insertDeviceByPort(encodedResp, currentArea.getId());
                                             progressDialog.dismiss();
                                             dialog.dismiss();
@@ -148,8 +150,31 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
 
+
+
                                     txtErr.setText("Không kết nối được thiết bị");
+                                    if (url.equals("http://1.1.1.1:80/get")) {
+                                        String encodedResp = "đèn bàn=db";
+                                        String encodedResp1 = "máy chiếu=db";
+                                        String encodedResp2 = "máy lạnh=db";
+                                        currentArea = saveArea(areaName.getText().toString(),
+                                                areaNickName.getText().toString(),
+                                                ipArea.getText().toString());
+                                        insertDeviceByPort(encodedResp, currentArea.getId());
+                                        insertDeviceByPort(encodedResp1, currentArea.getId());
+                                        insertDeviceByPort(encodedResp2, currentArea.getId());
+
+                                        String sensor = "Cảm biến âm thanh";
+                                        insertSensor(sensor,currentArea.getId(), AreaEntity.attrivutesValues[3]);
+                                        String sensor1 = "Cảm biến nhiệt độ";
+                                        insertSensor(sensor1,currentArea.getId(),AreaEntity.attrivutesValues[2]);
+                                        String sensor2 = "Cảm biến  ánh sáng";
+                                        insertSensor(sensor2,currentArea.getId(), AreaEntity.attrivutesValues[1]);
                                         progressDialog.dismiss();
+                                        dialog.dismiss();
+                                    } else
+                                        progressDialog.dismiss();
+                                    refineNickNameTarget();
                                 }
                             });
                             VolleySingleton.getInstance(ManageDeviceActivity.this).addToRequestQueue(connectAreaIP);
@@ -252,11 +277,9 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                             new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {
-                                    String encodedResp = VolleySingleton.fixEncodingUnicode(response);
                                 updateArea(areaEntity,nickName.getText().toString(),
                                         areaAddress.getText().toString());
-                                    Log.d(TAG,encodedResp);
-                                renewDeviceByPort(encodedResp, currentArea.getId());
+                                renewDeviceByPort(response, currentArea.getId());
                                 progressDialog.dismiss();
                                 dialog.dismiss();
                                 }
@@ -273,23 +296,18 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
 
                     private void renewDeviceByPort(String response, int id) {
                         String[] ports = response.split(",");
-
                         DeviceSQLite sqLite = new DeviceSQLite();
+                        sqLite.deleteByAreaId(currentArea.getId());
                         SmartHouse house = SmartHouse.getInstance();
                         house.removeDeviceByArea(currentArea.getId());
-                        sqLite.deleteByAreaId(currentArea.getId());
-                        for (String pair : ports){
-                            if (pair.length()>1) {
-                                String[] ele = pair.split("=");
-                                DeviceEntity device = new DeviceEntity();
-                                device.setPort(ele[1]);
-                                device.setName(ele[0]);
-                                device.setAreaId(currentArea.getId());
-                                device.setState("off");
-                                int deviceId = sqLite.insert(device);
-                                device.setId(deviceId);
-                                house.addDevice(device);
-                            }
+                        for (String port : ports){
+                            DeviceEntity device = new DeviceEntity();
+                            device.setPort(port);
+                            device.setAreaId(currentArea.getId());
+                            device.setState("off");
+                            int deviceId =sqLite.insert(device);
+                            device.setId(deviceId);
+                            house.addDevice(device);
                         }
                         devicesAdapter.setDevices(house.getDevicesByAreaId(currentArea.getId()));
                     }
@@ -339,7 +357,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
         final EditText txtNickName = (EditText) deviceDialog.findViewById(R.id.txtDeviceNickname);
         final TextView txtErr = (TextView) deviceDialog.findViewById(R.id.txtError);
         txtName.setText(currentDevice.getName()+"");
-        txtNickName.setText(currentDevice.getName()+"");
+        txtNickName.setText(currentDevice.getNickName()+"");
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -351,11 +369,12 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
                             attributeType += AreaEntity.attrivutesValues[i] + ',';
                         }
                     }
+                    Log.d(TAG, attributeType);
                     currentDevice.setName(txtName.getText().toString());
                     currentDevice.setNickName(txtNickName.getText().toString());
                     currentDevice.setAttributeType(attributeType);
                     currentDevice.setType(DeviceEntity.types[spnDeviceType.getSelectedItemPosition()]);
-                    currentDevice.setAreaId(currentDevice.getAreaId());
+                    currentDevice.setAreaId(currentArea.getId());
                     currentDevice.setState("off");
                     SmartHouse house = SmartHouse.getInstance();
                     house.updateDeviceById(currentDevice.getId(), currentDevice);
@@ -380,32 +399,30 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
     }
 
     @Override
-    public void onDeviceLongClick(final DeviceEntity deviceEntity) {
-        new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Xóa thiết bị")
-                .setMessage("Bạn có muốn xóa thiết bị "+deviceEntity.getName()+" không?")
-                .setPositiveButton("Đồng ý", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        DeviceSQLite.deleteByDevId(deviceEntity.getId());
-                        devicesAdapter.remove(deviceEntity);
-                    }
-
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .show();
+    public void onDeviceLongClick(DeviceEntity deviceEntity) {
+        DeviceSQLite.deleteByDevId(deviceEntity.getId());
+        devicesAdapter.remove(deviceEntity);
     }
     private void refineNickNameTarget(){
         final SmartHouse house = SmartHouse.getInstance();
         for (final DeviceEntity device: house.getDevices()){
             if (device.getNickName() == null || device.getNickName().equals("")){
+//                editNickNameDiag.setTitle("Tên gọi khác cho thiết bị : "+device.getName());
+//                final EditText input = new EditText(ManageDeviceActivity.this);
+//                input.setInputType(InputType.TYPE_CLASS_TEXT);
+//                input.setText(device.getName()+" ");
+//                editNickNameDiag.setView(input);
+//                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        device.setNickName(input.getText().toString());
+//                        DeviceSQLite.upById(device.getId(),device);
+//                        house.updateDeviceById(device.getId(),device);
+//                        dialog.dismiss();
+//                        refineNickNameTarget();
+//                    }
+//                });
+//                editNickNameDiag.show();
                 this.onDeviceClick(device);
                 return;
             }
