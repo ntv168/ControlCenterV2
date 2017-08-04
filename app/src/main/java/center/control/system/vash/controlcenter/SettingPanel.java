@@ -1,9 +1,10 @@
 package center.control.system.vash.controlcenter;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,50 +32,68 @@ import center.control.system.vash.controlcenter.panel.ControlPanel;
 import center.control.system.vash.controlcenter.panel.ModePanel;
 import center.control.system.vash.controlcenter.panel.VAPanel;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
+import center.control.system.vash.controlcenter.server.CloudApi;
+import center.control.system.vash.controlcenter.server.ConfigControlCenterDTO;
+import center.control.system.vash.controlcenter.server.EventDTO;
+import center.control.system.vash.controlcenter.server.RetroFitSingleton;
+import center.control.system.vash.controlcenter.server.StateDTO;
+import center.control.system.vash.controlcenter.server.VolleySingleton;
+import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
+import center.control.system.vash.controlcenter.utils.MessageUtils;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SettingPanel extends AppCompatActivity {
     private static final String TAG = "Setting Panel";
-
+    private ProgressDialog waitDiag;
     @Override
     protected void onResume() {
         super.onResume();
 
     }
+    private void initStateMachine() {
 
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_panel);
 
-        final Dialog dialog = new Dialog(SettingPanel.this);
-        dialog.setContentView(R.layout.activate_diaglog);
+        final AlertDialog dialog;
+
+        AlertDialog.Builder builer = new AlertDialog.Builder(this);
+
+        builer.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builer.setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        dialog = builer.create();
+        dialog.setTitle("Đặt lại thiết bị");
+        dialog.setMessage("Đặt lại thiết bị sẽ xóa mọi kết nối và cấu hình trong trung tâm điều khiển?");
+        dialog.setCancelable(false);
+
+
+        waitDiag = new ProgressDialog(this);
+        waitDiag.setTitle("Tải dữ liệu");
+        waitDiag.setIndeterminate(true);
+//        waitDialog.setCancelable(false);
 
         ImageButton btnActive = (ImageButton) findViewById(R.id.btnSetReset);
         btnActive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Button btnUpdatePerson = (Button) dialog.findViewById(R.id.btnUpdatePersons);
-                btnUpdatePerson.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String Id = StorageHelper.getPersonGroupId("nguoinha",SettingPanel.this);
-                        if (!StorageHelper.getAllPersonIds(Id, SettingPanel.this).isEmpty()) {
-                            StorageHelper.clearPersonIds(Id,SettingPanel.this);
-                        }
-                        new GetPersonIdsTask().execute(Id);
-                    }
-                });
-
-                Button btnCancel = (Button) dialog.findViewById(R.id.btnCancel);
-                btnCancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                    }
-                });
 
                 dialog.show();
             }
@@ -103,6 +122,14 @@ public class SettingPanel extends AppCompatActivity {
                 startActivity(new Intent(SettingPanel.this, SetConfigActivity.class));
             }
         });
+
+        String Id = StorageHelper.getPersonGroupId("nguoinha",SettingPanel.this);
+        if (!StorageHelper.getAllPersonIds(Id, SettingPanel.this).isEmpty()) {
+            StorageHelper.clearPersonIds(Id,SettingPanel.this);
+        }
+        waitDiag.show();
+        new GetPersonIdsTask().execute(Id);
+        initStateMachine();
     }
 
     class GetPersonIdsTask extends AsyncTask<String, String, Person[]> {
@@ -138,19 +165,23 @@ public class SettingPanel extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Person[] result) {
-            String message = "";
-            Log.d(TAG,result.length+" S");
             if (result != null) {
-                for (Person person : result) {
-                    try {
-                        String name = URLDecoder.decode(person.name, "UTF-8");
-                        Log.d(TAG,person.personId.toString()+"  "+name+"  "+ groupid);
-                        StorageHelper.setPersonName(person.personId.toString(), name, groupid, SettingPanel.this);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+                Log.d(TAG, result.length + " S");
+                if (result != null) {
+                    for (Person person : result) {
+                        try {
+                            String name = URLDecoder.decode(person.name, "UTF-8");
+                            Log.d(TAG, person.personId.toString() + "  " + name + "  " + groupid);
+                            StorageHelper.setPersonName(person.personId.toString(), name, groupid, SettingPanel.this);
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
+            } else {
+                MessageUtils.makeText(SettingPanel.this, "Không kết nối được dữ liệu nhận diện hình ảnh").show();
             }
+            if (waitDiag.isShowing()) waitDiag.dismiss();
         }
     }
 

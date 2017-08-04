@@ -20,7 +20,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +34,7 @@ import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
 import center.control.system.vash.controlcenter.nlp.OwnerTrainEntity;
 import center.control.system.vash.controlcenter.nlp.TermSQLite;
 import center.control.system.vash.controlcenter.nlp.TrainVAActivity;
+import center.control.system.vash.controlcenter.panel.ControlPanel;
 import center.control.system.vash.controlcenter.panel.UserSettingPanel;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
@@ -42,10 +42,13 @@ import center.control.system.vash.controlcenter.server.AssistantTypeDTO;
 import center.control.system.vash.controlcenter.server.BotDataCentralDTO;
 import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.FunctionIntentDTO;
+import center.control.system.vash.controlcenter.server.LoginSmarthouseDTO;
 import center.control.system.vash.controlcenter.server.RetroFitSingleton;
 import center.control.system.vash.controlcenter.server.SocialIntentDTO;
+import center.control.system.vash.controlcenter.server.VolleySingleton;
 import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
+import center.control.system.vash.controlcenter.utils.MessageUtils;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,7 +59,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private static final String TAG = "Personal Activity";
     private List<AssistantTypeDTO> typeDTOs;
-    private AlertDialog.Builder editNickNameDiag;
+    private AlertDialog.Builder inputDialog;
     private ArrayAdapter<String> botRoleAdapter;
     private EditText editOwnerName;
     private ArrayAdapter<String> ownerRoleAdapter;
@@ -77,6 +80,8 @@ public class PersonalInfoActivity extends AppCompatActivity {
     TextView txtHouseAddress;
     TextView txtContractID;
     TextView txtActiveDay;
+    LoginSmarthouseDTO passDto;
+    private ProgressDialog waitDialog;
 
     @Override
     protected void onResume() {
@@ -84,12 +89,12 @@ public class PersonalInfoActivity extends AppCompatActivity {
         botType = sharedPreferences.getString(ConstManager.BOT_TYPE,"");
         botRole = sharedPreferences.getString(ConstManager.BOT_ROLE,"");
         if (botType.length() < 2){
-            Toast.makeText(this,"Chưa chọn loại quản gia",Toast.LENGTH_SHORT);
+            MessageUtils.makeText(this,"Chưa chọn loại quản gia").show();
         }
         Log.d(TAG,botType + "  loai");
         botName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
         if (botName.length() <2){
-            Toast.makeText(this,"Chưa Tên quản gia",Toast.LENGTH_SHORT);
+            MessageUtils.makeText(this,"Chưa có Tên quản gia").show();
         }
         Log.d(TAG,botName + "  ten");
 
@@ -116,7 +121,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
         txtHouseOwnerPhone.setText(sharedPreferences.getString(ConstManager.OWNER_TEL,""));
 //        txtContractType.setText(sharedPreferences.getString(ConstManager.OWNE,""));
         txtHouseAddress.setText(sharedPreferences.getString(ConstManager.OWNER_ADD,""));
-        txtContractID.setText(sharedPreferences.getString(ConstManager.CONTRACT_ID,""));
+        txtContractID.setText(sharedPreferences.getString(ConstManager.CONTRACT_CODE,""));
         txtActiveDay.setText(sharedPreferences.getString(ConstManager.ACTIVE_DAY,""));
 
     }
@@ -126,6 +131,11 @@ public class PersonalInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.personal);
         sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME,MODE_PRIVATE);
+
+        waitDialog = new ProgressDialog(this);
+        waitDialog.setTitle("Vui lòng đợi");
+        waitDialog.setIndeterminate(true);
+        waitDialog.setCancelable(false);
 
         LinearLayout lnBack = (LinearLayout) findViewById(R.id.lnBack);
         lnBack.setOnClickListener(new View.OnClickListener() {
@@ -148,7 +158,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
         vaSetDiag.requestWindowFeature(Window.FEATURE_NO_TITLE);
         vaSetDiag.setContentView(R.layout.va_setting_dialog);
 
-        editNickNameDiag = new AlertDialog.Builder(PersonalInfoActivity.this);
+        inputDialog = new AlertDialog.Builder(PersonalInfoActivity.this);
         refineNickNameTarget();
 
         final ProgressDialog waitDialog = new ProgressDialog(PersonalInfoActivity.this);
@@ -189,6 +199,63 @@ public class PersonalInfoActivity extends AppCompatActivity {
             }
         });
 
+        LinearLayout btnChangePass = (LinearLayout) findViewById(R.id.btnChangePass);
+        btnChangePass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog passDiag = new Dialog(PersonalInfoActivity.this);
+                passDiag.setTitle("Nhập mật khẩu cũ ");
+                passDiag.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                passDiag.setContentView(R.layout.change_password_dialog);
+                final EditText txtOldPass = (EditText) passDiag.findViewById(R.id.txtOldPass);
+                final EditText txtNewPass = (EditText) passDiag.findViewById(R.id.txtNewPass);
+                final EditText txtConf = (EditText) passDiag.findViewById(R.id.txtConfirmPass);
+
+                ((Button)passDiag.findViewById(R.id.btnSave)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        passDiag.dismiss();
+                        waitDialog.show();
+                        if (txtConf.getText().toString().equals(txtNewPass.getText().toString())){
+                            passDto = new LoginSmarthouseDTO();
+                            passDto.setContractId(sharedPreferences.getString(ConstManager.CONTRACT_ID,""));
+                            passDto.setNewPassword(txtNewPass.getText().toString());
+                            passDto.setOldPassword(txtOldPass.getText().toString());
+                            final CloudApi loginStaffApi = RetroFitSingleton.getInstance().getCloudApi();
+                            loginStaffApi.changePass(passDto).enqueue(new Callback<LoginSmarthouseDTO>() {
+                                @Override
+                                public void onResponse(Call<LoginSmarthouseDTO> call, Response<LoginSmarthouseDTO> response) {
+                                    if (response.body().getNewPassword().equals("success")){
+                                        passDiag.dismiss();
+                                    } else {
+                                        MessageUtils.makeText(PersonalInfoActivity.this,response.body().getNewPassword()).show();
+                                    }
+                                    waitDialog.dismiss();
+                                }
+
+                                @Override
+                                public void onFailure(Call<LoginSmarthouseDTO> call, Throwable t) {
+                                    MessageUtils.makeText(PersonalInfoActivity.this,"Không kết nối được").show();
+                                    waitDialog.dismiss();
+                                }
+                            });
+                            waitDialog.show();
+                        }else {
+                            MessageUtils.makeText(PersonalInfoActivity.this,"Mật khẩu xác nhận không giống mật khẩu mới").show();
+                        }
+
+                    }
+                });
+                ((Button)passDiag.findViewById(R.id.btnCancel)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        passDiag.dismiss();
+                    }
+                });
+                passDiag.show();
+            }
+        });
+
         Button btnLoadBot = (Button)vaSetDiag.findViewById(R.id.btnLoadBot);
         btnLoadBot.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,49 +271,56 @@ public class PersonalInfoActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<BotDataCentralDTO> call, Response<BotDataCentralDTO> response) {
                         Log.d(TAG,call.request().url()+"");
-                        SharedPreferences.Editor edit = sharedPreferences.edit();
-                        edit.putString(ConstManager.BOT_ROLE,botRole);
-                        edit.putString(ConstManager.OWNER_ROLE,ownerRole);
-                        edit.putString(ConstManager.OWNER_NAME,ownerName);
-                        edit.putInt(ConstManager.BOT_TYPE_ID,botTypeId);
-                        edit.putString(ConstManager.BOT_TYPE,botType);
-                        edit.putString(ConstManager.BOT_NAME,botName);
-                        edit.commit();
-                        TermSQLite sqLite = new TermSQLite();
-                        List<OwnerTrainEntity> trained = sqLite.getOwnerTrain();
-                        Log.d(TAG,trained.size()+"  trains");
-                        Map<String,Map<String,Integer>> updatedFunct = BotUtils.updateFuncts(trained,response.body().getFunctionMap());
-                        DetectIntentSQLite sqlDect = new DetectIntentSQLite();
-                        sqLite.clearAll();
-                        sqlDect.clearAll();
-                        Log.d(TAG,"term FuncMap;"+response.body().getFunctionMap().size());
-                        Log.d(TAG,"term SocMap;"+response.body().getSocialMap().size());
-                        Log.d(TAG,"funct ;"+response.body().getFunctions().size());
-                        Log.d(TAG,"soc ;"+response.body().getSocials().size());
-
-                        for (SocialIntentDTO soc : response.body().getSocials()){
-                            sqlDect.insertSocial(new DetectSocialEntity(soc.getId(),
-                                    soc.getName(),soc.getQuestion(),soc.getReply()));
+                        if (response.body() != null) {
+                            SharedPreferences.Editor edit = sharedPreferences.edit();
+                            edit.putString(ConstManager.BOT_ROLE, botRole);
+                            edit.putString(ConstManager.OWNER_ROLE, ownerRole);
+                            edit.putString(ConstManager.OWNER_NAME, ownerName);
+                            edit.putInt(ConstManager.BOT_TYPE_ID, botTypeId);
+                            edit.putString(ConstManager.BOT_TYPE, botType);
+                            edit.putString(ConstManager.BOT_NAME, botName);
+                            edit.commit();
+                            TermSQLite sqLite = new TermSQLite();
+                            List<OwnerTrainEntity> trained = sqLite.getOwnerTrain();
+                            Log.d(TAG, trained.size() + "  trains");
+                            Map<String, Map<String, Integer>> updatedFunct = BotUtils.updateFuncts(trained, response.body().getFunctionMap());
+                            DetectIntentSQLite sqlDect = new DetectIntentSQLite();
+                            sqLite.clearAll();
+                            sqlDect.clearAll();
+                            if (response.body().getSocials().size() == 0){
+                                edit = sharedPreferences.edit();
+                                edit.putString(ConstManager.CONTRACT_ID,"");
+                                edit.commit();
+                                Log.d(TAG,"Deeactive sent");
+                                startActivity(new Intent(PersonalInfoActivity.this, MainActivity.class));
+                            }
+                            for (SocialIntentDTO soc : response.body().getSocials()) {
+                                sqlDect.insertSocial(new DetectSocialEntity(soc.getId(),
+                                        soc.getName(), soc.getQuestion(), soc.getReply()));
+                            }
+                            for (FunctionIntentDTO funct : response.body().getFunctions()) {
+                                sqlDect.insertFunction(new DetectFunctionEntity(funct.getId(),
+                                        funct.getName(), funct.getSuccess(), funct.getFail(), funct.getRemind()));
+                            }
+                            SmartHouse house = SmartHouse.getInstance();
+                            BotUtils bot = new BotUtils();
+                            bot.saveFunctionTFIDFTerm(updatedFunct);
+                            bot.saveSocialTFIDFTerm(response.body().getSocialMap());
+                            bot.saveDeviceTFIDFTerm(house.getDevices());
+                            bot.saveAreaTFIDFTerm(house.getAreas());
+                            bot.saveScriptTFIDFTerm(house.getScripts());
+                            vaSetDiag.dismiss();
+                            MessageUtils.makeText(PersonalInfoActivity.this, "Tải dữ liệu trợ lý " + botName + " thành công").show();
+                        } else {
+                            MessageUtils.makeText(PersonalInfoActivity.this, "Không kết nối được "+ VolleySingleton.SERVER_HOST).show();
                         }
-                        for (FunctionIntentDTO funct : response.body().getFunctions()){
-                            sqlDect.insertFunction(new DetectFunctionEntity(funct.getId(),
-                                    funct.getName(),funct.getSuccess(),funct.getFail(),funct.getRemind()));
-                        }
-                        SmartHouse house = SmartHouse.getInstance();
-                        BotUtils bot = new BotUtils();
-                        bot.saveFunctionTFIDFTerm(updatedFunct);
-                        bot.saveSocialTFIDFTerm(response.body().getSocialMap());
-                        bot.saveDeviceTFIDFTerm(house.getDevices());
-                        bot.saveAreaTFIDFTerm(house.getAreas());
-                        bot.saveScriptTFIDFTerm(house.getScripts());
                         waitDialog.dismiss();
-                        Toast.makeText(PersonalInfoActivity.this,"Tải dữ liệu trợ lý "+botName+" thành công",Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onFailure(Call<BotDataCentralDTO> call, Throwable t) {
                         Log.d(TAG,"down load bot data failed");
-                        Toast.makeText(PersonalInfoActivity.this,"Tải dữ liệu trợ lý "+botName+" thất bại",Toast.LENGTH_SHORT).show();
+                        MessageUtils.makeText(PersonalInfoActivity.this,"Tải dữ liệu trợ lý "+botName+" thất bại").show();
                         waitDialog.dismiss();
                     }
                 });
@@ -262,11 +336,11 @@ public class PersonalInfoActivity extends AppCompatActivity {
         final SmartHouse house = SmartHouse.getInstance();
         for (final DeviceEntity device: house.getDevices()){
             if (device.getNickName() == null || device.getNickName().equals("")){
-                editNickNameDiag.setTitle("Tên gọi khác cho thiết bị"+device.getName());
+                inputDialog.setTitle("Tên gọi khác cho thiết bị"+device.getName());
                 final EditText input = new EditText(PersonalInfoActivity.this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
-                editNickNameDiag.setView(input);
-                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                inputDialog.setView(input);
+                inputDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         device.setNickName(input.getText().toString());
@@ -275,16 +349,16 @@ public class PersonalInfoActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
-                editNickNameDiag.show();
+                inputDialog.show();
             }
         }
         for (final AreaEntity area: house.getAreas()){
             if (area.getNickName().length()<2){
-                editNickNameDiag.setTitle("Tên gọi khác cho không gian "+area.getName());
+                inputDialog.setTitle("Tên gọi khác cho không gian "+area.getName());
                 final EditText input = new EditText(PersonalInfoActivity.this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
-                editNickNameDiag.setView(input);
-                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                inputDialog.setView(input);
+                inputDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         area.setNickName(input.getText().toString());
@@ -293,16 +367,16 @@ public class PersonalInfoActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
-                editNickNameDiag.show();
+                inputDialog.show();
             }
         }
         for (final ScriptEntity mode: house.getScripts()){
             if (mode.getNickName().length()<2){
-                editNickNameDiag.setTitle("Tên gọi khác cho chế độ "+mode.getName());
+                inputDialog.setTitle("Tên gọi khác cho chế độ "+mode.getName());
                 final EditText input = new EditText(PersonalInfoActivity.this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
-                editNickNameDiag.setView(input);
-                editNickNameDiag.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                inputDialog.setView(input);
+                inputDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mode.setNickName(input.getText().toString());
@@ -311,7 +385,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
-                editNickNameDiag.show();
+                inputDialog.show();
             }
         }
     }

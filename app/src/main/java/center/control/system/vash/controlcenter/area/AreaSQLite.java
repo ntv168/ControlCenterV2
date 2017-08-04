@@ -128,7 +128,6 @@ public class AreaSQLite {
         area.setConnectAddress(cursor.getString(cursor.getColumnIndex(KEY_ADDRESS)));
         area.setElectricUsing(cursor.getString(cursor.getColumnIndex(KEY_ELECT_USING)));
         area.setSafety(cursor.getString(cursor.getColumnIndex(KEY_SAFE)));
-        area.setLight(cursor.getString(cursor.getColumnIndex(KEY_LIGHT)));
         area.setTemperature(cursor.getString(cursor.getColumnIndex(KEY_TEMP)));
         area.setNickName(cursor.getString(cursor.getColumnIndex(KEY_NICKNAME)));
         area.setDetect(cursor.getString(cursor.getColumnIndex(KEY_DETECT)));

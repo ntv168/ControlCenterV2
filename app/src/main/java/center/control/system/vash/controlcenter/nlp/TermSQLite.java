@@ -209,6 +209,11 @@ public class TermSQLite {
         db.delete(TABLE_HUMAN_TERM,null,null);
         SQLiteManager.getInstance().closeDatabase();
     }
+    public void clearTargweAll( ) {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        db.delete(TABLE_TARGET_TERM,null,null);
+        SQLiteManager.getInstance().closeDatabase();
+    }
 
     public List<TermEntity> getAllTerms() {
         List<TermEntity> result = new ArrayList<>();
