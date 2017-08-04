@@ -31,7 +31,6 @@ public class VoiceUtils {
                             }
                         }
                     });
-            singleton.tts.setSpeechRate()
         }
     }
     public static VoiceUtils getInstance() {
@@ -55,7 +54,7 @@ public class VoiceUtils {
     }
 
     public static void stopSpeakApi() {
-        if (singleton != null){
+        if (singleton.tts != null){
             singleton.tts.stop();
             singleton.tts.shutdown();
         }

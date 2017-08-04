@@ -38,6 +38,12 @@ public abstract class ListeningActivity extends Activity implements IVoiceContro
 		                "com.dummy");
 		    }
 			sr.startListening(intent);
+			AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+			amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+			amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
+			amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+			amanager.setStreamMute(AudioManager.STREAM_RING, true);
+			amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
 		} catch(Exception ex) {
 			ex.getMessage();
 		}
@@ -46,6 +52,13 @@ public abstract class ListeningActivity extends Activity implements IVoiceContro
 	// stops the service
 	protected void stopListening() {
 		if (sr != null) {
+			AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+
+			amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+			amanager.setStreamMute(AudioManager.STREAM_ALARM, false);
+			amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+			amanager.setStreamMute(AudioManager.STREAM_RING, false);
+			amanager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
 			sr.stopListening();
         	sr.cancel();
         	sr.destroy();

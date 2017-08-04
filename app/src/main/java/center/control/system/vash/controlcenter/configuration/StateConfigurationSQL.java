@@ -30,7 +30,6 @@ public class StateConfigurationSQL {
     private static final String KEY_DELAY = "delay";
     private static final String KEY_NAME = "name";
     private static final String KEY_NOTIFY = "notify";
-    private static final String KEY_DEFAULT = "default_state";
     private static final String KEY_NEXT_EVENT = "next_events";
     private static final String KEY_PRIORITY = "priority";
     private static final String KEY_DURING = "during";
@@ -47,7 +46,6 @@ public class StateConfigurationSQL {
                 + KEY_NAME + " TEXT , "
                 + KEY_NEXT_EVENT + " TEXT , "
                 + KEY_DURING + " INTEGER , "
-                + KEY_DEFAULT + " INTEGER , "
                 + KEY_NOTIFY + " TEXT  ) ";
     }
 
@@ -84,7 +82,6 @@ public class StateConfigurationSQL {
         values.put(KEY_NEXT_EVENT, state.getNextEvIds());
         values.put(KEY_DELAY, state.getDelaySec());
         values.put(KEY_NOTIFY, state.getNoticePattern());
-        values.put(KEY_DEFAULT, state.getDefautState());
 
         int id = (int)db.insert(TABLE_STATE, null, values);
         SQLiteManager.getInstance().closeDatabase();
@@ -98,6 +95,7 @@ public class StateConfigurationSQL {
         SQLiteManager.getInstance().closeDatabase();
     }
     public static EventEntity findEventById(int id){
+
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
                 + " FROM " + TABLE_EVENT
@@ -122,6 +120,7 @@ public class StateConfigurationSQL {
         event.setNextStateId(cursor.getInt(cursor.getColumnIndex(KEY_NEXT_STATE)));
         event.setPriority(cursor.getInt(cursor.getColumnIndex(KEY_PRIORITY)));
         event.setAreaId(cursor.getInt(cursor.getColumnIndex(KEY_AREA_ID)));
+        Log.d(TAG,event.getAreaId()+"  s");
 
         return event;
     }
@@ -153,10 +152,8 @@ public class StateConfigurationSQL {
         state.setDuringSec(cursor.getInt(cursor.getColumnIndex(KEY_DURING)));
         state.setNextEvIds(cursor.getString(cursor.getColumnIndex(KEY_NEXT_EVENT)));
         state.setNoticePattern(cursor.getString(cursor.getColumnIndex(KEY_NOTIFY)));
-        state.setDefautState(cursor.getInt(cursor.getColumnIndex(KEY_DEFAULT)));
         return state;
     }
-
 
     public static void updateEventById(int id, EventEntity event) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();

@@ -28,13 +28,11 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
     private CommandAdapter cmdAdapter;
     private EventAdapter eventAdapter;
     private AlertDialog.Builder selectStateDiag;
-    private AlertDialog.Builder selectDefaultDiag;
     private List<StateEntity> stats;
     private AlertDialog.Builder selectDeviceDiag;
     private AlertDialog.Builder selectAreaDiag;
     private StateEntity currentState;
     private ProgressDialog waitDialog;
-    private StateEntity defautlState;
 
 
     @Override
@@ -51,9 +49,6 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
         selectStateDiag= new AlertDialog.Builder(SetConfigActivity.this);
         selectStateDiag.setIcon(R.drawable.add);
         selectStateDiag.setTitle("Chọn trạng thái:");
-        selectDefaultDiag= new AlertDialog.Builder(SetConfigActivity.this);
-        selectDefaultDiag.setIcon(R.drawable.add);
-        selectDefaultDiag.setTitle("Chọn trạng thái mặc định:");
 
         RecyclerView lstCmd = (RecyclerView) findViewById(R.id.lstCmd);
         lstCmd .setHasFixedSize(true);
@@ -76,7 +71,6 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
 
 
         final Button btnSltState = (Button)  findViewById(R.id.btnSelectState);
-//        final Button btnSltDefault = (Button)  findViewById(R.id.btnSelectDefault);
         btnSltState.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,7 +89,6 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
             public void onClick(DialogInterface dialog, int which) {
                 btnSltState.setText(stats.get(which).getName());
                 cmdAdapter.setScriptEntities(stats.get(which).getCommands());
-                Log.d(TAG,stats.get(which).getEvents().size()+" s");
                 eventAdapter.setScriptEntities(stats.get(which).getEvents());
                 currentState = stats.get(which);
                 dialog.dismiss();

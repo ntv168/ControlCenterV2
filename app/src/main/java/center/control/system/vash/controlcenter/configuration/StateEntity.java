@@ -21,17 +21,6 @@ public class StateEntity {
     private String name;
     private String noticePattern;
     private List<EventEntity> events;
-    private int defautState;
-    private boolean activated;
-
-    public boolean isActivated() {
-        return activated;
-    }
-
-    public void setActivated(boolean activated) {
-        this.activated = activated;
-    }
-
     public StateEntity(){
         this.commands = new ArrayList<>();
         this.events = new ArrayList<>();
@@ -105,13 +94,5 @@ public class StateEntity {
         for (EventEntity ev: evs){
             this.events.add(ev);
         }
-    }
-
-    public int getDefautState() {
-        return defautState;
-    }
-
-    public void setDefautState(int defautState) {
-        this.defautState = defautState;
     }
 }

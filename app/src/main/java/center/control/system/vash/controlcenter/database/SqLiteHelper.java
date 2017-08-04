@@ -23,7 +23,7 @@ import center.control.system.vash.controlcenter.nlp.TermSQLite;
 
 public class SqLiteHelper extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 11;
 
     private static final String DATABASE_NAME = "ControlCenter";
 
@@ -48,11 +48,11 @@ public class SqLiteHelper extends SQLiteOpenHelper {
         db.execSQL(DetectIntentSQLite.createSocial());
 
         //Create configuration
-//        db.execSQL(ConfigurationSQLite.createConfiguration());
-//        db.execSQL(CommandSQLite.createCommand());
-//        db.execSQL(TriggerSQLite.createTriggerConfigution());
-//        db.execSQL(SensorSQLite.createSensor());
-//        db.execSQL(TriggerDeviceSQLite.createTable());
+        db.execSQL(ConfigurationSQLite.createConfiguration());
+        db.execSQL(CommandSQLite.createCommand());
+        db.execSQL(TriggerSQLite.createTriggerConfigution());
+        db.execSQL(SensorSQLite.createSensor());
+        db.execSQL(TriggerDeviceSQLite.createTable());
         db.execSQL(StateConfigurationSQL.createEvent());
         db.execSQL(StateConfigurationSQL.createState());
 

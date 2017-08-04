@@ -12,9 +12,6 @@ public class LoginSmarthouseDTO {
     @SerializedName("staticAddress")
     @Expose
     private String staticAddress;
-    @SerializedName("offlineAddress")
-    @Expose
-    private String offlineAddress;
     @SerializedName("contractCode")
     @Expose
     private String contractCode;
@@ -45,127 +42,93 @@ public class LoginSmarthouseDTO {
     @SerializedName("virtualAssistantTypeId")
     @Expose
     private int virtualAssistantTypeId;
-    @SerializedName("newPassword")
-    @Expose
-    private String newPassword;
-    @SerializedName("oldPassword")
-    @Expose
-    private String oldPassword;
 
-    public String getOldPassword() {
-        return oldPassword;
-    }
 
-    public void setOldPassword(String oldPassword) {
-        this.oldPassword = oldPassword;
-    }
-
-    public String getNewPassword() {
-        return newPassword;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
+    public String getStaticAddress() {
+        return staticAddress;
     }
 
     public void setStaticAddress(String staticAddress) {
         this.staticAddress = staticAddress;
     }
 
+    public String getContractCode() {
+        return contractCode;
+    }
+
     public void setContractCode(String contractCode) {
         this.contractCode = contractCode;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
     }
 
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
     }
 
+    public String getOwnerAddress() {
+        return ownerAddress;
+    }
+
     public void setOwnerAddress(String ownerAddress) {
         this.ownerAddress = ownerAddress;
+    }
+
+    public String getOwnerTel() {
+        return ownerTel;
     }
 
     public void setOwnerTel(String ownerTel) {
         this.ownerTel = ownerTel;
     }
 
-    public void setOwnerCmnd(String ownerCmnd) {
-        this.ownerCmnd = ownerCmnd;
-    }
-
-    public void setContractId(String contractId) {
-        this.contractId = contractId;
-    }
-
-    public void setActiveDay(String activeDay) {
-        this.activeDay = activeDay;
-    }
-
-    public void setVirtualAssistantName(String virtualAssistantName) {
-        this.virtualAssistantName = virtualAssistantName;
-    }
-
-    public void setVirtualAssistantType(String virtualAssistantType) {
-        this.virtualAssistantType = virtualAssistantType;
-    }
-
-    public void setVirtualAssistantTypeId(int virtualAssistantTypeId) {
-        this.virtualAssistantTypeId = virtualAssistantTypeId;
-    }
-
-    public String getOfflineAddress() {
-        return offlineAddress;
-    }
-
-    public void setOfflineAddress(String offlineAddress) {
-        this.offlineAddress = offlineAddress;
-    }
-
-    public String getStaticAddress() {
-        return staticAddress;
-    }
-
-
-    public String getContractCode() {
-        return contractCode;
-    }
-
-
-    public String getOwnerName() {
-        return ownerName;
-    }
-
-
-    public String getOwnerAddress() {
-        return ownerAddress;
-    }
-
-
-    public String getOwnerTel() {
-        return ownerTel;
-    }
-
     public String getOwnerCmnd() {
         return ownerCmnd;
+    }
+
+    public void setOwnerCmnd(String ownerCmnd) {
+        this.ownerCmnd = ownerCmnd;
     }
 
     public String getContractId() {
         return contractId;
     }
 
+    public void setContractId(String contractId) {
+        this.contractId = contractId;
+    }
 
     public String getActiveDay() {
         return activeDay;
+    }
+
+    public void setActiveDay(String activeDay) {
+        this.activeDay = activeDay;
     }
 
     public String getVirtualAssistantName() {
         return virtualAssistantName;
     }
 
+    public void setVirtualAssistantName(String virtualAssistantName) {
+        this.virtualAssistantName = virtualAssistantName;
+    }
+
     public String getVirtualAssistantType() {
         return virtualAssistantType;
     }
+
+    public void setVirtualAssistantType(String virtualAssistantType) {
+        this.virtualAssistantType = virtualAssistantType;
+    }
+
     public int getVirtualAssistantTypeId() {
         return virtualAssistantTypeId;
     }
 
+    public void setVirtualAssistantTypeId(int virtualAssistantTypeId) {
+        this.virtualAssistantTypeId = virtualAssistantTypeId;
+    }
 }

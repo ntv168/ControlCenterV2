@@ -28,15 +28,12 @@ public class AreaEntity extends TargetObject{
     public static final String TEMP_BURN = "bu";
     public static final String TEMP_WARM = "wm";
     public static final String TEMP_COLD = "co";
-    private static final double BURN_TEMP_RANGE = 60.0;
-    private static final double HOT_TEMP_RANGE = 38.0;
+    private static final double BURN_TEMP_RANGE = 40.0;
+    private static final double HOT_TEMP_RANGE = 35.0;
     private static final double FRESH_TEMP_RANGE = 27.0;
     private static final String TEMP_FRESH = "fr";
     private static final double COLD_TEMP_RANGE = 16.0;
     private static final String TEMP_FREEZE = "fz";
-    private static final String LIGHT_BRIGHT = "br";
-    private static final String LIGHT_DARK = "dk";
-    public static final long HOLD_PERSON = 11000;
 
     @SerializedName("temperature")
     private String temperature;
@@ -54,15 +51,6 @@ public class AreaEntity extends TargetObject{
     private Bitmap imageBitmap;
     private boolean hasCamera = true;
     private double detectScore;
-    private long updatePerson = -1;
-
-    public void setUpdatePerson(long updatePerson) {
-        this.updatePerson = updatePerson;
-    }
-
-    public long getUpdatePerson() {
-        return updatePerson;
-    }
 
     public String getDetect() {
         if (detect == null || detect.equals(NOBODY)){
@@ -103,7 +91,6 @@ public class AreaEntity extends TargetObject{
     public void setTemperature(String temperature) {
         if (temperature!=null) {
             this.tempAmout = Double.parseDouble(temperature);
-            this.tempAmout -= 5; //hard core
             if (tempAmout >= BURN_TEMP_RANGE) {
                 this.temperature = TEMP_BURN;
             } else if (tempAmout >= HOT_TEMP_RANGE) {
@@ -119,29 +106,7 @@ public class AreaEntity extends TargetObject{
     }
 
     public String getLight() {
-        int lightin = 0;
-        for (DeviceEntity dev : SmartHouse.getInstance().getDevicesByAreaId(getId())){
-            if (dev.getAttributeType()!= null && dev.getAttributeType().contains(attrivutesValues[1])) {
-                if (dev.getState().equals("on") ||
-                        dev.getState().equals("open")) {
-                    lightin++;
-                }
-            }
-        }
-        return  "Có "+ lightin + " đèn bật";
-    }
-    public String getBright() {
-        int lightin = 0;
-        for (DeviceEntity dev : SmartHouse.getInstance().getDevicesByAreaId(getId())){
-            if (dev.getAttributeType()!= null && dev.getAttributeType().contains(attrivutesValues[1])) {
-                if (dev.getState().equals("on") ||
-                        dev.getState().equals("open")) {
-                    lightin++;
-                }
-            }
-        }
-        if (lightin>0) return LIGHT_BRIGHT;
-        return  LIGHT_DARK;
+        return light;
     }
 
     public void setLight(String light) {
