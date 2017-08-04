@@ -24,7 +24,6 @@ public class AreaAttributeAdapter extends RecyclerView.Adapter<AreaAttributeAdap
     private AttributeClickListener listener;
 
     public void updateAttribute(String[] value) {
-        Log.d(TAG,"update attriute "+value[0]);
         for (int i = 0; i< value.length; i++){
             this.areaAttributes.get(i).setValue(value[i]);
         }

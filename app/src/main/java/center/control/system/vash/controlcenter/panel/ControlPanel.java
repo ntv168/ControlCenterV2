@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -146,9 +147,9 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
         SmartHouse house = SmartHouse.getInstance();
         if (house.getAreas().size()>0) {
-            currentArea = house.getAreas().get(0);
-            areaAttributeAdapter.updateAttribute(currentArea.generateValueArr());
-            deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
+//            currentArea = house.getAreas().get(0);
+//            areaAttributeAdapter.updateAttribute(currentArea.generateValueArr());
+//            deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
             startService(new Intent(this, ControlMonitorService.class));
         } else {
             MessageUtils.makeText(this,"Nhân viên chưa cấu hình thiết bị").show();
@@ -207,6 +208,10 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 initControl();
+
+            currentArea = SmartHouse.getInstance().getAreas().get(0);
+            areaAttributeAdapter.updateAttribute(currentArea.generateValueArr());
+            deviceAdapter.updateHouseDevice(SmartHouse.getInstance().getDevicesByAreaId(currentArea.getId()));
                 dialog.dismiss();
             }
         });
@@ -429,7 +434,9 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                         Log.d(TAG, ev.getNextStateId()+" " );
                         maxPrio = ev.getPriority();
                         nextEv = ev;
-                        result = area.getName();
+                        if (aquaintance == null)
+                            result = area.getName();
+                        else result = aquaintance;
                     }
                 } else if (ev.getSenName().equals(AreaEntity.attrivutesValues[1]) &&
                         ev.getSenValue().equals(area.getBright())){
@@ -479,7 +486,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     }
 
     private void showAlertState(StateEntity state, String resultValue) {
-        if (stateDialog == null) {
+        if (state.getCommands().size()>0) {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -487,7 +494,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (SmartHouse.getInstance().getCurrentState().isActivated()){
-                        SmartHouse.getInstance().revertCmdState();
+//                        SmartHouse.getInstance().revertCmdState();
                     }
                     SmartHouse.getInstance().resetStateToDefault();
                     startListening();
@@ -506,13 +513,31 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 }
             });
             stateDialog = builder.create();
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            builder.setNegativeButton("Xác nhận", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    SmartHouse.getInstance().resetStateToDefault();
+                    startListening();
+                    dialog.dismiss();
+                }
+            });
+            stateDialog = builder.create();
         }
         if (stateDialog.isShowing()){
             stateDialog.dismiss();
         }
         stateDialog.setTitle(state.getName());
+        String command  = "";
+        for (CommandEntity cmd : state.getCommands()){
+            command += (cmd.getDeviceState().equals("on")?"bật":"tắt")+" "+
+                    SmartHouse.getInstance().getDeviceById(cmd.getDeviceId()).getName()+" trong "
+                    + SmartHouse.getAreaById(SmartHouse.getInstance().getDeviceById(cmd.getDeviceId()).getAreaId()).getName() +"\n";
+        }
         stateDialog.setMessage(BotUtils.completeSentence(state.getNoticePattern(),resultValue,"")+
-                "\n"+"Tự động kích hoat sau "+state.getDelaySec()+" giây");
+                "\n"+ (command.length()>2?command:"Thông báo sẽ tự động tắt"));
         stateDialog.setCancelable(false);
         stateDialog.show();
     }
@@ -633,6 +658,13 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         if (CurrentContext.getInstance().isWaitingOwnerSpeak()) {
             promptSpeechInput(sentenceReply);
         }
+
+        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
+        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+        amanager.setStreamMute(AudioManager.STREAM_RING, true);
+        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
     }
 
     private class DetectionTask extends AsyncTask<InputStream, String, com.microsoft.projectoxford.face.contract.Face[]> {
@@ -823,7 +855,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
 //        showReply(BotUtils.completeSentence(camArea.getDetect(),info.substring(4,info.length()-1),""));
         cameraDialog.dismiss();
-        if (currentArea.getId() == cameraAreaId) {
+        if (currentArea!= null && currentArea.getId() == cameraAreaId) {
             areaAttributeAdapter.updateAttribute(currentArea.generateValueArr());
         }
         restartListeningService();
@@ -875,7 +907,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     }
                 }
             } else {
-                MessageUtils.makeText(ControlPanel.this, "Không kết nối được dữ liệu nhận diện hình ảnh").show();
+//                MessageUtils.makeText(ControlPanel.this, "Không kết nối được dữ liệu nhận diện hình ảnh").show();
             }
         }
     }
@@ -884,7 +916,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         if (sentenceReply.contains("ác nhậ")){
             CurrentContext.getInstance().stopWaitOwner();
             stopListening();
-        }else if (sentenceReply.contains("Đang lấy hình")){
+        }else if (sentenceReply.contains("Hình từ")){
             SmartHouse house = SmartHouse.getInstance();
             Bitmap bmImg = house.getBitmapByAreaId(currentArea.getId());
             ImageView imgFace = (ImageView) cameraDialog.findViewById(R.id.imgFace);
@@ -892,25 +924,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             if (bmImg!=null){
                 stopListening();
                 imgFace.setImageBitmap(bmImg);
-                File myDir =  Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES);
-                myDir.mkdirs();
-                String nameFile = "testSelf.jpg";
-                File file = new File(myDir, nameFile);
-                if (file.exists ()) file.delete();
-                try {
-                    FileOutputStream out = new FileOutputStream(file);
-//                                Log.d(TAG,file.getAbsolutePath());
-                    bmImg.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                    out.close();
-                } catch (IOException e){
-                    Log.d(TAG, e.getMessage());
-                }
-
-                Uri uri = Uri.fromFile(file);
-                Bitmap mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
-                        uri, getContentResolver());
-                detect(mBitmap);
                 cameraDialog.show();
                 sentenceReply = "";
             } else {
@@ -931,6 +944,12 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             lockDialog.show();
             CurrentContext.getInstance().stopWaitOwner();
         }
+
+        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+        amanager.setStreamMute(AudioManager.STREAM_ALARM, false);
+        amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+        amanager.setStreamMute(AudioManager.STREAM_RING, false);
         VoiceUtils.speak(sentenceReply);
         Log.d(TAG, sentenceReply + "  " +CurrentContext.getInstance().isWaitingOwnerSpeak());
     }
@@ -1000,6 +1019,13 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     showReply(sentence);
                     configUpdateDialog.show();
                     SmartHouse.getInstance().setRequireUpdate(false);
+                } else if (resultType.equals(ControlMonitorService.PERSON_UPDATE)){
+                    String Id = StorageHelper.getPersonGroupId("nguoinha",ControlPanel.this);
+                    if (!StorageHelper.getAllPersonIds(Id, ControlPanel.this).isEmpty()) {
+                        StorageHelper.clearPersonIds(Id,ControlPanel.this);
+                    }
+                    new GetPersonIdsTask().execute(Id);
+                    SmartHouse.getInstance().setRequirePersonUpdate(false);
                 } else
                 if (resultType.equals(WebServerService.SERVER_SUCCESS)) {
                     noticBuilder.setContentText(resultType);
@@ -1060,7 +1086,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     }
                 } else if (resultType.equals(ControlMonitorService.MONITOR)) {
                     int areaId = intent.getIntExtra(AREA_ID, -1);
-                    Log.d(TAG,currentArea.getId()+" , "+areaId);
+//                    Log.d(TAG,currentArea.getId()+" , "+areaId);
                     if ( currentArea!=null && areaId == currentArea.getId()) {
                         areaAttributeAdapter.updateAttribute(currentArea.generateValueArr());
                         SmartHouse house = SmartHouse.getInstance();

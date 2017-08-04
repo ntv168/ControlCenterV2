@@ -69,7 +69,7 @@ public class TermSQLite {
             ContentValues values = new ContentValues();
             values.put(KEY_WORDS, train.getWords()+" "+cursor.getString(cursor.getColumnIndex(KEY_WORDS)));
 
-            db.update(TABLE_OWNER_TRAIN_TERM, values, KEY_NAME + " = "+train.getName(), null);
+            db.update(TABLE_OWNER_TRAIN_TERM, values, KEY_NAME + " = ?",   new String[]{train.getName()});
             return train.getName();
         } else {
             ContentValues values = new ContentValues();

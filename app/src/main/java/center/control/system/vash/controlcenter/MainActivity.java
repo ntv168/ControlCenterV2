@@ -85,7 +85,7 @@ public class MainActivity extends Activity {
                         dialog.dismiss();
                     }
                 });
-        modHost.show();
+//        modHost.show();
     }
 
     private void loginStaffCode() {

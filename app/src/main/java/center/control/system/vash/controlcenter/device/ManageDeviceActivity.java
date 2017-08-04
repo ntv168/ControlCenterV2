@@ -339,7 +339,7 @@ public class ManageDeviceActivity extends AppCompatActivity implements ListAreaA
         final EditText txtNickName = (EditText) deviceDialog.findViewById(R.id.txtDeviceNickname);
         final TextView txtErr = (TextView) deviceDialog.findViewById(R.id.txtError);
         txtName.setText(currentDevice.getName()+"");
-        txtNickName.setText(currentDevice.getName()+"");
+        txtNickName.setText(currentDevice.getNickName()+"");
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
