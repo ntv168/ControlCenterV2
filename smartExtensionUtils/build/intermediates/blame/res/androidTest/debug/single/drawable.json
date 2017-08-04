@@ -1,26 +1,26 @@
 [
     {
-        "merged": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\text_bg.png",
-        "source": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\drawable\\text_bg.png"
+        "merged": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\text_bg.png",
+        "source": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\drawable\\text_bg.png"
     },
     {
-        "merged": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\headset_pro_ok_icn.png",
-        "source": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\drawable\\headset_pro_ok_icn.png"
+        "merged": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\headset_pro_ok_icn.png",
+        "source": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\drawable\\headset_pro_ok_icn.png"
     },
     {
-        "merged": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\headset_pro_focus_xs_icn.png",
-        "source": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\drawable\\headset_pro_focus_xs_icn.png"
+        "merged": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\widget_frame.png",
+        "source": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\drawable\\widget_frame.png"
     },
     {
-        "merged": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\headset_pro_cancel_icn.png",
-        "source": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\drawable\\headset_pro_cancel_icn.png"
+        "merged": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\badge_counter.png",
+        "source": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\drawable\\badge_counter.png"
     },
     {
-        "merged": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\widget_frame.png",
-        "source": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\drawable\\widget_frame.png"
+        "merged": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\headset_pro_cancel_icn.png",
+        "source": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\drawable\\headset_pro_cancel_icn.png"
     },
     {
-        "merged": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\badge_counter.png",
-        "source": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\drawable\\badge_counter.png"
+        "merged": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\headset_pro_focus_xs_icn.png",
+        "source": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\bundles\\debug\\res\\drawable\\headset_pro_focus_xs_icn.png"
     }
 ]

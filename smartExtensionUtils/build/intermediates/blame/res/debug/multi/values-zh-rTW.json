@@ -1,6 +1,6 @@
 [
     {
-        "outputFile": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-zh-rTW\\values-zh-rTW.xml",
+        "outputFile": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-zh-rTW\\values-zh-rTW.xml",
         "map": [
             {
                 "to": {
@@ -11,13 +11,13 @@
                     "endOffset": 103
                 },
                 "from": {
-                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values-zh-rTW\\headset_pro.xml",
+                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values-zh-rTW\\headset_pro.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
-                        "startOffset": 145,
+                        "startOffset": 142,
                         "endColumn": 52,
-                        "endOffset": 193
+                        "endOffset": 190
                     }
                 }
             },
@@ -30,13 +30,13 @@
                     "endOffset": 163
                 },
                 "from": {
-                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values-zh-rTW\\smart_watch.xml",
+                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values-zh-rTW\\smart_watch.xml",
                     "position": {
                         "startLine": 2,
                         "startColumn": 4,
-                        "startOffset": 57,
+                        "startOffset": 55,
                         "endColumn": 59,
-                        "endOffset": 112
+                        "endOffset": 110
                     }
                 }
             },
@@ -49,13 +49,13 @@
                     "endOffset": 222
                 },
                 "from": {
-                    "file": "D:\\Project\\Android\\ControlCenter\\smartExtensionUtils\\src\\main\\res\\values-zh-rTW\\smart_watch.xml",
+                    "file": "D:\\Source\\android\\controlcenter\\smartExtensionUtils\\src\\main\\res\\values-zh-rTW\\smart_watch.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
-                        "startOffset": 118,
+                        "startOffset": 115,
                         "endColumn": 58,
-                        "endOffset": 172
+                        "endOffset": 169
                     }
                 }
             }

@@ -31,7 +31,7 @@ public class VoiceUtils {
                             }
                         }
                     });
-            singleton.tts.setSpeechRate()
+//            singleton.tts.setSpeechRate(1.01);
         }
     }
     public static VoiceUtils getInstance() {

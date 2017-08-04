@@ -110,7 +110,7 @@ public class DetectIntentSQLite {
         SQLiteManager.getInstance().closeDatabase();
     }
 
-    public DetectFunctionEntity findFunctionById(int id) {
+    public static DetectFunctionEntity findFunctionById(int id) {
 
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "

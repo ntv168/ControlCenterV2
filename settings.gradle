@@ -1,2 +1,3 @@
-include ':app', ':SmartExtensionAPI'
-include ':SmartExtensionUtils'
+include ':app'
+include ':smartExtensionAPI'
+include ':smartExtensionUtils'

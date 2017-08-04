@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="D:\Project\Android\ControlCenter\SmartExtensionAPI\assets"/><source path="D:\Project\Android\ControlCenter\SmartExtensionAPI\build\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="D:\Project\Android\ControlCenter\SmartExtensionAPI\src\debug\assets"/></dataSet></merger>
+<merger version="3"><dataSet config="main"><source path="D:\Source\android\controlcenter\smartExtensionAPI\src\main\assets"/><source path="D:\Source\android\controlcenter\smartExtensionAPI\build\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="D:\Source\android\controlcenter\smartExtensionAPI\src\debug\assets"/></dataSet></merger>
