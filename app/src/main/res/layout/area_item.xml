@@ -2,21 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_marginRight="10dp"
     android:background="@android:color/transparent"
     android:gravity="center"
     android:orientation="vertical"
+    android:padding="10dp"
     style="@style/AreaSelect">
     <LinearLayout
         android:id="@+id/linArea"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:gravity="center">
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="10dp">
         <TextView
             android:id="@+id/txtAreaName"
             android:layout_width="wrap_content"

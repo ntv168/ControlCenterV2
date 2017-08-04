@@ -35,7 +35,7 @@
         android:layout_margin="20dp"
         android:width="400dp"
         android:cursorVisible="false"
-        android:text="..."
+        android:text="Chào mừng bạn đến quán cafe Dù Vàng!"
         android:textAlignment="center"
         android:textColor="@color/nDarkGray"
         android:textSize="24sp"
