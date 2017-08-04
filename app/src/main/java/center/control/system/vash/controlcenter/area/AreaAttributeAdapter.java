@@ -21,17 +21,20 @@ import center.control.system.vash.controlcenter.R;
 public class AreaAttributeAdapter extends RecyclerView.Adapter<AreaAttributeAdapter.AreaAttributeHolder> {
     private static final String TAG = "AreaAdapter";
     private List<AreaAttribute> areaAttributes = new ArrayList<>();
+    private int areaId;
     private AttributeClickListener listener;
 
-    public void updateAttribute(String[] value) {
+    public void updateAttribute(String[] value, int areaId) {
         for (int i = 0; i< value.length; i++){
             this.areaAttributes.get(i).setValue(value[i]);
         }
-        this.notifyDataSetChanged();
+        this.areaId = areaId;
+        notifyDataSetChanged();
     }
-    public AreaAttributeAdapter(List<AreaAttribute> areaAttributes, AttributeClickListener listener) {
+    public AreaAttributeAdapter(List<AreaAttribute> areaAttributes, AttributeClickListener listener, int areaId) {
         this.areaAttributes = areaAttributes;
         this.listener = listener;
+        this.areaId  = areaId;
     }
 
 
@@ -67,6 +70,12 @@ public class AreaAttributeAdapter extends RecyclerView.Adapter<AreaAttributeAdap
         }else  {
             holder.value.setText("Không khả dụng");
         }
+        holder.view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onAttributeClick(areaAttributes.get(position),areaId);
+            }
+        });
     }
     public interface AttributeClickListener{
         public void onAttributeClick(AreaAttribute areaAttribute,int areaId);

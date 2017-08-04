@@ -62,10 +62,8 @@ public class VoiceService extends Service {
         mServiceHandler = new ServiceHandler(mServiceLooper);
     }
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
         new ControlPanel();
         // For each start request, send a message to start a job and deliver the
@@ -74,7 +72,6 @@ public class VoiceService extends Service {
         msg.arg1 = startId;
         mServiceHandler.sendMessage(msg);
         new ControlPanel();
-
         // If we get killed, after returning from here, restart
         return START_STICKY;
     }

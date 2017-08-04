@@ -88,9 +88,9 @@ public class CommandEntity {
 
     public void inverseDeviceState() {
         if (deviceState.equals("on")){
-            deviceState.equals("off");
+            deviceState = "off";
         } else if (deviceState.equals("off")){
-            deviceState.equals("on");
+            deviceState = "on";
         }
     }
 }

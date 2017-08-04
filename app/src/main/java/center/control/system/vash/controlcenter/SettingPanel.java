@@ -49,13 +49,54 @@ import retrofit2.Response;
 public class SettingPanel extends AppCompatActivity {
     private static final String TAG = "Setting Panel";
     private ProgressDialog waitDiag;
+    private  CloudApi configApi;
     @Override
     protected void onResume() {
         super.onResume();
 
     }
     private void initStateMachine() {
+        configApi.getConfig(ConstManager.HOUSE_ID).enqueue(new Callback<ConfigControlCenterDTO>() {
+            @Override
+            public void onResponse(Call<ConfigControlCenterDTO> call, Response<ConfigControlCenterDTO> response) {
+                Log.d(TAG,call.request().url().toString());
+                if (response.body()!=null){
+                    StateConfigurationSQL.removeAll();
+                    for (StateDTO state: response.body().getStates()){
+                        StateEntity statEnt = new StateEntity();
+                        statEnt.setDelaySec(state.getDelay());
+                        statEnt.setNextEvIds(state.getNextEvent());
+                        statEnt.setDuringSec(state.getDuring());
+                        statEnt.setId(state.getId());
+                        statEnt.setName(state.getName());
+                        statEnt.setNoticePattern(state.getNotification());
+                        statEnt.setDefautState(state.getTimeoutState());
+                        StateConfigurationSQL.insertState(statEnt);
+                        ScriptSQLite.clearStateCmd(state.getId());
+                     }
+                    for (EventDTO ev: response.body().getEvents()){
+                        EventEntity eventEnt = new EventEntity();
+                        eventEnt.setId(ev.getId());
+                        eventEnt.setSenValue(ev.getSensorValue());
+                        eventEnt.setSenName(ev.getSensorName());
+                        eventEnt.setNextStateId(ev.getNextState());
+                        eventEnt.setPriority(ev.getPriority());
+                        StateConfigurationSQL.insertEvent(eventEnt);
+                    }
+                    SmartHouse.getInstance().setStates(StateConfigurationSQL.getAll());
+                    SmartHouse.getInstance().setCurrentState(SmartHouse.getInstance().getStateById(ConstManager.NO_BODY_HOME_STATE));
+                    if (waitDiag.isShowing()) waitDiag.dismiss();
+                }else {
+                    if (waitDiag.isShowing()) waitDiag.dismiss();
+                    MessageUtils.makeText(SettingPanel.this, "Không tải được dữ liệu"+ VolleySingleton.SERVER_HOST).show();
+                }
+            }
 
+            @Override
+            public void onFailure(Call<ConfigControlCenterDTO> call, Throwable t) {
+                MessageUtils.makeText(SettingPanel.this, "Không kết nối được "+ VolleySingleton.SERVER_HOST).show();
+            }
+        }); 
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +124,8 @@ public class SettingPanel extends AppCompatActivity {
         dialog.setMessage("Đặt lại thiết bị sẽ xóa mọi kết nối và cấu hình trong trung tâm điều khiển?");
         dialog.setCancelable(false);
 
+
+    configApi = RetroFitSingleton.getInstance().getCloudApi();
 
         waitDiag = new ProgressDialog(this);
         waitDiag.setTitle("Tải dữ liệu");

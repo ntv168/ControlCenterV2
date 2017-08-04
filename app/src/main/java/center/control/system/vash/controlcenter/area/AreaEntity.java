@@ -30,17 +30,17 @@ public class AreaEntity extends TargetObject{
     public static final String TEMP_COLD = "co";
     private static final double BURN_TEMP_RANGE = 60.0;
     private static final double HOT_TEMP_RANGE = 38.0;
-    private static final double FRESH_TEMP_RANGE = 25.0;
+    private static final double FRESH_TEMP_RANGE = 27.0;
     private static final String TEMP_FRESH = "fr";
     private static final double COLD_TEMP_RANGE = 16.0;
     private static final String TEMP_FREEZE = "fz";
     private static final String LIGHT_BRIGHT = "br";
     private static final String LIGHT_DARK = "dk";
-    public static final long HOLD_PERSON = 9000;
+    public static final long HOLD_PERSON = 11000;
 
     @SerializedName("temperature")
     private String temperature;
-    private double tempAmout = 0;
+    private double tempAmout;
     @SerializedName("light")
     private String light;
     @SerializedName("safety")
@@ -56,14 +56,6 @@ public class AreaEntity extends TargetObject{
     private double detectScore;
     private long updatePerson = -1;
 
-    public void setTempAmout(double tempAmout) {
-        this.tempAmout = tempAmout;
-    }
-
-    public double getTempAmout() {
-        return tempAmout;
-    }
-
     public void setUpdatePerson(long updatePerson) {
         this.updatePerson = updatePerson;
     }
@@ -76,10 +68,7 @@ public class AreaEntity extends TargetObject{
         if (detect == null || detect.equals(NOBODY)){
             return "Không có ai";
         }
-        String result = detect;
-        result = result.replace(DETECT_STRANGE,"Phát hiện người lạ");
-        result = result.replace(DETECT_AQUAINTANCE,"Phát hiện người nhà");
-        return result;
+        return detect;
     }
 
     public void setDetect(String detect) {
@@ -112,17 +101,20 @@ public class AreaEntity extends TargetObject{
     }
 
     public void setTemperature(String temperature) {
-//        this.tempAmout -= 7; //hard core
-        if (tempAmout >= BURN_TEMP_RANGE) {
-            this.temperature = TEMP_BURN;
-        } else if (tempAmout >= HOT_TEMP_RANGE) {
-            this.temperature = TEMP_WARM;
-        } else if (tempAmout >= FRESH_TEMP_RANGE) {
-            this.temperature = TEMP_FRESH;
-        } else if (tempAmout >= COLD_TEMP_RANGE) {
-            this.temperature = TEMP_COLD;
-        } else {
-            this.temperature = TEMP_FREEZE;
+        if (temperature!=null) {
+            this.tempAmout = Double.parseDouble(temperature);
+            this.tempAmout -= 5; //hard core
+            if (tempAmout >= BURN_TEMP_RANGE) {
+                this.temperature = TEMP_BURN;
+            } else if (tempAmout >= HOT_TEMP_RANGE) {
+                this.temperature = TEMP_WARM;
+            } else if (tempAmout >= FRESH_TEMP_RANGE) {
+                this.temperature = TEMP_FRESH;
+            } else if (tempAmout >= COLD_TEMP_RANGE) {
+                this.temperature = TEMP_COLD;
+            } else {
+                this.temperature = TEMP_FREEZE;
+            }
         }
     }
 
@@ -136,11 +128,7 @@ public class AreaEntity extends TargetObject{
                 }
             }
         }
-
-        if (lightin == 0 ){
-            return "không có đèn nào sáng";
-        } else
-        return  "có "+ lightin + " đèn bật";
+        return  "Có "+ lightin + " đèn bật";
     }
     public String getBright() {
         int lightin = 0;
@@ -164,17 +152,6 @@ public class AreaEntity extends TargetObject{
         return safety;
     }
 
-    public String getSafetyBot() {
-        switch (safety)
-        {
-            case DOOR_OPEN:
-                return " có cửa chưa đóng";
-            case  DOOR_CLOSE:
-                return " đóng hết cửa rồi";
-        }
-        return null;
-    }
-
     public void setSafety(String safety) {
         this.safety = safety;
     }
@@ -190,10 +167,7 @@ public class AreaEntity extends TargetObject{
                 }
             }
         }
-        if (usingDev == 0){
-            return "Không có thiết bị nào sử dụng điện";
-        }
-        return "có "+usingDev + " thiết bị sử dụng điện";
+        return usingDev + " thiết bị sử dụng điện";
     }
 
     public void setElectricUsing(String electricUsing) {
@@ -230,7 +204,6 @@ public class AreaEntity extends TargetObject{
             }
         }
         String temperat = "Không khả dụng";
-        this.setTemperature("");
         if (this.getTemperature()!=null) {
             switch (this.getTemperature()) {
                 case TEMP_BURN:
@@ -260,11 +233,7 @@ public class AreaEntity extends TargetObject{
                 }
             }
         }
-        String lighting = "";
-        if (lightin == 0 ){
-            lighting =  "không có đèn nào sáng";
-        } else
-        lighting = "Có "+ lightin + " đèn bật";
+        String lighting = "Có "+ lightin + " đèn bật";
 
         String[] result = new String[]{
                 safetyRes,
@@ -288,7 +257,6 @@ public class AreaEntity extends TargetObject{
             }
         }
         String temperat = "Không khả dụng";
-        this.setTemperature("");
         if (this.getTemperature()!=null) {
             switch (this.getTemperature()) {
                 case TEMP_BURN:
@@ -330,24 +298,4 @@ public class AreaEntity extends TargetObject{
         return result;
     }
 
-    public String getRawDetect() {
-        return detect;
-    }
-    public String getTemperatureBot(){
-
-        this.setTemperature("");
-        switch (temperature){
-            case TEMP_BURN:
-                return " nóng như lửa";
-            case TEMP_COLD:
-                return " lạnh rồi";
-            case TEMP_FREEZE:
-                return " rét lắm";
-            case TEMP_WARM:
-                return " hơi nóng";
-            case TEMP_FRESH:
-                return " mát rồi";
-        }
-        return " có nhiệt độ lạ lắm";
-    }
 }

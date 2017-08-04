@@ -1,11 +1,8 @@
 package center.control.system.vash.controlcenter.server;
 
-import android.graphics.Bitmap;
-import android.util.Base64;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -32,7 +29,6 @@ import center.control.system.vash.controlcenter.utils.SmartHouse;
 public class HttpResponseThread extends Thread {
     private static final String AREA_REQ = "area";
     private static final String AREA_ATTRIBUTE_REQ = "getAreaSensor";
-    private static final String AREA_CAMERA_REQ = "getAreaCamera";
     private static final String AREA_DEVICE = "getAreaDevice";
     private static final String MODE_REQ = "getAllMode";
     private static final String ACTIVE_MODE = "activateMode";
@@ -42,7 +38,6 @@ public class HttpResponseThread extends Thread {
     private static final String MODE_TODAY = "getModeToday";
     private static final String RUN_MODE_TODAY = "modeToday";
     private static final String ACTIVATE_CONFIG = "activeConfig";
-    private static final String UPDATE_PERSON = "updatePerson";
     private static final String DEACTIVATE_CONFIG = "cancelConfig";
     private static final String RESPONSE_SUCCESS = "tung=success";
     private static final String DATABASE_VERS = "databaseVersion";
@@ -79,26 +74,14 @@ public class HttpResponseThread extends Thread {
                 } else if (request.contains(AREA_ATTRIBUTE_REQ)){
                     String[] reqElement  = request.split("/");
                     Log.d(TAG,"area id:  "+reqElement[2]);
-                    if (!house.isDefaultState()) {
+                    if (house.getCurrentState().getId() != ConstManager.NO_BODY_HOME_STATE &&
+                            house.getCurrentState().getId() != ConstManager.OWNER_IN_HOUSE_STATE) {
                         response += "config;"+house.getCurrentState().getNoticePattern()+
                                 ";"+house.getCurrentState().getName();
                     } else {
                         AreaEntity area = SmartHouse.getAreaById(Integer.parseInt(reqElement[2]));
                         response += area.generateAttributeForApi();
                     }
-                }
-                else if (request.contains(AREA_CAMERA_REQ)){
-                    String[] reqElement  = request.split("/");
-                    Log.d(TAG,"area id:  "+reqElement[2]);
-                    AreaEntity area = SmartHouse.getAreaById(Integer.parseInt(reqElement[2]));
-//                    response += area.getImageBitmap();
-                    if (area.getImageBitmap() != null) {
-                        ByteArrayOutputStream osb = new ByteArrayOutputStream();
-                        area.getImageBitmap().compress(Bitmap.CompressFormat.JPEG, 100, osb);
-                        String encoded = Base64.encodeToString(osb.toByteArray(), Base64.NO_WRAP);
-                        response = encoded;
-                    }
-
                 }
                 else if (request.contains(AREA_DEVICE)){
                     String[] reqElement  = request.split("/");
@@ -175,16 +158,7 @@ public class HttpResponseThread extends Thread {
                             SmartHouse.getInstance().setRequireBotUpdate(true);
                         }
                     }
-                }else if (request.contains(UPDATE_PERSON)) {
-                    String[] reqElement = request.split("/");
-                    if (reqElement.length>=3) {
-                        Log.d(TAG, "Code :  " + reqElement[2]);
-                        if (reqElement[2].equals(house.getContractId())) {
-                            SmartHouse.getInstance().setRequirePersonUpdate(true);
-                            response += "success";
-                        }
-                    }
-                }  else if (request.contains(ACTIVATE_CONFIG)) {
+                } else if (request.contains(ACTIVATE_CONFIG)) {
                     String[] reqElement = request.split("/");
                     if (reqElement.length>=3) {
                         Log.d(TAG, "Code :  " + reqElement[2]);
