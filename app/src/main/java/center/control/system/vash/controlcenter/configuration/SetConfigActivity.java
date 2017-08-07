@@ -85,6 +85,7 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
                     SmartHouse.getInstance().setCurrentState(SmartHouse.getInstance().getStateById(ConstManager.NO_BODY_HOME_STATE));
 
                     waitDiag.dismiss();
+                    stats = SmartHouse.getInstance().getStates();
                     selectStateDiag.setAdapter(getStateAdapter(), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

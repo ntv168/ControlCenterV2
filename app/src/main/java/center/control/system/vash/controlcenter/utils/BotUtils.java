@@ -501,7 +501,6 @@ public class BotUtils {
             case ConstManager.CHECK_LIGHT:
                 return area.getLight();
             case ConstManager.CHECK_TEMPERATUR:
-                Log.d(TAG,"check nhiet "+area.getTempAmout());
                 return area.getTemperatureBot();
             case ConstManager.CHECK_PERSON:
                 return area.getDetect();

@@ -97,7 +97,8 @@ public class MainActivity extends Activity {
             @Override
             public void onResponse(Call<StaffCodeDTO> call, Response<StaffCodeDTO> response) {
                 Log.d(TAG,call.request().url()+"");
-                if (response.body()!=null && response.body().getMessage()!= null && response.body().getMessage().equals("success")){
+                if (response.body()!=null && response.body().getMessage()!= null
+                        && response.body().getMessage().equals("success")){
                     startActivity(new Intent(MainActivity.this,SettingPanel.class));
                 }else {
                     MessageUtils.makeText(MainActivity.this,"Sai code nhân viên ").show();
