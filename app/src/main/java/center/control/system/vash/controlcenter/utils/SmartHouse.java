@@ -2,16 +2,13 @@ package center.control.system.vash.controlcenter.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -19,19 +16,15 @@ import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.configuration.ConfigurationEntity;
-import center.control.system.vash.controlcenter.configuration.ConfigurationSQLite;
 import center.control.system.vash.controlcenter.configuration.EventEntity;
-import center.control.system.vash.controlcenter.configuration.SetConfigActivity;
 import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
 import center.control.system.vash.controlcenter.configuration.StateEntity;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
-
+import center.control.system.vash.controlcenter.event.TriggerCheckList;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.sensor.SensorEntity;
-import center.control.system.vash.controlcenter.sensor.SensorSQLite;
-import center.control.system.vash.controlcenter.trigger.TriggerCheckList;
 
 /**
  * Created by Thuans on 5/27/2017.

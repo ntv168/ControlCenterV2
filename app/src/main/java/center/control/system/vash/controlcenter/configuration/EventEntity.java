@@ -5,6 +5,7 @@ package center.control.system.vash.controlcenter.configuration;
  */
 
 public class EventEntity {
+    private String name;
     private int id;
     private String senName;
     private String senValue;
@@ -58,5 +59,9 @@ public class EventEntity {
 
     public void setNextStateId(int nextStateId) {
         this.nextStateId = nextStateId;
+    }
+
+    public String getName() {
+        return getSenName() + " " + getSenValue();
     }
 }

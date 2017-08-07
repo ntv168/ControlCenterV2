@@ -2,10 +2,9 @@ package center.control.system.vash.controlcenter.configuration;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
-import center.control.system.vash.controlcenter.SettingPanel;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.script.CommandAdapter;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
@@ -114,7 +112,7 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_set_config);
+        setContentView(R.layout.configuration);
 
 
         configApi = RetroFitSingleton.getInstance().getCloudApi();
@@ -236,7 +234,6 @@ public class SetConfigActivity extends AppCompatActivity implements EventAdapter
                 waitDialog.dismiss();
             }
         });
-
 
     }
 

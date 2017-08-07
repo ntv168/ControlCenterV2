@@ -1,4 +1,4 @@
-package center.control.system.vash.controlcenter.trigger;
+package center.control.system.vash.controlcenter.event;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -52,7 +52,7 @@ public class TriggerSQLite {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         String selectQuery =  " SELECT * "
                 + " FROM " + TABLE_TRIGGER;
-        Cursor cursor = db.rawQuery(selectQuery,  new String[]{});
+         Cursor cursor = db.rawQuery(selectQuery,  new String[]{});
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {

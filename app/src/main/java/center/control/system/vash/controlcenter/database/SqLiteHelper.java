@@ -9,13 +9,13 @@ import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.command.CommandSQLite;
 import center.control.system.vash.controlcenter.configuration.ConfigurationSQLite;
 import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
-import center.control.system.vash.controlcenter.device.TriggerDeviceSQLite;
-import center.control.system.vash.controlcenter.sensor.SensorSQLite;
-import center.control.system.vash.controlcenter.trigger.TriggerSQLite;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
+import center.control.system.vash.controlcenter.device.TriggerDeviceSQLite;
+import center.control.system.vash.controlcenter.event.TriggerSQLite;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
-import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.nlp.TermSQLite;
+import center.control.system.vash.controlcenter.script.ScriptSQLite;
+import center.control.system.vash.controlcenter.sensor.SensorSQLite;
 
 /**
  * Created by Thuans on 4/27/2017.

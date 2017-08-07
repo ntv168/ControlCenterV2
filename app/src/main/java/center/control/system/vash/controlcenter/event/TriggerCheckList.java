@@ -1,9 +1,5 @@
-package center.control.system.vash.controlcenter.trigger;
+package center.control.system.vash.controlcenter.event;
 
-import java.util.List;
-
-import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.device.TriggerDeviceSQLite;
 import center.control.system.vash.controlcenter.sensor.SensorEntity;
 import center.control.system.vash.controlcenter.sensor.SensorSQLite;

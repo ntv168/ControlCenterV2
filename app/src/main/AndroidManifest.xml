@@ -34,15 +34,11 @@
 
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="landscape"></activity>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".panel.ControlPanel"
             android:screenOrientation="landscape">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".panel.ModePanel"
@@ -56,23 +52,35 @@
         <activity
             android:name=".device.ManageDeviceActivity"
             android:screenOrientation="landscape" />
-        <activity android:name=".panel.UserSettingPanel"
-            android:screenOrientation="landscape"/>
-        <activity android:name=".PersonalInfoActivity"
-            android:screenOrientation="landscape"></activity>
-        <activity android:name=".nlp.TrainVAActivity"
-            android:screenOrientation="landscape"/>
+        <activity
+            android:name=".panel.UserSettingPanel"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".PersonalInfoActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".nlp.TrainVAActivity"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".configuration.SetConfigActivity"
             android:screenOrientation="landscape" />
-        <activity android:name=".trigger.MapDeviceTriggerActivity"
-            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".event.MapDeviceTriggerActivity"
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".watch.SonyActivity">
             <intent-filter>
                 <action android:name="smart.house.watch.SONY_ACTIVITY" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".configuration.ConfigurationActivity"></activity>
 
         <service android:name=".watch.WatchService" />
         <service android:name="com.sonyericsson.extras.liveware.extension.util.TunnelService">
@@ -83,6 +91,7 @@
 
         <receiver android:name=".watch.WatchBroadcastReceiver">
             <intent-filter>
+
                 <!-- Generic extension intents. -->
                 <action android:name="com.sonyericsson.extras.liveware.aef.registration.EXTENSION_REGISTER_REQUEST" />
                 <action android:name="com.sonyericsson.extras.liveware.aef.registration.ACCESSORY_CONNECTION" />
@@ -111,6 +120,8 @@
                 <action android:name="com.sonyericsson.extras.aef.control.MENU_ITEM_SELECTED" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".event.EventActivity"></activity>
     </application>
 
 </manifest>

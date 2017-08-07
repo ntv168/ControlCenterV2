@@ -1,4 +1,4 @@
-package center.control.system.vash.controlcenter.trigger;
+package center.control.system.vash.controlcenter.event;
 
 import com.google.gson.annotations.SerializedName;
 

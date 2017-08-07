@@ -1,6 +1,7 @@
-package center.control.system.vash.controlcenter.trigger;
+package center.control.system.vash.controlcenter.event;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,33 +10,35 @@ import android.widget.TextView;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.configuration.StateEntity;
 
 /**
  * Created by Sam on 6/28/2017.
  */
 
-public class RecyclerViewTriggerAdapter extends RecyclerView.Adapter<RecyclerViewTriggerAdapter.ViewHolder>{
-    private List<TriggerEntity> triggerEntities;
+public class RecyclerViewStateAdapter extends RecyclerView.Adapter<RecyclerViewStateAdapter.ViewHolder>{
+    private List<StateEntity> stateEntities;
     private OnAdapterItemClickListener mListener;
     private int focused;
     View view;
 
-    public RecyclerViewTriggerAdapter(List<TriggerEntity> items, OnAdapterItemClickListener listener) {
-        this.triggerEntities = items;
+    public RecyclerViewStateAdapter(List<StateEntity> items, OnAdapterItemClickListener listener) {
+        this.stateEntities = items;
         this.mListener = listener;
     }
 
     @Override
-    public RecyclerViewTriggerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerViewStateAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.condition_item, parent, false);
-        return new RecyclerViewTriggerAdapter.ViewHolder(view);
+        return new RecyclerViewStateAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerViewTriggerAdapter.ViewHolder holder, final int position) {
-        holder.item = triggerEntities.get(position);
+    public void onBindViewHolder(final RecyclerViewStateAdapter.ViewHolder holder, final int position) {
+        holder.item = stateEntities.get(position);
         holder.triggerName.setText(holder.item.getName());
+        Log.d("------", "onBindViewHolder: " + holder.item.getName());
         if (position == focused){
             holder.view.setBackgroundColor(view.getResources().getColor(R.color.nGreen2));
 
@@ -47,7 +50,7 @@ public class RecyclerViewTriggerAdapter extends RecyclerView.Adapter<RecyclerVie
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    mListener.onTriggerClick(holder.item);
+                    mListener.onStateClick(holder.item);
                 }
                 focused = position;
                 notifyDataSetChanged();
@@ -57,24 +60,24 @@ public class RecyclerViewTriggerAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public int getItemCount() {
-        return triggerEntities.size();
+        return stateEntities.size();
     }
 
 
-    public void setDevices(List<TriggerEntity> devices) {
-        this.triggerEntities = devices;
+    public void setDevices(List<StateEntity> devices) {
+        this.stateEntities = devices;
         this.notifyDataSetChanged();
     }
 
-    public void remove(TriggerEntity deviceEntity) {
-        this.triggerEntities.remove(deviceEntity);
+    public void remove(StateEntity deviceEntity) {
+        this.stateEntities.remove(deviceEntity);
         this.notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public final TextView triggerName;
-        public TriggerEntity item;
+        public StateEntity item;
 
         public ViewHolder(View view) {
             super(view);
@@ -88,6 +91,6 @@ public class RecyclerViewTriggerAdapter extends RecyclerView.Adapter<RecyclerVie
     }
 
     public interface OnAdapterItemClickListener {
-        public void onTriggerClick(TriggerEntity triggerEntity);
+        public void onStateClick(StateEntity triggerEntity);
     }
 }

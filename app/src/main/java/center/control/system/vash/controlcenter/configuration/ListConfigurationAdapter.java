@@ -17,9 +17,8 @@ import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.command.CommandSQLite;
 import center.control.system.vash.controlcenter.command.ListCommandAdapter;
-import center.control.system.vash.controlcenter.trigger.ListTriggersAdapter;
-import center.control.system.vash.controlcenter.trigger.TriggerEntity;
-import center.control.system.vash.controlcenter.trigger.TriggerSQLite;
+import center.control.system.vash.controlcenter.event.ListEventsAdapter;
+import center.control.system.vash.controlcenter.event.TriggerSQLite;
 
 
 /**
@@ -27,20 +26,20 @@ import center.control.system.vash.controlcenter.trigger.TriggerSQLite;
  */
 
 public class ListConfigurationAdapter extends ArrayAdapter<ConfigurationEntity> {
-    List<ConfigurationEntity> configurationEntities;
+    List<StateEntity> stateEntities;
     Dialog dialog;
     TriggerSQLite triggerSQLite = new TriggerSQLite();
     CommandSQLite commandSQLite = new CommandSQLite();
 
-    public ListConfigurationAdapter(Context context, List<ConfigurationEntity> items) {
+    public ListConfigurationAdapter(Context context, List<StateEntity> items) {
         super(context, 0);
-        this.configurationEntities = items;
+        this.stateEntities = items;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
-        ConfigurationEntity entity = configurationEntities.get(position);
+        StateEntity entity = stateEntities.get(position);
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
@@ -63,9 +62,9 @@ public class ListConfigurationAdapter extends ArrayAdapter<ConfigurationEntity> 
                 dialog = new Dialog(getContext());
                 dialog.setContentView(R.layout.condition_dialog);
 
-                List<TriggerEntity> listTrigger = triggerSQLite.getAll();
+                List<EventEntity> listTrigger = stateEntities.get(position).getEvents();
 
-                ListTriggersAdapter triggerAdapter = new ListTriggersAdapter(getContext(), listTrigger);
+                ListEventsAdapter triggerAdapter = new ListEventsAdapter(getContext(), listTrigger);
                 ListView lwTrigger = (ListView) dialog.findViewById(R.id.lsCondition);
                 lwTrigger.setAdapter(triggerAdapter);
                 triggerAdapter.notifyDataSetChanged();
@@ -90,14 +89,20 @@ public class ListConfigurationAdapter extends ArrayAdapter<ConfigurationEntity> 
         });
 
 
+        Button btnSave = (Button) convertView.findViewById(R.id.btnSave);
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+            }
+        });
         // Return the completed view to render on screen
         return convertView;
     }
 
     @Override
     public int getCount() {
-        return configurationEntities.size();
+        return stateEntities.size();
     }
 
     public long getItemId(int position) {

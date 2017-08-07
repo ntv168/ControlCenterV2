@@ -14,6 +14,7 @@
         android:weightSum="10">
 
         <ImageButton
+            android:id="@+id/lnBack"
             android:layout_width="30dp"
             android:layout_height="20dp"
             android:background="@android:color/transparent"
@@ -153,11 +154,11 @@
                         android:textSize="30sp" />
                 </LinearLayout>
 
-                <ListView
+                <android.support.v7.widget.RecyclerView
                     android:id="@+id/listItemCenter"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="3"></ListView>
+                    android:layout_weight="3"></android.support.v7.widget.RecyclerView>
             </LinearLayout>
 
             <View
@@ -201,11 +202,11 @@
                         android:textSize="30sp" />
                 </LinearLayout>
 
-                <ListView
+                <android.support.v7.widget.RecyclerView
                     android:id="@+id/listItemRight"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="3"></ListView>
+                    android:layout_weight="3"></android.support.v7.widget.RecyclerView>
             </LinearLayout>
 
 

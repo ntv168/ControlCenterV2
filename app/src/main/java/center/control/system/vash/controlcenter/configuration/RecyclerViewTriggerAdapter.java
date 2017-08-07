@@ -9,7 +9,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
-import center.control.system.vash.controlcenter.trigger.TriggerEntity;
+import center.control.system.vash.controlcenter.event.TriggerEntity;
 
 /**
  * Created by Sam on 6/28/2017.

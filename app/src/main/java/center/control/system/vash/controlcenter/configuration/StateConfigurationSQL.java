@@ -1,6 +1,5 @@
 package center.control.system.vash.controlcenter.configuration;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,12 +8,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.database.SQLiteManager;
-import center.control.system.vash.controlcenter.nlp.OwnerTrainEntity;
-import center.control.system.vash.controlcenter.nlp.TargetTernEntity;
-import center.control.system.vash.controlcenter.trigger.TriggerEntity;
 
 /**
  * Created by Thuans on 7/2/2017.

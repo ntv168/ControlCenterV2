@@ -1,16 +1,14 @@
 package center.control.system.vash.controlcenter;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.microsoft.projectoxford.face.FaceServiceClient;
@@ -19,32 +17,10 @@ import com.microsoft.projectoxford.face.contract.Person;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-import center.control.system.vash.controlcenter.area.AreaEntity;
-import center.control.system.vash.controlcenter.configuration.ConfigurationActivity;
-import center.control.system.vash.controlcenter.configuration.EventEntity;
-import center.control.system.vash.controlcenter.configuration.SetConfigActivity;
-import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
-import center.control.system.vash.controlcenter.configuration.StateEntity;
-import center.control.system.vash.controlcenter.database.SQLiteManager;
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
+import center.control.system.vash.controlcenter.event.MapDeviceTriggerActivity;
 import center.control.system.vash.controlcenter.helper.StorageHelper;
-import center.control.system.vash.controlcenter.panel.ControlPanel;
-import center.control.system.vash.controlcenter.panel.ModePanel;
-import center.control.system.vash.controlcenter.panel.VAPanel;
-import center.control.system.vash.controlcenter.script.ScriptSQLite;
-import center.control.system.vash.controlcenter.server.CloudApi;
-import center.control.system.vash.controlcenter.server.ConfigControlCenterDTO;
-import center.control.system.vash.controlcenter.server.EventDTO;
-import center.control.system.vash.controlcenter.server.RetroFitSingleton;
-import center.control.system.vash.controlcenter.server.StateDTO;
-import center.control.system.vash.controlcenter.server.VolleySingleton;
-import center.control.system.vash.controlcenter.utils.BotUtils;
-import center.control.system.vash.controlcenter.utils.ConstManager;
 import center.control.system.vash.controlcenter.utils.MessageUtils;
-import center.control.system.vash.controlcenter.utils.SmartHouse;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class SettingPanel extends AppCompatActivity {
     private static final String TAG = "Setting Panel";
@@ -119,7 +95,7 @@ public class SettingPanel extends AppCompatActivity {
         btnSetConfig.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(SettingPanel.this, SetConfigActivity.class));
+                startActivity(new Intent(SettingPanel.this, MapDeviceTriggerActivity.class));
             }
         });
 
