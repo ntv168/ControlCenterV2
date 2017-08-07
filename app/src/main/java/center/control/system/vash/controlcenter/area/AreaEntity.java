@@ -23,17 +23,19 @@ public class AreaEntity extends TargetObject{
     public static final String DETECT_NOT_AVAILABLE = "noAvai";
     public static final String NOBODY = "nob";
     public static final String DETECT_AQUAINTANCE = "aqa";
+    public static final String DETECT_BAD_GUY = "bguy";
     public static final String DOOR_OPEN = "do";
+    public static final String FUME = "fu";
     public static final String DOOR_CLOSE = "dc";
     public static final String TEMP_BURN = "bu";
     public static final String TEMP_WARM = "wm";
     public static final String TEMP_COLD = "co";
-    private static final double BURN_TEMP_RANGE = 60.0;
+    public static final double BURN_TEMP_RANGE = 60.0;
     private static final double HOT_TEMP_RANGE = 38.0;
-    private static final double FRESH_TEMP_RANGE = 25.0;
-    private static final String TEMP_FRESH = "fr";
+    public static final double FRESH_TEMP_RANGE = 25.0;
+    public static final String TEMP_FRESH = "fr";
     private static final double COLD_TEMP_RANGE = 16.0;
-    private static final String TEMP_FREEZE = "fz";
+    public static final String TEMP_FREEZE = "fz";
     private static final String LIGHT_BRIGHT = "br";
     private static final String LIGHT_DARK = "dk";
     public static final long HOLD_PERSON = 9000;
@@ -76,22 +78,17 @@ public class AreaEntity extends TargetObject{
         if (detect == null || detect.equals(NOBODY)){
             return "Không có ai";
         }
+        String item[] =detect.split(" ");
+        detect = item[0]+" "+item[1].split("-")[0];
         String result = detect;
         result = result.replace(DETECT_STRANGE,"Phát hiện người lạ");
         result = result.replace(DETECT_AQUAINTANCE,"Phát hiện người nhà");
+        result = result.replace(DETECT_BAD_GUY,"Phát hiện kẻ xấu");
         return result;
     }
 
     public void setDetect(String detect) {
         this.detect = detect;
-    }
-
-    public double getDetectScore() {
-        return detectScore;
-    }
-
-    public void setDetectScore(double detectScore) {
-        this.detectScore = detectScore;
     }
 
     public boolean isHasCamera() {
@@ -101,11 +98,6 @@ public class AreaEntity extends TargetObject{
     public void setHasCamera(boolean hasCamera) {
         this.hasCamera = hasCamera;
     }
-
-    public static String[] getAttrivutes() {
-        return attrivutes;
-    }
-
 
     public String getTemperature() {
         return temperature;
@@ -169,6 +161,8 @@ public class AreaEntity extends TargetObject{
         {
             case DOOR_OPEN:
                 return " có cửa chưa đóng";
+            case FUME:
+                return " có khói";
             case  DOOR_CLOSE:
                 return " đóng hết cửa rồi";
         }

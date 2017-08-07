@@ -41,11 +41,7 @@ public class ListScriptAdapter extends RecyclerView.Adapter<ListScriptAdapter.Vi
     public void onBindViewHolder(final ViewHolder holder,final int position) {
         holder.item = scriptEntities.get(position);
         holder.name.setText(holder.item.getName());
-        if (position == focusedItem){
-            holder.btnActive.setEnabled(false);
-        } else {
-            holder.btnActive.setEnabled(true);
-        }
+
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,16 +59,7 @@ public class ListScriptAdapter extends RecyclerView.Adapter<ListScriptAdapter.Vi
                 return true;
             }
         });
-        holder.btnActive.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    mListener.activaScript(holder.item);
-                }
-                focusedItem = position;
-                notifyDataSetChanged();
-            }
-        });
+      
     }
 
     @Override
@@ -97,14 +84,12 @@ public class ListScriptAdapter extends RecyclerView.Adapter<ListScriptAdapter.Vi
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public final TextView name;
-        public final ImageButton btnActive;
         public ScriptEntity item;
 
         public ViewHolder(View view) {
             super(view);
             this.view = view;
             name = (TextView) view.findViewById(R.id.scriptName);
-            btnActive = (ImageButton) view.findViewById(R.id.btnActiveScript);
         }
 
     }

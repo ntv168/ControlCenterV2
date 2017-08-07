@@ -14,6 +14,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
+import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
@@ -41,13 +42,31 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.item = eventEntities.get(position);
-        Log.d("adapter event",eventEntities.size()+" "+position+" "+eventEntities.get(0));
+//        Log.d("adapter event",eventEntities.size()+" "+position+" "+eventEntities.get(0));
         SmartHouse house = SmartHouse.getInstance();
-        holder.nextState.setText(house.getStateById(holder.item.getNextStateId()).getName());
-        holder.senVal.setText(holder.item.getSenValue());
-        holder.senName.setText(holder.item.getSenName());
-        holder.priorirty.setText(holder.item.getPriority()+"");
-        holder.btnAreaId.setText(holder.item.getAreaId()+"");
+        switch (holder.item.getSenName()){
+            case "sec":
+                holder.senVal.setText("an ninh : ");
+            case "cam":
+                holder.senVal.setText("camera : ");
+            case "tem":
+                holder.senVal.setText("nhiệt độ : ");
+        }
+        switch (holder.item.getSenValue()){
+            case AreaEntity.DETECT_AQUAINTANCE:
+                holder.senName.setText("người thân");
+            case AreaEntity.DETECT_STRANGE:
+                holder.senName.setText("người lạ ");
+            case AreaEntity.DOOR_CLOSE:
+                holder.senName.setText("cửa đóng");
+            case AreaEntity.DETECT_BAD_GUY:
+                holder.senName.setText("kẻ xấu");
+            case AreaEntity.FUME:
+                holder.senName.setText("có khói");
+            case AreaEntity.DOOR_OPEN:
+                holder.senName.setText("cửa mở");
+        }
+        holder.btnAreaId.setText("ở" + SmartHouse.getAreaById(holder.item.getAreaId()).getName());
         holder.btnAreaId.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,9 +111,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public final TextView senName;
-        public final TextView senVal;
-        public final TextView nextState;
-        public final TextView priorirty;
+        public final TextView senVal; 
         public final Button btnAreaId;
         public EventEntity item;
 
@@ -103,8 +120,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             this.view = view;
             senName = (TextView) view.findViewById(R.id.txtSenName);
             senVal = (TextView) view.findViewById(R.id.txtSenValue);
-            priorirty = (TextView) view.findViewById(R.id.txtPriority);
-            nextState = (TextView) view.findViewById(R.id.txtNextStateName);
             btnAreaId = (Button) view.findViewById(R.id.btnAreaId);
         }
 

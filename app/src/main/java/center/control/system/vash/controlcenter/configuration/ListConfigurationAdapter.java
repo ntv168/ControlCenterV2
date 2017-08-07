@@ -68,7 +68,7 @@ public class ListConfigurationAdapter extends ArrayAdapter<ConfigurationEntity> 
                 ListView lwTrigger = (ListView) dialog.findViewById(R.id.lsCondition);
                 lwTrigger.setAdapter(triggerAdapter);
                 triggerAdapter.notifyDataSetChanged();
-                Log.d("-------------------", "onClick: " + "-----------" );
+//                Log.d("-------------------", "onClick: " + "-----------" );
                 dialog.show();
             }
         });
