@@ -49,7 +49,7 @@ public class ConstManager {
     public static final int FUNCTION_DEC_TEMP = 1035;
     public static final int FUNCTION_START_MODE = 1027;
     public static final int FUNCTION_STOP_MODE = 1033;
-    public static final int SERVICE_PERIOD = 4000;
+    public static final int SERVICE_PERIOD = 3500;
     public static final int PRIORITY_MAX = 100;
     public static final int DURING_MAX = 1000;
     public static final int SAY_BYE = 24;

@@ -515,7 +515,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             stateDialog = builder.create();
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
             builder.setNegativeButton("Xác nhận", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -530,14 +529,18 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             stateDialog.dismiss();
         }
         stateDialog.setTitle(state.getName());
-        String command  = "";
+        String command  = "Các thiết bị sẽ được kích hoạt: \n";
         for (CommandEntity cmd : state.getCommands()){
-            command += (cmd.getDeviceState().equals("on")?"bật":"tắt")+" "+
-                    SmartHouse.getInstance().getDeviceById(cmd.getDeviceId()).getName()+" trong "
-                    + SmartHouse.getAreaById(SmartHouse.getInstance().getDeviceById(cmd.getDeviceId()).getAreaId()).getName() +"\n";
+            DeviceEntity dev = SmartHouse.getInstance().getDeviceById(cmd.getDeviceId());
+            String ctrCmd = (cmd.getDeviceState().equals("on")?"Bật":"Tắt");
+            if (dev.isDoor()){
+                ctrCmd = (cmd.getDeviceState().equals("on")?"Mở":"Đóng");
+            }
+            command += ctrCmd+" "+ dev.getName()+" trong "
+                    + SmartHouse.getAreaById(dev.getAreaId()).getName() +"\n";
         }
         stateDialog.setMessage(BotUtils.completeSentence(state.getNoticePattern(),resultValue,"")+
-                "\n"+ (command.length()>2?command:"Thông báo sẽ tự động tắt"));
+                "\n"+ (state.getCommands().size()>2?command:"Thông báo sẽ tự động tắt"));
         stateDialog.setCancelable(false);
         stateDialog.show();
     }
@@ -1074,14 +1077,18 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     CurrentContext current = CurrentContext.getInstance();
                     String target = current.getDevice()!=null?current.getDevice().getName():current.getScript().getName();
                     if (result == ControlMonitorService.SUCCESS){
-                        showReply(BotUtils.completeSentence(
-                                current.getDetectedFunction().getSuccessPattern(),"",target));
+                        if (current.getDevice()!= null && !current.getDevice().isDoor()){
+                            showReply(BotUtils.completeSentence(
+                                    current.getDetectedFunction().getSuccessPattern(), "", target));
+                        }
                         SmartHouse house = SmartHouse.getInstance();
                         Log.d(TAG,house.getDevices().size()+" succ");
                         deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
                     } else if (result == ControlMonitorService.FAIL){
-                        showReply(BotUtils.completeSentence(
-                                current.getDetectedFunction().getFailPattern(),"",target));
+                        if (current.getDevice()!= null && !current.getDevice().isDoor()){
+                            showReply(BotUtils.completeSentence(
+                                    current.getDetectedFunction().getFailPattern(),"",target));
+                        }
 
                     }
                 } else if (resultType.equals(ControlMonitorService.MONITOR)) {

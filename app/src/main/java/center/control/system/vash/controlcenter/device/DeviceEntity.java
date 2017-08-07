@@ -11,8 +11,8 @@ import java.util.Set;
  */
 
 public class DeviceEntity extends TargetObject{
-    public static final String [] types = new  String[]{"light","bell","door","fan","camera","tivi","airCondition","cooker","curtain"};
-    public static final String [] typeNames = new  String[]{"đèn","chuông","cửa","quạt","camera","ti-vi","máy lạnh","nồi cơm","rèm cửa"};
+    public static final String [] types = new  String[]{"light","bell","door","fan","tivi","airCondition","cooker","curtain"};
+    public static final String [] typeNames = new  String[]{"đèn","chuông","cửa","quạt","ti-vi","máy lạnh","nồi cơm","cửa sổ"};
     public static final String remoteTypes = new  String("airCondition");
 
     @SerializedName("port")
@@ -39,6 +39,13 @@ public class DeviceEntity extends TargetObject{
     }
 
     Set<String> attributeSet;
+
+    public boolean isLight(){
+        return this.attributeType.contains(types[0]);
+    }
+    public boolean isDoor(){
+        return (this.attributeType.contains(types[2]) || this.attributeType.contains(types[7])) ;
+    }
 
 
     public String getAttributeType() {

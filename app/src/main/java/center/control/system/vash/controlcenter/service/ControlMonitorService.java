@@ -146,7 +146,7 @@ public class ControlMonitorService extends Service {
                             && smartHouse.getCurrentState().getDuringSec() != ConstManager.DURING_MAX
                             && !smartHouse.isDefaultState()){
                         Log.d(TAG,smartHouse.getCurrentState().getName()+ " Cấu hình tự động chuyển time out ");
-                        smartHouse.revertCmdState();
+//                        smartHouse.revertCmdState();
                         smartHouse.resetStateToDefault();
                         sendResult(CHANGE_STATE,-1);
                     }
@@ -290,7 +290,7 @@ public class ControlMonitorService extends Service {
 
     @Override
     public void onDestroy(){
-        Toast.makeText(this, "Stop read sensor", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Stop read sensor", Toast.LENGTH_SHORT).show();
         if (repeatScheduler !=null){
             repeatScheduler.cancel();
         }
