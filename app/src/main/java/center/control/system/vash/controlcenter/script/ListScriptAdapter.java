@@ -59,7 +59,7 @@ public class ListScriptAdapter extends RecyclerView.Adapter<ListScriptAdapter.Vi
                 return true;
             }
         });
-      
+
     }
 
     @Override

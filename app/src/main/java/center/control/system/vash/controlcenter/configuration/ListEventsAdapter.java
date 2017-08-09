@@ -1,4 +1,4 @@
-package center.control.system.vash.controlcenter.event;
+package center.control.system.vash.controlcenter.configuration;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -50,7 +50,8 @@ public class ListEventsAdapter extends ArrayAdapter<EventEntity> {
         }
         // Lookup view for data population
         TextView txtName = (TextView) convertView.findViewById(R.id.txtConditionName);
-        final Spinner listArea = (Spinner) convertView.findViewById(R.id.spin_arena);
+        final Spinner listArea = null;
+//                (Spinner) convertView.findViewById(R.id.spin_arena);
 
         // Populate the data into the template view using the data object
         txtName.setText(event.getName());

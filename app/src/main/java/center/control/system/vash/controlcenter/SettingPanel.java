@@ -18,7 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 import center.control.system.vash.controlcenter.device.ManageDeviceActivity;
-import center.control.system.vash.controlcenter.event.MapDeviceTriggerActivity;
+import center.control.system.vash.controlcenter.configuration.MapDeviceTriggerActivity;
 import center.control.system.vash.controlcenter.helper.StorageHelper;
 import center.control.system.vash.controlcenter.utils.MessageUtils;
 

@@ -98,7 +98,7 @@ public class ControlMonitorService extends Service {
                     sendResult(CONTROL,FAIL);
                 }
             });
-            control.setRetryPolicy(new DefaultRetryPolicy(1000,0,1f));
+            control.setRetryPolicy(new DefaultRetryPolicy(1500,0,1f));
 
             VolleySingleton.getInstance(this).addToRequestQueue(control);
         } else {
@@ -110,7 +110,6 @@ public class ControlMonitorService extends Service {
     public void onCreate() {
         super.onCreate();
         repeatScheduler = new Timer();
-        Log.d(TAG,"Start service");
         repeatScheduler.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -190,7 +189,7 @@ public class ControlMonitorService extends Service {
 //                        }
 //                    } else {
                         for (AreaEntity area : smartHouse.getAreas()) {
-                            Log.d(TAG, area.getName() + "   " + area.isHasCamera());
+//                            Log.d(TAG, area.getName() + "   " + area.isHasCamera());
                             if (area.isHasCamera() && areaChecked) {
                                 checkCamera(area);
                             } else if (!areaChecked) {

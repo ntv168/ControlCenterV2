@@ -2,6 +2,7 @@ package center.control.system.vash.controlcenter.device;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,14 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
             holder.deviceStatus.setText("đang bật");
         }else {
             holder.deviceStatus.setText("đang tắt");
+        }
+        Log.d(TAG,holder.item.getType());
+        if (holder.item.isDoor()){
+            if (holder.item.getState().equals("on")) {
+                holder.deviceStatus.setText("đang mở");
+            }else {
+                holder.deviceStatus.setText("đang đóng");
+            }
         }
         if (holder.item.getState().equals("on")){
             holder.view.setBackgroundResource(R.drawable.background_device_active);

@@ -46,6 +46,14 @@
                 android:textStyle="bold" />
 
             <ImageButton
+                android:id="@+id/lockHouse"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="20dp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@android:drawable/ic_lock_idle_lock" />
+            <ImageButton
                 android:id="@+id/selectMode"
                 android:layout_width="30dp"
                 android:layout_height="match_parent"

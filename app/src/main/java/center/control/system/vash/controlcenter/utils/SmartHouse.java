@@ -21,7 +21,6 @@ import center.control.system.vash.controlcenter.configuration.StateConfiguration
 import center.control.system.vash.controlcenter.configuration.StateEntity;
 import center.control.system.vash.controlcenter.device.DeviceEntity;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
-import center.control.system.vash.controlcenter.event.TriggerCheckList;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.sensor.SensorEntity;
@@ -117,7 +116,6 @@ public class SmartHouse {
         return currentState;
     }
 
-    TriggerCheckList checkList;
 
     public String getStaffCode() {
         return staffCode;
@@ -597,7 +595,7 @@ public class SmartHouse {
 
     public void turnOffAll() {
         for (DeviceEntity dev: getDevices()){
-            if (dev.getAreaId() != -1) {
+            if (dev.getAreaId() != -1 && dev.getState().equals("on")) {
                 CommandEntity cmd = new CommandEntity();
                 cmd.setDeviceState("off");
                 cmd.setDeviceId(dev.getId());
@@ -621,5 +619,9 @@ public class SmartHouse {
     public boolean isDefaultState() {
         return currentState.getId() == ConstManager.OWNER_IN_HOUSE_STATE ||
                 currentState.getId()== ConstManager.NO_BODY_HOME_STATE;
+    }
+
+    public void setCurrentStateNotice(String s) {
+        this.currentState.setNoticePattern(s);
     }
 }

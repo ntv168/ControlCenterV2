@@ -75,11 +75,15 @@ public class AreaEntity extends TargetObject{
     }
 
     public String getDetect() {
-        if (detect == null || detect.equals(NOBODY)){
-            return "Không có ai";
+        if (detect == null || detect.contains(NOBODY)){
+            return "thấy không có ai";
         }
-        String item[] =detect.split(" ");
-        detect = item[0]+" "+item[1].split("-")[0];
+//        String item[] =detect.split(" ");
+        if (detect.contains(DETECT_STRANGE)){
+            return "Thấy người lạ";
+        }
+//        Log.d(TAG,detect);
+//        detect = item[0]+" "+item[1].split("-")[0];
         String result = detect;
         result = result.replace(DETECT_STRANGE,"Phát hiện người lạ");
         result = result.replace(DETECT_AQUAINTANCE,"Phát hiện người nhà");
@@ -157,16 +161,17 @@ public class AreaEntity extends TargetObject{
     }
 
     public String getSafetyBot() {
-        switch (safety)
-        {
-            case DOOR_OPEN:
-                return " có cửa chưa đóng";
-            case FUME:
-                return " có khói";
-            case  DOOR_CLOSE:
-                return " đóng hết cửa rồi";
+        if (safety != null) {
+            switch (safety) {
+                case DOOR_OPEN:
+                    return " có cửa chưa đóng";
+                case FUME:
+                    return " có khói";
+                case DOOR_CLOSE:
+                    return " đóng hết cửa rồi";
+            }
         }
-        return null;
+        return "không kiểm tra được";
     }
 
     public void setSafety(String safety) {

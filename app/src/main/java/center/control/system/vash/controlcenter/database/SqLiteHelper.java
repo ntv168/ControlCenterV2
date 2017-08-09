@@ -11,7 +11,7 @@ import center.control.system.vash.controlcenter.configuration.ConfigurationSQLit
 import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.device.TriggerDeviceSQLite;
-import center.control.system.vash.controlcenter.event.TriggerSQLite;
+import center.control.system.vash.controlcenter.configuration.TriggerSQLite;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.nlp.TermSQLite;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;

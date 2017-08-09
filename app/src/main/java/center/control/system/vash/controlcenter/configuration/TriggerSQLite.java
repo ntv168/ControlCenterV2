@@ -1,4 +1,4 @@
-package center.control.system.vash.controlcenter.event;
+package center.control.system.vash.controlcenter.configuration;
 
 import android.content.ContentValues;
 import android.database.Cursor;

@@ -2,7 +2,6 @@ package center.control.system.vash.controlcenter.configuration;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +16,6 @@ import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.command.CommandSQLite;
 import center.control.system.vash.controlcenter.command.ListCommandAdapter;
-import center.control.system.vash.controlcenter.event.ListEventsAdapter;
-import center.control.system.vash.controlcenter.event.TriggerSQLite;
 
 
 /**
@@ -68,7 +65,6 @@ public class ListConfigurationAdapter extends ArrayAdapter<ConfigurationEntity> 
                 ListView lwTrigger = (ListView) dialog.findViewById(R.id.lsCondition);
                 lwTrigger.setAdapter(triggerAdapter);
                 triggerAdapter.notifyDataSetChanged();
-//                Log.d("-------------------", "onClick: " + "-----------" );
                 dialog.show();
             }
         });

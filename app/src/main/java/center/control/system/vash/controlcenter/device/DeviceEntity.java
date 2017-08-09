@@ -44,7 +44,7 @@ public class DeviceEntity extends TargetObject{
         return this.attributeType.contains(types[0]);
     }
     public boolean isDoor(){
-        return (this.attributeType.contains(types[2]) || this.attributeType.contains(types[7])) ;
+        return (this.type.equals(types[2]) || this.type.equals(types[7])) ;
     }
 
 

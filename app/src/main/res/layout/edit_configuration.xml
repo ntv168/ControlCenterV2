@@ -49,12 +49,6 @@
             android:layout_weight="3"
             android:gravity="right">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="5dp"
-                android:paddingTop="5dp"
-                android:src="@drawable/icn_edit" />
         </LinearLayout>
     </LinearLayout>
 
@@ -63,12 +57,13 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="horizontal"
-        android:weightSum="3">
+        android:weightSum="5">
 
         <LinearLayout
+
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="1.2"
             android:animateLayoutChanges="true"
             android:orientation="vertical"
             android:paddingBottom="20dp"
@@ -112,7 +107,7 @@
             android:layout_marginLeft="-1dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="20dp"
-            android:layout_weight="2"
+            android:layout_weight="3.8"
             android:background="@drawable/background_rounded"
             android:orientation="horizontal"
             android:padding="20dp"
@@ -189,17 +184,6 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <Button
-                        android:id="@+id/btnAddSensor"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="@drawable/background_home_sensor"
-                        android:elevation="1dp"
-                        android:gravity="center_vertical|center_horizontal|center"
-                        android:onClick="addSensortoTrigger"
-                        android:text="+"
-                        android:textColor="@color/nGreen1"
-                        android:textSize="30sp" />
                 </LinearLayout>
 
                 <android.support.v7.widget.RecyclerView

@@ -7,7 +7,7 @@ import center.control.system.vash.controlcenter.area.AreaSQLite;
 import center.control.system.vash.controlcenter.command.CommandSQLite;
 import center.control.system.vash.controlcenter.configuration.ConfigurationSQLite;
 import center.control.system.vash.controlcenter.device.DeviceSQLite;
-import center.control.system.vash.controlcenter.event.TriggerSQLite;
+import center.control.system.vash.controlcenter.configuration.TriggerSQLite;
 import center.control.system.vash.controlcenter.nlp.DetectIntentSQLite;
 import center.control.system.vash.controlcenter.nlp.TermSQLite;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;

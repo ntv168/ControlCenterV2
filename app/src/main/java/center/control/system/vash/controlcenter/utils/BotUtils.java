@@ -528,7 +528,7 @@ public class BotUtils {
             DetectSocialEntity askDevice = BotUtils.getSocialById(ConstManager.SOCIAL_ASK_DEVICEONLY);
             current.setDetectSocial(askDevice);
             return completeSentence(askDevice.getQuestionPattern(),"",
-                    ConstManager.getVerbByIntent(functionIntent.getId()));
+                    ConstManager.getVerbByIntent(functionIntent.getId(),false));
         }
     }
     public static String processDeviceInArea(DetectFunctionEntity functionIntent, List<TargetTernEntity> termTargets){
@@ -543,13 +543,13 @@ public class BotUtils {
                 current.setDetectSocial(askWhichDevice);
 
                 return completeSentence(askWhichDevice.getQuestionPattern(),"",
-                        ConstManager.getVerbByIntent(functionIntent.getId())+" "+ current.getArea().getName());
+                        ConstManager.getVerbByIntent(functionIntent.getId(),false)+" "+ current.getArea().getName());
             } else {
                 Log.d(TAG, "Tìm thấy cả hai" + device.getName()+current.getArea().getName());
                 current.setScript(null);
                 current.setDevice(device);
                 BotUtils.implementCommand(functionIntent,device,null);
-                return "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getId()) +
+                return "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getId(),device.isDoor()) +
                         " " + current.getDevice().getName()+" trong "+current.getArea().getName();
             }
         } else {
@@ -617,13 +617,13 @@ public class BotUtils {
             current.setScript(mode);
             current.setDevice(null);
             BotUtils.implementCommand(functionIntent,null,mode);
-            Log.d(TAG,"Xác nhận "+ConstManager.getVerbByIntent(functionIntent.getId())+" chế độ "+mode.getName());
-            return "Xác nhận "+ConstManager.getVerbByIntent(functionIntent.getId())+" chế độ "+mode.getName();
+            Log.d(TAG,"Xác nhận "+ConstManager.getVerbByIntent(functionIntent.getId(),false)+" chế độ "+mode.getName());
+            return "Xác nhận "+ConstManager.getVerbByIntent(functionIntent.getId(),false)+" chế độ "+mode.getName();
         } else {
             Log.d(TAG,"Khong thay mode ");
             DetectSocialEntity askWhichMode = BotUtils.getSocialById(ConstManager.SOCIAL_ASK_MODE);
             return completeSentence(askWhichMode.getQuestionPattern(),
-                    ConstManager.getVerbByIntent(functionIntent.getId()), "");
+                    ConstManager.getVerbByIntent(functionIntent.getId(),false), "");
         }
     }
     private static String processFunction(List<TargetTernEntity> termTargets, DetectFunctionEntity functionIntent){
@@ -640,23 +640,35 @@ public class BotUtils {
             } 
             return processDeviceOnly(functionIntent,termTargets);
         } else if (functionIntent.getFunctionName().contains("check")){
-            AreaEntity area = BotUtils.findBestArea(termTargets);
-            if (area != null) {
-                area = SmartHouse.getAreaById(area.getId());
-                Log.d(TAG,"Thay phong de check"+area.getName() + "  "+functionIntent.getId());
-                String resultVal = BotUtils.getAttributeByFunction(functionIntent.getId(),area);
-                String replyComplete ="";
-                if (resultVal == null){
-                    replyComplete=completeSentence(functionIntent.getFailPattern(), resultVal, area.getName());
-                } else {
-                    replyComplete=completeSentence(functionIntent.getSuccessPattern(), resultVal, area.getName());
+            if (functionIntent.getId() == ConstManager.CHECK_DEV_STATE){
+                DeviceEntity deviceOnly = BotUtils.findBestDevice(termTargets, -1);
+                if (deviceOnly != null) {
+                    String resultVal = "đang mở";
+                    if (deviceOnly.getState().equals("off")) resultVal = "đang tắt";
+                    if (deviceOnly.getState().equals("off") && deviceOnly.isDoor())
+                        resultVal = "đang đóng";
+                    if (resultVal == null) {
+                        return completeSentence(functionIntent.getFailPattern(), resultVal, deviceOnly.getName());
+                    } else {
+                        return completeSentence(functionIntent.getSuccessPattern(), resultVal, deviceOnly.getName());
+                    }
                 }
-                return replyComplete;
-                //
-            }  
-            Log.d(TAG,"Khong tim thay phong");
-            Log.d(TAG,functionIntent.getRemindPattern() +"");
-            return completeSentence(functionIntent.getRemindPattern(),"",""); 
+                return completeSentence(functionIntent.getRemindPattern(),"","");
+            } else {
+                AreaEntity area = BotUtils.findBestArea(termTargets);
+                if (area != null) {
+                    area = SmartHouse.getAreaById(area.getId());
+                    Log.d(TAG, "Thay phong de check" + area.getName() + "  " + functionIntent.getId());
+                    String resultVal = BotUtils.getAttributeByFunction(functionIntent.getId(), area);
+                    if (resultVal == null) {
+                        return completeSentence(functionIntent.getFailPattern(), resultVal, area.getName());
+                    } else {
+                        return completeSentence(functionIntent.getSuccessPattern(), resultVal, area.getName());
+                    }
+                }
+                Log.d(TAG,"Khong tim thay phong");
+                return completeSentence(functionIntent.getRemindPattern(),"","");
+            }
         } else if (functionIntent.getId() == ConstManager.SHOW_CAMERA) {
             AreaEntity area = BotUtils.findBestArea(termTargets);
             if (area != null) {
@@ -699,7 +711,7 @@ public class BotUtils {
                 if (current.getDetectedFunction() != null ){
                     if (current.getDevice() != null) {
                         implementCommand(current.getDetectedFunction(), current.getDevice(), null);
-                        String res = "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getId()) +
+                        String res = "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getId(),current.getDevice().isDoor()) +
                                 " " + current.getDevice().getName()+" trong "+current.getArea().getName();
                         return res;
                     } else  if (current.getScript() != null) {
@@ -713,7 +725,7 @@ public class BotUtils {
                             Log.d(TAG,"Scheduler acted");
                         }
                         implementCommand(current.getDetectedFunction(), null, current.getScript());
-                        String res  ="Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getId()) +
+                        String res  ="Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getId(),false) +
                                 " chế độ " + current.getScript().getName();
                         return res;
                     }
@@ -725,12 +737,9 @@ public class BotUtils {
             case ConstManager.SOCIAL_DENY:
                 if (current.getDetectedFunction() != null ){
                    current.renew();
-                    return completeSentence(socialIntent.getReplyPattern(),"","");
-                } else {
-                    DetectSocialEntity notUnderReply = BotUtils.getSocialById(ConstManager.NOT_UNDERSTD);
-                    current.setDetectSocial(notUnderReply);
-                    return completeSentence(notUnderReply.getQuestionPattern(), "", "");
+
                 }
+                return completeSentence(socialIntent.getReplyPattern(),"","");
         }
         return completeSentence(socialIntent.getReplyPattern(), result, "");
     }

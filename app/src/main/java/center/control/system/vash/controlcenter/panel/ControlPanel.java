@@ -274,7 +274,16 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 selectMode.show();
             }
         });
-
+        ((ImageButton) findViewById(R.id.lockHouse)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SmartHouse house = SmartHouse.getInstance();
+                house.setCurrentState(house.getStateById(ConstManager.NO_BODY_HOME_STATE));
+                CurrentContext.getInstance().renew();
+                lockDialog.show();
+                Log.d(TAG,"lock");
+            }
+        });
         if (contractId.length()<2){
             startActivity(new Intent(this,MainActivity.class));
             finish();
@@ -441,7 +450,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 } else if (ev.getSenName().equals(AreaEntity.attrivutesValues[1]) &&
                         ev.getSenValue().equals(area.getBright())){
                     if (ev.getPriority() >maxPrio){
-                        Log.d(TAG, ev.getNextStateId()+" " );
+//                        Log.d(TAG, ev.getNextStateId()+" " );
                         maxPrio = ev.getPriority();
                         result = area.getName();
                         nextEv = ev;
@@ -449,7 +458,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 }else if (ev.getSenName().equals(AreaEntity.attrivutesValues[2]) &&
                         ev.getSenValue().equals(area.getTemperature())){
                     if (ev.getPriority() >maxPrio){
-                        Log.d(TAG, ev.getNextStateId()+" " );
+//                        Log.d(TAG, ev.getNextStateId()+" " );
                         maxPrio = ev.getPriority();
                         result = area.getName();
                         nextEv = ev;
@@ -457,7 +466,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 } else if (ev.getSenName().equals(AreaEntity.attrivutesValues[3]) &&
                         area.getRawDetect().contains(ev.getSenValue())){
                     if (ev.getPriority() >maxPrio){
-                        Log.d(TAG, ev.getNextStateId()+" " );
+//                        Log.d(TAG, ev.getNextStateId()+" " );
                         maxPrio = ev.getPriority();
                         result = aquaintance;
                         nextEv = ev;
@@ -471,13 +480,15 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     private void changeState(EventEntity ev,String resultValue){
         SmartHouse house = SmartHouse.getInstance();
         house.setCurrentState(SmartHouse.getInstance().getStateById(ev.getNextStateId()));
-        Log.d(TAG,house.getCurrentState().getName())
-        ;
+        Log.d(TAG,"chuyển state : "+house.getCurrentState().getName());
         house.setStateChangedTime((new Date()).getTime());
+        if (SmartHouse.getInstance().getCurrentState().getId() == ConstManager.OWNER_IN_HOUSE_STATE){
+            lockDialog.dismiss();
+        }
 
         if (!house.isDefaultState()) {
             showAlertState(house.getCurrentState(), resultValue);
-
+            house.setCurrentStateNotice(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(), resultValue, ""));
             showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(), resultValue, ""));
         }  else
         if (stateDialog!= null &&stateDialog.isShowing()){
@@ -486,6 +497,9 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     }
 
     private void showAlertState(StateEntity state, String resultValue) {
+        if (stateDialog!= null && stateDialog.isShowing()){
+            stateDialog.dismiss();
+        }
         if (state.getCommands().size()>0) {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -525,9 +539,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             });
             stateDialog = builder.create();
         }
-        if (stateDialog.isShowing()){
-            stateDialog.dismiss();
-        }
         stateDialog.setTitle(state.getName());
         String command  = "Các thiết bị sẽ được kích hoạt: \n";
         for (CommandEntity cmd : state.getCommands()){
@@ -540,7 +551,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     + SmartHouse.getAreaById(dev.getAreaId()).getName() +"\n";
         }
         stateDialog.setMessage(BotUtils.completeSentence(state.getNoticePattern(),resultValue,"")+
-                "\n"+ (state.getCommands().size()>2?command:"Thông báo sẽ tự động tắt"));
+                "\n"+ (state.getCommands().size()>0?command:"Thông báo sẽ tự động tắt"));
         stateDialog.setCancelable(false);
         stateDialog.show();
     }
@@ -663,11 +674,11 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         }
 
         AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
-        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
+//        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+//        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
         amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
         amanager.setStreamMute(AudioManager.STREAM_RING, true);
-        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+//        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
     }
 
     private class DetectionTask extends AsyncTask<InputStream, String, com.microsoft.projectoxford.face.contract.Face[]> {
@@ -734,7 +745,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
                         new IdentificationTask(mPersonGroupId).execute(
                                 faceIds.toArray(new UUID[faceIds.size()]));
-                        Log.d("-------", "identify: facezise" + faceIds.size());
+//                        Log.d("-------", "identify: facezise" + faceIds.size());
                     } else {
                         // Not detectingor person group exists.
                         Log.d(TAG,AreaEntity.DETECT_NOT_AVAILABLE + " khong detect diuoc");
@@ -806,30 +817,28 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         protected void onPostExecute(IdentifyResult[] result) {
             long endidentify= System.currentTimeMillis();
             Log.d("----------------", "time identity: ------------- " + (endidentify - startidentify));
-            // Show the result on screen when detection is done.
-            // Set the information about the detection result.
             if (result != null) {
-
                 String message = AreaEntity.DETECT_AQUAINTANCE +" ";
                 aquaintance = "";
                 Boolean hasAqua = false;
-                int stranger = 0;
                 for (IdentifyResult identifyResult: result) {
                     if (identifyResult.candidates.size() > 0) {
                         if (identifyResult.candidates.get(0).confidence > 0.65) {
                             String personId = identifyResult.candidates.get(0).personId.toString();
                             String personName = StorageHelper.getPersonName(
                                     personId, mPersonGroupId, ControlPanel.this);
+                            String[] item= personName.split("-");
 
-                            message += personName+" ";
-                            aquaintance += personName+" ";
-
+                            aquaintance += item[0];
+                            if (item.length>1) {
+                                if (item[1].equals("x")) {
+                                    message = AreaEntity.DETECT_BAD_GUY + " " + item[0];
+                                } else if (item[1].equals("t")) {
+                                    message = AreaEntity.DETECT_AQUAINTANCE + " " + item[0];
+                                }
+                            }
                             hasAqua = true;
-                        } else {
-                            stranger++;
                         }
-                    } else {
-                        stranger++;
                     }
                 }
                 if (!hasAqua) {
@@ -849,6 +858,9 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     private void setDetectMessage(String info) {
         startService(new Intent(this,ControlMonitorService.class));
         AreaEntity camArea = SmartHouse.getAreaById(cameraAreaId);
+//        String[] item = info.split("-");
+//        Log.d(TAG,"  "+info+"  detect nguoi "+ item[1]);
+
         camArea.setDetect(info);
         camArea.setUpdatePerson((new Date()).getTime());
         SmartHouse.getInstance().updateAreaById(cameraAreaId,camArea);
@@ -876,7 +888,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             try{
 
                 groupid = params[0];
-                Log.d(TAG,groupid);
+//                Log.d(TAG,groupid);
                 return faceServiceClient.listPersons(params[0]);
 
             } catch (Exception e) {
@@ -897,7 +909,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         @Override
         protected void onPostExecute(Person[] result) {
             if (result != null) {
-                Log.d(TAG, result.length + " S");
+//                Log.d(TAG, result.length + " S");
                 if (result != null) {
                     for (Person person : result) {
                         try {
@@ -949,12 +961,12 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         }
 
         AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-        amanager.setStreamMute(AudioManager.STREAM_ALARM, false);
+//        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+//        amanager.setStreamMute(AudioManager.STREAM_ALARM, false);
         amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
         amanager.setStreamMute(AudioManager.STREAM_RING, false);
         VoiceUtils.speak(sentenceReply);
-        Log.d(TAG, sentenceReply + "  " +CurrentContext.getInstance().isWaitingOwnerSpeak());
+//        Log.d(TAG, sentenceReply + "  " +CurrentContext.getInstance().isWaitingOwnerSpeak());
     }
     @Override
     protected void onPause() {
@@ -998,7 +1010,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             @Override
             public void onReceive(Context context, Intent intent) {
                 String resultType = intent.getStringExtra(ACTION_TYPE);
-                Log.d(TAG,resultType);
+//                Log.d(TAG,resultType);
                 if (SmartHouse.getInstance().isDefaultState()) {
                     if (stateDialog!= null && stateDialog.isShowing()){
                         stateDialog.dismiss();
@@ -1077,17 +1089,32 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     CurrentContext current = CurrentContext.getInstance();
                     String target = current.getDevice()!=null?current.getDevice().getName():current.getScript().getName();
                     if (result == ControlMonitorService.SUCCESS){
-                        if (current.getDevice()!= null && !current.getDevice().isDoor()){
+                        if (current.getDevice()!= null) {
+                            String resultVal = "bật";
+                            if (current.getDetectedFunction().getId() == ConstManager.FUNCTION_TURN_OFF)
+                                resultVal = "tắt";
+                            if (current.getDevice().isDoor()) {
+                                if (current.getDetectedFunction().getId() == ConstManager.FUNCTION_TURN_OFF)
+                                    resultVal = "đóng";
+                                if (current.getDetectedFunction().getId() == ConstManager.FUNCTION_TURN_ON)
+                                    resultVal = "mở";
+                            }
                             showReply(BotUtils.completeSentence(
-                                    current.getDetectedFunction().getSuccessPattern(), "", target));
+                                    current.getDetectedFunction().getSuccessPattern(), resultVal, target));
                         }
                         SmartHouse house = SmartHouse.getInstance();
                         Log.d(TAG,house.getDevices().size()+" succ");
                         deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
                     } else if (result == ControlMonitorService.FAIL){
-                        if (current.getDevice()!= null && !current.getDevice().isDoor()){
+                        if (current.getDevice()!= null){
+                            String resultVal = "bật";
+                            if (current.getDetectedFunction().getId() == ConstManager.FUNCTION_TURN_OFF) resultVal = "tắt";
+                            if (current.getDevice().isDoor()){
+                                if (current.getDetectedFunction().getId() == ConstManager.FUNCTION_TURN_OFF) resultVal = "đóng";
+                                if (current.getDetectedFunction().getId() == ConstManager.FUNCTION_TURN_ON) resultVal = "mở";
+                            }
                             showReply(BotUtils.completeSentence(
-                                    current.getDetectedFunction().getFailPattern(),"",target));
+                                    current.getDetectedFunction().getFailPattern(),resultVal,target));
                         }
 
                     }

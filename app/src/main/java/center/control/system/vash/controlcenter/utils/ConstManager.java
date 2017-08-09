@@ -84,14 +84,15 @@ public class ConstManager {
         result += " ngày "+day+" tháng "+month+" ";
         return result;
     }
-    public static String getVerbByIntent(int functId) {
+    public static String getVerbByIntent(int functId, boolean deviceIsDoor) {
         switch (functId){
             case FUNCTION_TURN_ON:
-                return "bật";
+
+                return deviceIsDoor?"mở":"bật";
             case FUNCTION_START_MODE:
                 return "bật";
             case FUNCTION_TURN_OFF:
-                return "tắt";
+                return deviceIsDoor?"đóng":"tắt";
             case FUNCTION_STOP_MODE:
                 return "tắt";
             case FUNCTION_INC_TEMP:

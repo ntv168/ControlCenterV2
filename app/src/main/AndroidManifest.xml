@@ -34,7 +34,13 @@
 
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".panel.ControlPanel"
             android:screenOrientation="landscape">
@@ -65,13 +71,9 @@
             android:name=".configuration.SetConfigActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".event.MapDeviceTriggerActivity"
+            android:name=".configuration.MapDeviceTriggerActivity"
             android:screenOrientation="landscape" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".watch.SonyActivity">
             <intent-filter>
@@ -121,7 +123,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".event.EventActivity"></activity>
+        <activity android:name=".configuration.EventActivity"></activity>
     </application>
 
 </manifest>

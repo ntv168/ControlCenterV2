@@ -1,4 +1,4 @@
-package center.control.system.vash.controlcenter.event;
+package center.control.system.vash.controlcenter.configuration;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -18,26 +18,18 @@ import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.command.CommandEntity;
-import center.control.system.vash.controlcenter.configuration.EventAdapter;
-import center.control.system.vash.controlcenter.configuration.EventEntity;
-import center.control.system.vash.controlcenter.configuration.StateConfigurationSQL;
-import center.control.system.vash.controlcenter.configuration.StateEntity;
-import center.control.system.vash.controlcenter.device.DeviceEntity;
-import center.control.system.vash.controlcenter.device.DeviceSQLite;
 import center.control.system.vash.controlcenter.device.ListDevicesTriggerAdapter;
 import center.control.system.vash.controlcenter.device.TriggerDeviceEntity;
-import center.control.system.vash.controlcenter.device.TriggerDeviceSQLite;
 import center.control.system.vash.controlcenter.script.CommandAdapter;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
-import center.control.system.vash.controlcenter.sensor.ListSensorAdapter;
-import center.control.system.vash.controlcenter.sensor.SensorEntity;
-import center.control.system.vash.controlcenter.sensor.SensorSQLite;
 import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.ConfigControlCenterDTO;
 import center.control.system.vash.controlcenter.server.EventDTO;
 import center.control.system.vash.controlcenter.server.RetroFitSingleton;
 import center.control.system.vash.controlcenter.server.StateDTO;
+import center.control.system.vash.controlcenter.server.VolleySingleton;
 import center.control.system.vash.controlcenter.utils.ConstManager;
+import center.control.system.vash.controlcenter.utils.MessageUtils;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,24 +38,15 @@ import retrofit2.Response;
 public class MapDeviceTriggerActivity extends AppCompatActivity implements
         RecyclerViewStateAdapter.OnAdapterItemClickListener, EventAdapter.EventListener {
 
-    private static final String TAG = "MapDeviceTriggerActivity: ";
+    private static final String TAG = "MapDeviceTriggerAy: ";
     private AlertDialog.Builder selectDeviceDiag;
     private AlertDialog.Builder selectAreaDiag;
-    private int triggerId = 1;
     private CloudApi configApi;
     private List<StateEntity> liststats;
     private ProgressDialog waitDialog;
-    List<DeviceEntity> listDevices;
-    List<SensorEntity> listSensors;
-    DeviceSQLite deviceSQLite = new DeviceSQLite();
     SmartHouse house;
     EventAdapter eventAdapter;
-    TriggerSQLite triggerSQLite = new TriggerSQLite();
-    SensorSQLite sensorSQLite = new SensorSQLite();
-    TriggerDeviceSQLite triggerdevicesSQLite = new TriggerDeviceSQLite();
     RecyclerViewStateAdapter triggerAdapter;
-
-    ListSensorAdapter sensorAdapter;
     Boolean isDevice = true;
     private CommandAdapter cmdAdapter;
     private StateEntity currentState;
@@ -103,15 +86,6 @@ public class MapDeviceTriggerActivity extends AppCompatActivity implements
 
                     liststats = SmartHouse.getInstance().getStates();
 
-//                    selectStateDiag.setAdapter(getStateAdapter(), new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            btnSltState.setText(stats.get(which).getName());
-//                            cmdAdapter.setScriptEntities(stats.get(which).getCommands());
-//                            Log.d(TAG,stats.get(which).getEvents().size()+" s");
-//                            eventAdapter.setScriptEntities(stats.get(which).getEvents());
-//                            currentState = stats.get(which);
-//                        }
                     triggerAdapter.setDevices(liststats);
                     triggerAdapter.notifyDataSetChanged();
                     waitDialog.dismiss();
@@ -125,7 +99,7 @@ public class MapDeviceTriggerActivity extends AppCompatActivity implements
 
             @Override
             public void onFailure(Call<ConfigControlCenterDTO> call, Throwable t) {
-//                MessageUtils.makeText(SetConfigActivity.this, "Không kết nối được "+ VolleySingleton.SERVER_HOST).show();
+                MessageUtils.makeText(MapDeviceTriggerActivity.this, "Không kết nối được "+ VolleySingleton.SERVER_HOST).show();
             }
         });
         waitDialog.show();
@@ -170,8 +144,6 @@ public class MapDeviceTriggerActivity extends AppCompatActivity implements
             }
         });
 
-        // RecyclerView for List State
-//        final List<TriggerEntity> listTrigger = triggerSQLite.getAll();
 
 
         RecyclerView rwTrigger = (RecyclerView) findViewById(R.id.listItemLeft);
@@ -213,37 +185,6 @@ public class MapDeviceTriggerActivity extends AppCompatActivity implements
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 int areaId = house.getAreas().get(which).getId();
-
-//                if (isDevice) {
-//                    final List<DeviceEntity> listDevice = house.getDeviceswithoutTrigger(areaId,triggerId);
-//                    ArrayAdapter<String> devNames = new ArrayAdapter<String>(MapDeviceTriggerActivity.this,android.R.layout.select_dialog_singlechoice);
-//
-//                    for (DeviceEntity device : listDevice){
-//                        devNames.add(device.getName());
-//                        Log.d("---------", "Trigger Id: " + device.getTriggerId());
-//                    }
-//                    selectDeviceDiag.setAdapter(devNames,
-//                            new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//
-//                                    listDevice.get(which).setTriggerId(triggerId);
-//                                    TriggerDeviceEntity entity = new TriggerDeviceEntity();
-//                                    entity.setName(listDevice.get(which).getName());
-//                                    entity.setDeviceId(listDevice.get(which).getId());
-//                                    entity.setTriggerId(triggerId);
-//                                    entity.setType(1);
-//                                    entity.setValue("mở");
-//                                    triggerdevicesSQLite.insert(entity);
-//
-//                                    List<TriggerDeviceEntity> list = triggerdevicesSQLite.getDevicesByTriggerandTypeId(triggerId,1);
-//                                    loadListDevicebyTriggerId(triggerId,list);
-//
-//                                    Log.d("----------", "onClick: " + listDevice.get(which).getName() + "---" + listDevice.get(which).getTriggerId());
-//
-//                                    dialog.dismiss();
-//                                }
-//                            });
 //                    selectDeviceDiag.show();
                     final List<CommandEntity> newScript = house.getDeviceScriptByAreaId(areaId);
                     ArrayAdapter<String> devNames = new ArrayAdapter<String>(MapDeviceTriggerActivity.this,android.R.layout.select_dialog_singlechoice);
@@ -271,44 +212,10 @@ public class MapDeviceTriggerActivity extends AppCompatActivity implements
                             });
                     selectDeviceDiag.show();
 
-//                } else {
-//                    final List<SensorEntity> listSensor = house.getSensorWithoutTriggerByAreaId(areaId,triggerId);
-//                    ArrayAdapter<String> senNames = new ArrayAdapter<String>(MapDeviceTriggerActivity.this,android.R.layout.select_dialog_singlechoice);
-//
-//                    for (SensorEntity sensor : listSensor){
-//                        senNames.add(sensor.getName());
-//                    }
-//                    selectDeviceDiag.setAdapter(senNames,
-//                            new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//
-//                                    listSensor.get(which).setTriggerId(triggerId);
-//                                    TriggerDeviceEntity entity = new TriggerDeviceEntity();
-//                                    entity.setName(listSensor.get(which).getName());
-//                                    entity.setDeviceId(listSensor.get(which).getId());
-//                                    entity.setTriggerId(triggerId);
-//                                    entity.setType(2);
-//                                    entity.setValue("nóng hơn 20 độ");
-//                                    triggerdevicesSQLite.insert(entity);
-//                                Log.d("----------", "onClick: " + listSensor.get(which).getName() + "---" + listSensor.get(which).getTriggerId());
-////
-//
-//                                    List<TriggerDeviceEntity> list = triggerdevicesSQLite.getDevicesByTriggerandTypeId(triggerId,2);
-//                                    loadListSensorbyTriggerId(triggerId,list);
-//
-//                                    dialog.dismiss();
-//                                }
-//                            });
-//                    selectDeviceDiag.show();
-//                }
 
             }
         });
 
-        //--------------Adapter for select area
-
-        Log.d("-------------------", "onClick: " + "-----------" );
     }
 
 
@@ -387,7 +294,6 @@ public class MapDeviceTriggerActivity extends AppCompatActivity implements
     public void onStateClick(StateEntity stats) {
         if (currentState != null){
             List<CommandEntity> listCommmand = cmdAdapter.getScriptDeviceEntities();
-            Log.d(TAG,listCommmand.size()+" ");
             ScriptSQLite.insertStateCommand(currentState.getId(),listCommmand);
             for (EventEntity event : eventAdapter.getEventEntities()){
                 StateConfigurationSQL.updateEventById(event.getId(),event);

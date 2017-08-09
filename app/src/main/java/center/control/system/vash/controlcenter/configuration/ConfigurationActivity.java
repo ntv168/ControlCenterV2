@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
-import center.control.system.vash.controlcenter.event.MapDeviceTriggerActivity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.ConfigControlCenterDTO;

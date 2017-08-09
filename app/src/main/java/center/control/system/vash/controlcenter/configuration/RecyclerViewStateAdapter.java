@@ -1,7 +1,6 @@
-package center.control.system.vash.controlcenter.event;
+package center.control.system.vash.controlcenter.configuration;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import center.control.system.vash.controlcenter.R;
-import center.control.system.vash.controlcenter.configuration.StateEntity;
 
 /**
  * Created by Sam on 6/28/2017.
@@ -38,7 +36,6 @@ public class RecyclerViewStateAdapter extends RecyclerView.Adapter<RecyclerViewS
     public void onBindViewHolder(final RecyclerViewStateAdapter.ViewHolder holder, final int position) {
         holder.item = stateEntities.get(position);
         holder.triggerName.setText(holder.item.getName());
-        Log.d("------", "onBindViewHolder: " + holder.item.getName());
         if (position == focused){
             holder.view.setBackgroundColor(view.getResources().getColor(R.color.nGreen2));
 

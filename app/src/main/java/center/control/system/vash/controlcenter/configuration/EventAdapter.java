@@ -46,27 +46,29 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         SmartHouse house = SmartHouse.getInstance();
         switch (holder.item.getSenName()){
             case "sec":
-                holder.senVal.setText("an ninh : ");
+                holder.senName.setText("an ninh : "); break;
             case "cam":
-                holder.senVal.setText("camera : ");
+                holder.senName.setText("camera : "); break;
             case "tem":
-                holder.senVal.setText("nhiệt độ : ");
+                holder.senName.setText("nhiệt độ : ");break;
         }
         switch (holder.item.getSenValue()){
             case AreaEntity.DETECT_AQUAINTANCE:
-                holder.senName.setText("người thân");
+                holder.senVal.setText("người thân");break;
             case AreaEntity.DETECT_STRANGE:
-                holder.senName.setText("người lạ ");
+                holder.senVal.setText("người lạ ");break;
             case AreaEntity.DOOR_CLOSE:
-                holder.senName.setText("cửa đóng");
+                holder.senVal.setText("cửa đóng");break;
             case AreaEntity.DETECT_BAD_GUY:
-                holder.senName.setText("kẻ xấu");
+                holder.senVal.setText("kẻ xấu");break;
             case AreaEntity.FUME:
-                holder.senName.setText("có khói");
+                holder.senVal.setText("có khói");break;
             case AreaEntity.DOOR_OPEN:
-                holder.senName.setText("cửa mở");
+                holder.senVal.setText("cửa mở");break;
         }
-        holder.btnAreaId.setText("ở" + SmartHouse.getAreaById(holder.item.getAreaId()).getName());
+        if (SmartHouse.getAreaById(holder.item.getAreaId()) != null)
+        holder.btnAreaId.setText("ở " + SmartHouse.getAreaById(holder.item.getAreaId()).getName()); else
+            holder.btnAreaId.setText("chọn không gian");
         holder.btnAreaId.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,7 +113,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public final TextView senName;
-        public final TextView senVal; 
+        public final TextView senVal;
         public final Button btnAreaId;
         public EventEntity item;
 
