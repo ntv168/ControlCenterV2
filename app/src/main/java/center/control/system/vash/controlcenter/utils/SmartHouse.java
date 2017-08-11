@@ -462,9 +462,12 @@ public class SmartHouse {
     public void updateModeById(int id, ScriptEntity mode) {
         for (int i=0; i<this.getScripts().size();i++){
             if (this.getScripts().get(i).getId() == id){
+                Log.d(TAG,"up mode"+mode.getName());
                 this.getScripts().set(i,mode);
             }
         }
+    }
+    public void resetTodayMode(){
         runToday = getTodayMode();
     }
 

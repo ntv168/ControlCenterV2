@@ -38,7 +38,7 @@ public class TodayAdapter extends RecyclerView.Adapter<TodayAdapter.ViewHolder> 
         holder.name.setText(holder.item.getName());
         holder.time.setText(holder.item.getHour()+":"+holder.item.getMinute());
 
-            holder.swtActive.setChecked(holder.item.isEnabled());
+        holder.swtActive.setChecked(holder.item.isEnabled());
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,7 +115,7 @@ public class TodayAdapter extends RecyclerView.Adapter<TodayAdapter.ViewHolder> 
                 script.setEnabled(mode.isEnabled());
                 script.setHour(mode.getHour());
                 script.setMinute(mode.getMinute());
-
+                return;
             }
         }
         notifyDataSetChanged();

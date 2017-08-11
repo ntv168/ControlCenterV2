@@ -103,7 +103,7 @@ public class ControlMonitorService extends Service {
             VolleySingleton.getInstance(this).addToRequestQueue(control);
         } else {
             Log.d(TAG,deviceEntity.getName()+" đã được "+deviceEntity.getState());
-            sendResult(CONTROL, SUCCESS);
+//            sendResult(CONTROL, SUCCESS);
         }
     }
     @Override

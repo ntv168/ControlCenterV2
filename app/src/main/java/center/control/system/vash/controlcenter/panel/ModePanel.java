@@ -181,6 +181,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
                         Log.d(TAG,listCommmand.size()+" ");
                         ScriptSQLite.insertScript(script,listCommmand);
                         scriptAdapter.addScrip(script);
+                        SmartHouse.getInstance().addMode(script);
                         dialog.dismiss();
                     }
 
@@ -334,6 +335,7 @@ public class ModePanel extends AppCompatActivity implements ListScriptAdapter.On
                 }
                 ScriptSQLite.upById(scriptEntity.getId(), scriptEntity, listCommmand);
                 SmartHouse.getInstance().updateModeById(scriptEntity.getId(),scriptEntity);
+                SmartHouse.getInstance().resetTodayMode();
                 scriptAdapter.setScriptEntities(SmartHouse.getInstance().getScripts());
                 todayAdapter.setScriptEntities(SmartHouse.getInstance().getRunToday());
                 dialog.dismiss();

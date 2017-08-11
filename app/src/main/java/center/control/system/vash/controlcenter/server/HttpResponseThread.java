@@ -152,8 +152,9 @@ public class HttpResponseThread extends Thread {
                 }else if (request.contains(SEND_MESSAGE)) {
                     String[] reqElement = request.split("/");
                     Log.d(TAG, "h Id :  " + reqElement[2]);
-                    Log.d(TAG, "message :  " + reqElement[3]);
-                    response += BotUtils.botReplyToSentence(reqElement[3]);
+                    String text = reqElement[3].replace("_"," ");
+                    Log.d(TAG, "message :  " + text);
+                    response += BotUtils.botReplyToSentence(text);
                 }else if (request.contains(MODE_TODAY)){
                     for (ScriptEntity script : house.getRunToday()){
                         response += script.getName()+"="+script.getId()+"="+

@@ -5,6 +5,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -531,7 +533,7 @@ public class BotUtils {
                     ConstManager.getVerbByIntent(functionIntent.getId(),false));
         }
     }
-    public static String processDeviceInArea(DetectFunctionEntity functionIntent, List<TargetTernEntity> termTargets){
+    public static String processDeviceInArea(DetectFunctionEntity functionIntent, List<TargetTernEntity> termTargets, String sentence){
         CurrentContext current = CurrentContext.getInstance();
         current.setDetectedFunction(functionIntent);
         current.setDetectSocial(null);
@@ -546,11 +548,48 @@ public class BotUtils {
                         ConstManager.getVerbByIntent(functionIntent.getId(),false)+" "+ current.getArea().getName());
             } else {
                 Log.d(TAG, "Tìm thấy cả hai" + device.getName()+current.getArea().getName());
-                current.setScript(null);
-                current.setDevice(device);
-                BotUtils.implementCommand(functionIntent,device,null);
-                return "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getId(),device.isDoor()) +
-                        " " + current.getDevice().getName()+" trong "+current.getArea().getName();
+                int extraMin  = getMinute(sentence);
+                if (extraMin > 0){
+                    Calendar date = Calendar.getInstance();
+                    long now= date.getTimeInMillis();
+
+                    int hour = extraMin / 60;
+                    int min = extraMin - (hour * 60);
+                    if (containRemainTime(sentence)) {
+                        Date setTime = new Date(now + (extraMin * ConstManager.ONE_MINUTE_IN_MILLIS));
+                        Log.d(TAG,setTime.toLocaleString());
+                        hour = setTime.getHours();
+                        min = setTime.getMinutes();
+                    }
+                    Log.d(TAG,"scheduler "+extraMin+" "+hour+" "+min+" "+device.getName()+" "+functionIntent.getFunctionName());
+                    ScriptEntity schedule = new ScriptEntity();
+                    List<CommandEntity> listCommmand = new ArrayList<>();
+                    CommandEntity cmd = new CommandEntity();
+                    cmd.setDeviceId(device.getId());
+                    cmd.setDeviceState("on");
+                    if (functionIntent.getId() == ConstManager.FUNCTION_TURN_OFF){
+                        cmd.setDeviceState("off");}
+                    listCommmand.add(cmd);
+
+                    schedule.setName(ConstManager.getVerbByIntent(current.getDetectedFunction().getId(), device.isDoor())+" "+device.getName());
+                    schedule.setHour(hour);
+                    schedule.setMinute(min);
+                    schedule.setEnabled(true);
+
+                    schedule.setWeeksDay(date.get(Calendar.DAY_OF_WEEK)+"");
+                    schedule.setOnlyOneTime(true);
+                    ScriptSQLite.insertScript(schedule, listCommmand);
+                    SmartHouse.getInstance().addMode(schedule);
+                    SmartHouse.getInstance().resetTodayMode();
+                    return "Xác nhận "+device.getName()+" sẽ "+ConstManager.getVerbByIntent(current.getDetectedFunction().getId(), device.isDoor())
+                            +" lúc "+hour+" giờ "+min+" phút ";
+                }  else {
+                    current.setScript(null);
+                    current.setDevice(device);
+                    BotUtils.implementCommand(functionIntent, device, null);
+                    return "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getId(), device.isDoor()) +
+                            " " + current.getDevice().getName() + " trong " + current.getArea().getName();
+                }
             }
         } else {
             DetectSocialEntity notUnderReply = BotUtils.getSocialById(ConstManager.NOT_UNDERSTD);
@@ -567,11 +606,11 @@ public class BotUtils {
         AreaEntity area = BotUtils.findBestArea(termTargets);
 
         if (currentSocial!= null && currentSocial.getId() == ConstManager.SOCIAL_ASK_DEVICEAREA){
-            return processDeviceInArea(CurrentContext.getInstance().getDetectedFunction(),termTargets);
+            return processDeviceInArea(CurrentContext.getInstance().getDetectedFunction(),termTargets,humanSay);
         } else if (currentSocial!= null && currentSocial.getId() == ConstManager.SOCIAL_ASK_DEVICEONLY){
             return processDeviceOnly(CurrentContext.getInstance().getDetectedFunction(),termTargets);
         } else if (currentSocial!= null && currentSocial.getId() == ConstManager.SOCIAL_ASK_MODE){
-            return processMode(CurrentContext.getInstance().getDetectedFunction(),termTargets);
+            return processMode(CurrentContext.getInstance().getDetectedFunction(),termTargets,humanSay);
         } else if (currentFunct!= null && currentFunct.getFunctionName().contains("check") && area!=null){
             String resultVal = BotUtils.getAttributeByFunction(currentFunct.getId(),area);
             String replyComplete ="";
@@ -594,14 +633,14 @@ public class BotUtils {
                 functionTfidf += BotUtils.findBestArreaTfidf(termTargets) + BotUtils.findBestDeviceTfidf(termTargets);
                 Log.d(TAG, "funct point: " + functionTfidf + " soc point " + socialFound.getDetectScore());
                 if (functionTfidf > socialFound.getDetectScore()) {
-                    return processFunction(termTargets, functFound);
+                    return processFunction(termTargets, functFound, humanSay);
                 } else {
                     return processSocial(socialFound);
                 }
             } else if (functFound == null && socialFound != null) {
                 return processSocial(socialFound);
             } else if (functFound != null && socialFound == null) {
-                return processFunction(termTargets, functFound);
+                return processFunction(termTargets, functFound,humanSay);
             } else {
                 DetectSocialEntity notUnderReply = BotUtils.getSocialById(ConstManager.NOT_UNDERSTD);
                 CurrentContext.getInstance().setDetectSocial(notUnderReply);
@@ -609,15 +648,45 @@ public class BotUtils {
             }
         }
     }
-    private static String processMode(DetectFunctionEntity functionIntent,List<TargetTernEntity> termTargets){
+    private static String processMode(DetectFunctionEntity functionIntent,List<TargetTernEntity> termTargets, String sentence){
         CurrentContext current = CurrentContext.getInstance();
         ScriptEntity mode = BotUtils.findBestScript(termTargets);
         if (mode != null) {
             Log.d(TAG,"Tim thay mode "+mode.getName());
-            current.setScript(mode);
-            current.setDevice(null);
-            BotUtils.implementCommand(functionIntent,null,mode);
-            Log.d(TAG,"Xác nhận "+ConstManager.getVerbByIntent(functionIntent.getId(),false)+" chế độ "+mode.getName());
+            int extraMin  = getMinute(sentence);
+            if (extraMin > 0){
+                Calendar date = Calendar.getInstance();
+                long now= date.getTimeInMillis();
+
+                int hour = extraMin / 60;
+                int min = extraMin - (hour * 60);
+                if (containRemainTime(sentence)) {
+                    Date setTime = new Date(now + (extraMin * ConstManager.ONE_MINUTE_IN_MILLIS));
+                    Log.d(TAG,setTime.toLocaleString());
+                    hour = setTime.getHours();
+                    min = setTime.getMinutes();
+                }
+                Log.d(TAG,"scheduler "+extraMin+" "+hour+" "+min+" "+mode.getName()+" "+functionIntent.getFunctionName());
+                ScriptEntity schedule = new ScriptEntity();
+                List<CommandEntity> listCommmand = ScriptSQLite.getCommandByScriptId(mode.getId());
+
+                schedule.setName(ConstManager.getVerbByIntent(current.getDetectedFunction().getId(), false)+" "+mode.getName());
+                schedule.setHour(hour);
+                schedule.setMinute(min);
+                schedule.setEnabled(true);
+
+                schedule.setWeeksDay(date.get(Calendar.DAY_OF_WEEK)+"");
+                schedule.setOnlyOneTime(true);
+                ScriptSQLite.insertScript(schedule, listCommmand);
+                SmartHouse.getInstance().addMode(schedule);
+                SmartHouse.getInstance().resetTodayMode();
+                return "Xác nhận chế độ "+mode.getName()+" sẽ "+ConstManager.getVerbByIntent(current.getDetectedFunction().getId(), false)
+                        +" lúc "+hour+" giờ "+min+" phút ";
+            }  else {
+                current.setScript(mode);
+                current.setDevice(null);
+                BotUtils.implementCommand(functionIntent, null, mode);
+             }
             return "Xác nhận "+ConstManager.getVerbByIntent(functionIntent.getId(),false)+" chế độ "+mode.getName();
         } else {
             Log.d(TAG,"Khong thay mode ");
@@ -626,17 +695,19 @@ public class BotUtils {
                     ConstManager.getVerbByIntent(functionIntent.getId(),false), "");
         }
     }
-    private static String processFunction(List<TargetTernEntity> termTargets, DetectFunctionEntity functionIntent){
+    private static String processFunction(List<TargetTernEntity> termTargets, DetectFunctionEntity functionIntent, String sentence){
         CurrentContext current = CurrentContext.getInstance();
         current.setDetectedFunction(functionIntent);
         current.setDetectSocial(null);
+
+
         if (ConstManager.FUNCTION_FOR_SCRIPT.contains(functionIntent.getFunctionName())){
-            return processMode(functionIntent,termTargets);
+            return processMode(functionIntent,termTargets,sentence);
         } else if (ConstManager.FUNCTION_FOR_DEVICE.contains(functionIntent.getFunctionName())){
             AreaEntity findArea = BotUtils.findBestArea(termTargets);
             current.setArea(findArea);
             if (findArea !=null) {
-                return  processDeviceInArea(functionIntent, termTargets);
+                return  processDeviceInArea(functionIntent, termTargets,sentence);
             } 
             return processDeviceOnly(functionIntent,termTargets);
         } else if (functionIntent.getFunctionName().contains("check")){
@@ -683,6 +754,45 @@ public class BotUtils {
             return notLearnSentence;
         }
     }
+
+    private static boolean containRemainTime(String sentence) {
+        return sentence.contains("nữa") || sentence.contains("tới");
+    }
+
+    private static int getMinute(String sentence) {
+        int min = 0;
+        String[] item= sentence.split(" ");
+        for (int i=0;i < item.length; i ++){
+            if (item[i].equals("phút")){
+                item[i-1] = wordToNumber(item[i-1]);
+                Log.d(TAG, item[i-1]+"  "+item[i]);
+                try{
+                    min += Integer.parseInt(item[i-1]);
+                } catch (NumberFormatException e){
+                    Log.d(TAG,"partse fail");
+                }
+            }   if (item[i].equals("giờ") || item[i].equals("tiếng")){
+                Log.d(TAG, item[i-1]+"  "+item[i]);
+                try{
+                    min += Integer.parseInt(item[i-1])*60;
+                } catch (NumberFormatException e){
+                    Log.d(TAG,"partse fail");
+                }
+            }
+        }
+        return min;
+    }
+
+    private static String wordToNumber(String s) {
+        String nStr[] = {"không","một","hai","ba","bốn","năm","sáu","bảy","tám","chín"};
+        for (int i = 0 ; i< nStr.length; i ++){
+            if (s.equals(nStr[i])){
+                return i+"";
+            }
+        }
+        return s;
+    }
+
     public static String processSocial(DetectSocialEntity socialIntent){
         CurrentContext current = CurrentContext.getInstance();
         current.setDetectSocial(socialIntent);
@@ -715,16 +825,9 @@ public class BotUtils {
                                 " " + current.getDevice().getName()+" trong "+current.getArea().getName();
                         return res;
                     } else  if (current.getScript() != null) {
-                        if (current.isSchedulerMode()) {
-                            current.getScript().setEnabled(false);
-                            SmartHouse.getInstance().disableToday(current.getScript().getId());
-                            if (current.getScript().isOnlyOneTime()) {
-                                ScriptSQLite.deleteModeById(current.getScript().getId());
-                            }
-                            implementCommand(current.getDetectedFunction(),null,current.getScript());
-                            Log.d(TAG,"Scheduler acted");
-                        }
-                        implementCommand(current.getDetectedFunction(), null, current.getScript());
+
+                        implementCommand(current.getDetectedFunction(),null,current.getScript());
+
                         String res  ="Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getId(),false) +
                                 " chế độ " + current.getScript().getName();
                         return res;

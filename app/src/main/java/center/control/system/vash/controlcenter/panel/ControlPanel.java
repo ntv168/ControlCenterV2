@@ -435,7 +435,10 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         int maxPrio = -2;
         String result = "";
         for (EventEntity ev : SmartHouse.getInstance().getCurrentState().getEvents()){
-            Log.d(TAG, ev.getAreaId()+" "+ev.getSenName()+" "+ev.getSenValue() );
+//            Log.d(TAG, ev.getAreaId()+" "+ev.getSenName()+" "+ev.getSenValue() );
+            if (ev.getAreaId() == 0){
+                MessageUtils.makeText(this,"Cấu hình chưa được kích hoạt").show();
+            } else
             if (ev.getAreaId() == area.getId()){
                 if (ev.getSenName().equals(AreaEntity.attrivutesValues[0]) &&
                         ev.getSenValue().equals(area.getSafety())){
@@ -623,7 +626,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 public void onClick(View v) {
                     CurrentContext.getInstance().setDevice(device);
                     CurrentContext.getInstance().setScript(null);
-                    CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_DEC_TEMP));
+                    CurrentContext.getInstance().setDetectedFunction(DetectIntentSQLite.findFunctionById(ConstManager.FUNCTION_INC_TEMP));
                     SmartHouse.getInstance().addCommand(new CommandEntity(device.getId(),"inc"));
                     waitDialog.show();
                 }
@@ -1049,10 +1052,18 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     man.notify(0,noticBuilder.build());
 
                 }  else if (resultType.equals(ControlMonitorService.SCHEDULER) && CurrentContext.getInstance().getDetectedFunction() != null) {
-                    Log.d(TAG,"scheduler sent");
-                    CurrentContext cont = CurrentContext.getInstance();
-                    showReply(BotUtils.completeSentence(cont.getDetectedFunction().getRemindPattern(),"",cont.getScript().getName()));
-//                    cont.waitOwner();
+
+                    CurrentContext current = CurrentContext.getInstance();
+                    showReply(BotUtils.completeSentence("đang bật hẹn giờ","",""));
+                    current.getScript().setEnabled(false);
+                    SmartHouse.getInstance().disableToday(current.getScript().getId());
+                    for (CommandEntity cmd : ScriptSQLite.getCommandByScriptId(current.getScript().getId())){
+                        SmartHouse.getInstance().addCommand(cmd);
+                    }
+
+                    if (current.getScript().isOnlyOneTime()) {
+                        ScriptSQLite.deleteModeById(current.getScript().getId());
+                    }
 
                 }else if (resultType.equals(ControlMonitorService.DEACTIVATE)){
                     sharedPreferences = getSharedPreferences(ConstManager.SHARED_PREF_NAME, MODE_PRIVATE);
@@ -1104,7 +1115,10 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                         }
                         SmartHouse house = SmartHouse.getInstance();
                         Log.d(TAG,house.getDevices().size()+" succ");
-                        deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
+                        if (currentArea!= null) {
+                            deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
+                        }
+
                     } else if (result == ControlMonitorService.FAIL){
                         if (current.getDevice()!= null){
                             String resultVal = "bật";

@@ -46,7 +46,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         }else {
             holder.deviceStatus.setText("đang tắt");
         }
-        Log.d(TAG,holder.item.getType());
+//        Log.d(TAG,holder.item.getType());
         if (holder.item.isDoor()){
             if (holder.item.getState().equals("on")) {
                 holder.deviceStatus.setText("đang mở");
