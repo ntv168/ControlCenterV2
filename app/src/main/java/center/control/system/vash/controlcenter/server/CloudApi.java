@@ -27,6 +27,7 @@ public  interface CloudApi {
     Call<SmartHouseRequestDTO> sendRequest(@Body SmartHouseRequestDTO requestDTO);
     @POST("api/SmartHouse/changePassword")
     Call<LoginSmarthouseDTO> changePass(@Body LoginSmarthouseDTO requestDTO);
-
+    @POST("api/SmartHouse/checkSmartHouseStatus")
+    Call<LoginSmarthouseDTO> check(@Body HouseKeyDTO houseKeyDTO);
 
 }

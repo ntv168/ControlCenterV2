@@ -134,9 +134,9 @@ public class AreaEntity extends TargetObject{
         }
 
         if (lightin == 0 ){
-            return "không có đèn nào sáng";
+            return "không cái sáng";
         } else
-        return  "có "+ lightin + " đèn bật";
+        return lightin + " đèn bật";
     }
     public String getBright() {
         int lightin = 0;
@@ -190,9 +190,9 @@ public class AreaEntity extends TargetObject{
             }
         }
         if (usingDev == 0){
-            return "Không có thiết bị nào sử dụng điện";
+            return "Không thiết bị nào sử dụng điện";
         }
-        return "có "+usingDev + " thiết bị sử dụng điện";
+        return usingDev + " thiết bị sử dụng điện";
     }
 
     public void setElectricUsing(String electricUsing) {
@@ -263,7 +263,7 @@ public class AreaEntity extends TargetObject{
         if (lightin == 0 ){
             lighting =  "không có đèn nào sáng";
         } else
-        lighting = "Có "+ lightin + " đèn bật";
+        lighting = lightin + " đèn bật";
 
         String[] result = new String[]{
                 safetyRes,
@@ -347,6 +347,22 @@ public class AreaEntity extends TargetObject{
             case TEMP_FRESH:
                 return " mát rồi";
         }
-        return " có nhiệt độ lạ lắm";
+        return " nhiệt độ lạ lắm";
+    }
+
+    public String getResultDetect() {
+        if (detect == null || detect.contains(NOBODY)){
+            return "ma";
+        }
+//        String item[] =detect.split(" ");
+        if (detect.contains(DETECT_STRANGE)){
+            return "khách";
+        }
+//        Log.d(TAG,detect);
+//        detect = item[0]+" "+item[1].split("-")[0];
+        String result = detect;
+        result = result.replace(DETECT_AQUAINTANCE,"");
+        result = result.replace(DETECT_BAD_GUY,"kẻ xấu là");
+        return result;
     }
 }

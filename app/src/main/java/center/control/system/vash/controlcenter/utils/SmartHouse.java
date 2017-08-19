@@ -105,6 +105,7 @@ public class SmartHouse {
         this.currentState = currentState;
     }
     public void resetStateToDefault(){
+        getCurrentState().setActivated(false);
         if (this.getStateById(this.currentState.getDefautState())!=null) {
             this.currentState = this.getStateById(this.currentState.getDefautState());
             this.stateChangedTime = (new Date()).getTime();
@@ -181,7 +182,7 @@ public class SmartHouse {
     public void startConfigCmds(){
         Log.d(TAG, "steartstrd coingfgtogh");
         if (currentState.getCommands()!= null){
-            Log.d(TAG, currentState.getCommands().size()+"");
+//            Log.d(TAG, currentState.getCommands().size()+"");
             stateStarted = true;
             for (CommandEntity cmd: currentState.getCommands()){
 
@@ -221,7 +222,7 @@ public class SmartHouse {
                         } else if (val[0].equals(AreaEntity.attrivutesValues[2])){
                             area.setTempAmout(Double.parseDouble(val[1]));
                         } else if (getDeviceByPort(val[0],areaId) != -1){
-                             Log.d(TAG,val[0]+"   :  "+val[1]);
+//                             Log.d(TAG,val[0]+"   :  "+val[1]);
                              devices.get(getDeviceByPort(val[0],areaId)).setState(val[1]);
                         }
                     }

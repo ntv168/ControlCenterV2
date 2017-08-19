@@ -17,6 +17,7 @@ import center.control.system.vash.controlcenter.MainActivity;
 import center.control.system.vash.controlcenter.PersonalInfoActivity;
 import center.control.system.vash.controlcenter.R;
 import center.control.system.vash.controlcenter.nlp.CurrentContext;
+import center.control.system.vash.controlcenter.nlp.TermSQLite;
 import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.RetroFitSingleton;
 import center.control.system.vash.controlcenter.server.SmartHouseRequestDTO;
@@ -52,6 +53,8 @@ public class UserSettingPanel extends AppCompatActivity {
                 SharedPreferences.Editor edit = sharedPreferences.edit();
                 edit.putString(ConstManager.CONTRACT_ID,"");
                 edit.commit();
+
+                TermSQLite.clearTrain();
                 startActivity(new Intent(UserSettingPanel.this, MainActivity.class));
             }
         });

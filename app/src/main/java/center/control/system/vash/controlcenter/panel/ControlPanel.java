@@ -301,10 +301,10 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
         if (StorageHelper.getAllPersonIds(mPersonGroupId, ControlPanel.this).isEmpty()) {
 
-            StorageHelper.setPersonName("0d6b5e21-6404-482c-af20-ea239881fcf0","Thuận", mPersonGroupId, ControlPanel.this);
-            StorageHelper.setPersonName("b84c17d0-1c02-48b8-abc5-1ec270db3f2a","Tùng", mPersonGroupId, ControlPanel.this);
-            StorageHelper.setPersonName("64efd2f3-6429-4775-bc87-a56db12d6dde","Mỹ", mPersonGroupId, ControlPanel.this);
-            StorageHelper.setPersonName("7f0fa924-cc34-4a6b-92d5-a2328a1cc0b3","Văn", mPersonGroupId, ControlPanel.this);
+            StorageHelper.setPersonName("496025e7-53b8-48a4-bc71-38aea1e4b527","Thuận", mPersonGroupId, ControlPanel.this);
+            StorageHelper.setPersonName("201e9bdc-422f-4399-ac00-6199fda634d2","Tùng", mPersonGroupId, ControlPanel.this);
+            StorageHelper.setPersonName("435cd15a-90da-433a-9707-81514987f75b","Mỹ", mPersonGroupId, ControlPanel.this);
+            StorageHelper.setPersonName("56eba0ff-5396-401e-8a4a-dffd0dbe0311","Văn", mPersonGroupId, ControlPanel.this);
         }
 
 
@@ -435,7 +435,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         int maxPrio = -2;
         String result = "";
         for (EventEntity ev : SmartHouse.getInstance().getCurrentState().getEvents()){
-//            Log.d(TAG, ev.getAreaId()+" "+ev.getSenName()+" "+ev.getSenValue() );
+            Log.d(TAG, ev.getAreaId()+" "+ev.getSenName()+" "+ev.getSenValue() );
             if (ev.getAreaId() == 0){
                 MessageUtils.makeText(this,"Cấu hình chưa được kích hoạt").show();
             } else
@@ -446,9 +446,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                         Log.d(TAG, ev.getNextStateId()+" " );
                         maxPrio = ev.getPriority();
                         nextEv = ev;
-                        if (aquaintance == null)
-                            result = area.getName();
-                        else result = aquaintance;
+                        result = area.getName();
                     }
                 } else if (ev.getSenName().equals(AreaEntity.attrivutesValues[1]) &&
                         ev.getSenValue().equals(area.getBright())){
@@ -469,9 +467,9 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 } else if (ev.getSenName().equals(AreaEntity.attrivutesValues[3]) &&
                         area.getRawDetect().contains(ev.getSenValue())){
                     if (ev.getPriority() >maxPrio){
-//                        Log.d(TAG, ev.getNextStateId()+" " );
+                        Log.d(TAG, area.getRawDetect()+" " );
                         maxPrio = ev.getPriority();
-                        result = aquaintance;
+                        result = area.getResultDetect();
                         nextEv = ev;
                     }
                 }
@@ -482,37 +480,39 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     }
     private void changeState(EventEntity ev,String resultValue){
         SmartHouse house = SmartHouse.getInstance();
+        house.getCurrentState().setActivated(false);
         house.setCurrentState(SmartHouse.getInstance().getStateById(ev.getNextStateId()));
-        Log.d(TAG,"chuyển state : "+house.getCurrentState().getName());
+        Log.d(TAG,"chuyển state : "+house.getCurrentState().getName()+"  "+resultValue);
         house.setStateChangedTime((new Date()).getTime());
         if (SmartHouse.getInstance().getCurrentState().getId() == ConstManager.OWNER_IN_HOUSE_STATE){
             lockDialog.dismiss();
         }
 
         if (!house.isDefaultState()) {
-            showAlertState(house.getCurrentState(), resultValue);
-            house.setCurrentStateNotice(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(), resultValue, ""));
-            showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(), resultValue, ""));
+            String message = BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(), resultValue, "");
+            if (resultValue.contains("kẻ xấu")){
+                message = "Có "+resultValue+" đến trước nhà kìa";
+            }
+            showAlertState(house.getCurrentState(), message);
+            Log.d(TAG,"message state : "+message+"      "+resultValue);
+            house.setCurrentStateNotice(message);
+            showReply(message);
         }  else
         if (stateDialog!= null &&stateDialog.isShowing()){
             stateDialog.dismiss();
         }
     }
 
-    private void showAlertState(StateEntity state, String resultValue) {
+    private void showAlertState(StateEntity state, String message) {
         if (stateDialog!= null && stateDialog.isShowing()){
             stateDialog.dismiss();
         }
         if (state.getCommands().size()>0) {
-
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if (SmartHouse.getInstance().getCurrentState().isActivated()){
-//                        SmartHouse.getInstance().revertCmdState();
-                    }
                     SmartHouse.getInstance().resetStateToDefault();
                     startListening();
                     dialog.dismiss();
@@ -553,7 +553,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             command += ctrCmd+" "+ dev.getName()+" trong "
                     + SmartHouse.getAreaById(dev.getAreaId()).getName() +"\n";
         }
-        stateDialog.setMessage(BotUtils.completeSentence(state.getNoticePattern(),resultValue,"")+
+//        Log.d(TAG,"show state dia "+resultValue);
+        stateDialog.setMessage(message+"\n"+
                 "\n"+ (state.getCommands().size()>0?command:"Thông báo sẽ tự động tắt"));
         stateDialog.setCancelable(false);
         stateDialog.show();
@@ -603,6 +604,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     @Override
     public void onDeviceClick(final DeviceEntity device) {
         CurrentContext.getInstance().stopWaitOwner();
+        Log.d(TAG,"stop wait wait stop");
         ((TextView) remoteDialog.findViewById(R.id.txtRemoteName)).setText(device.getName()+" ở "+currentArea.getName()+ " ");
         if (DeviceEntity.remoteTypes.contains(device.getType())){
 
@@ -672,7 +674,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     @Override
     public void onFinish() {
         Log.d(TAG, CurrentContext.getInstance().isWaitingOwnerSpeak()+ "  ");
-        if (CurrentContext.getInstance().isWaitingOwnerSpeak()) {
+        if (CurrentContext.getInstance().isWaitingOwnerSpeak() && SmartHouse.getInstance().isDefaultState()) {
             promptSpeechInput(sentenceReply);
         }
 
@@ -721,8 +723,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
         @Override
         protected void onPostExecute(com.microsoft.projectoxford.face.contract.Face[] result) {
-            long enddetect= System.currentTimeMillis();
-            Log.d("--------------", "time detect --------------- " + result.length);
+//            long enddetect= System.currentTimeMillis();
+//            Log.d("--------------", "time detect --------------- " + result.length);
 
             if (result != null) {
                 // Set the adapter of the ListView which contains the details of detectingfaces.
@@ -933,6 +935,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         this.sentenceReply = sentenceReply;
         if (sentenceReply.contains("ác nhậ")){
             CurrentContext.getInstance().stopWaitOwner();
+            Log.d(TAG,"stop wait wait stop");
             stopListening();
         }else if (sentenceReply.contains("Hình từ")){
             SmartHouse house = SmartHouse.getInstance();
@@ -954,6 +957,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                         CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_THANK)) {
             restartListeningService();
             CurrentContext.getInstance().stopWaitOwner();
+            Log.d(TAG,"stop wait wait stop");
         } else if (CurrentContext.getInstance().getDetectSocial()!= null &&(
                 CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_AGREE ||
                 CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_DENY ) &&
@@ -961,6 +965,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             stopListening();
             lockDialog.show();
             CurrentContext.getInstance().stopWaitOwner();
+            Log.d(TAG,"stop wait wait stop");
         }
 
         AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
@@ -1083,7 +1088,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     }
                 } else if (resultType.equals(ControlMonitorService.CHANGE_STATE)){
                     SmartHouse house =SmartHouse.getInstance();
-                    CurrentContext.getInstance().stopWaitOwner();
+//                    CurrentContext.getInstance().stopWaitOwner();
                     if (!house.isDefaultState()) {
                         showAlertState(house.getCurrentState(), "");
                         showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(), "", ""));
@@ -1094,6 +1099,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 }else if (resultType.equals(ControlMonitorService.CONTROL)){
                     waitDialog.dismiss();
                     CurrentContext.getInstance().stopWaitOwner();
+                    Log.d(TAG,"stop wait wait stop");
                     int result = intent.getIntExtra(AREA_ID, -1);
                     restartListeningService();
 

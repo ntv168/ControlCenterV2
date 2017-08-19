@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import center.control.system.vash.controlcenter.nlp.TermSQLite;
 import center.control.system.vash.controlcenter.server.CloudApi;
 import center.control.system.vash.controlcenter.server.HouseKeyDTO;
 import center.control.system.vash.controlcenter.server.LoginSmarthouseDTO;

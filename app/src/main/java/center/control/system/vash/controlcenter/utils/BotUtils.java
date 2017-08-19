@@ -187,6 +187,7 @@ public class BotUtils {
                     notLearnSentence = notLearnSentence.replaceAll(TARGET_OBJECT, targetObject);
                 }
             }
+            Log.d(TAG,"Sentence null  "+notLearnSentence);
             return notLearnSentence;
         } else {
             String result = sentence.replaceAll(BOT_NAME, house.getBotName());
@@ -195,8 +196,6 @@ public class BotUtils {
             result = result.replaceAll(OWNER_ROLE, house.getOwnerRole());
             result = result.replaceAll(RESULT_VALUE, resultValue);
             result = result.replaceAll(TARGET_OBJECT, targetObject);
-
-            Log.d(TAG, result.trim());
             return result.trim();
         }
     }
@@ -571,7 +570,8 @@ public class BotUtils {
                         cmd.setDeviceState("off");}
                     listCommmand.add(cmd);
 
-                    schedule.setName(ConstManager.getVerbByIntent(current.getDetectedFunction().getId(), device.isDoor())+" "+device.getName());
+                    schedule.setName(hour+" : "+min);
+                    schedule.setNickName("chế độ");
                     schedule.setHour(hour);
                     schedule.setMinute(min);
                     schedule.setEnabled(true);
@@ -581,7 +581,7 @@ public class BotUtils {
                     ScriptSQLite.insertScript(schedule, listCommmand);
                     SmartHouse.getInstance().addMode(schedule);
                     SmartHouse.getInstance().resetTodayMode();
-                    return "Xác nhận "+device.getName()+" sẽ "+ConstManager.getVerbByIntent(current.getDetectedFunction().getId(), device.isDoor())
+                    return device.getName()+" sẽ "+ConstManager.getVerbByIntent(current.getDetectedFunction().getId(), device.isDoor())
                             +" lúc "+hour+" giờ "+min+" phút ";
                 }  else {
                     current.setScript(null);
@@ -644,7 +644,7 @@ public class BotUtils {
             } else {
                 DetectSocialEntity notUnderReply = BotUtils.getSocialById(ConstManager.NOT_UNDERSTD);
                 CurrentContext.getInstance().setDetectSocial(notUnderReply);
-                return completeSentence(notUnderReply.getQuestionPattern(), "", "");
+                return completeSentence(notUnderReply.getReplyPattern(), "", "");
             }
         }
     }
@@ -680,7 +680,7 @@ public class BotUtils {
                 ScriptSQLite.insertScript(schedule, listCommmand);
                 SmartHouse.getInstance().addMode(schedule);
                 SmartHouse.getInstance().resetTodayMode();
-                return "Xác nhận chế độ "+mode.getName()+" sẽ "+ConstManager.getVerbByIntent(current.getDetectedFunction().getId(), false)
+                return "chế độ "+mode.getName()+" sẽ "+ConstManager.getVerbByIntent(current.getDetectedFunction().getId(), false)
                         +" lúc "+hour+" giờ "+min+" phút ";
             }  else {
                 current.setScript(mode);
@@ -847,17 +847,40 @@ public class BotUtils {
         return completeSentence(socialIntent.getReplyPattern(), result, "");
     }
     public static Map<String,Map<String,Integer>> updateFuncts(List<OwnerTrainEntity> trained, Map<String, Map<String, Integer>> functionMap) {
+
+
         for (OwnerTrainEntity train : trained){
+
             String []words = train.getWords().split("( )+");
+            // Get by funct name.
             Map<String,Integer> currentCount = functionMap.get(train.getName());
             if (currentCount != null) {
                 for (int i = 0; i < words.length; i++) {
                     Integer currWordCout = currentCount.get(words[i]);
-                    currentCount.put(words[i], (currWordCout != null) ? currWordCout + 1 : 1);
+                    int maxCount = 0;
+                    String maxFunct = train.getName();
+                    Iterator it = functionMap.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry pair = (Map.Entry) it.next();
+                        Map<String, Integer> wordCounts = (Map<String, Integer>) pair.getValue();
+                        Integer count = wordCounts.get(words[i]);
+                        if (count != null){
+                            if (count > maxCount ) {
+                                maxCount = count;
+                                maxFunct =(String) pair.getKey();
+                            }
+                        }
+
+                    }
+                    if (maxFunct.equals(train.getName())){
+                        maxCount = 0;
+                    }
+                    Log.d(TAG, "max count "+maxCount+"  word "+words[i] +  " funct "+maxFunct);
+                    currentCount.put(words[i], (currWordCout != null) ? currWordCout + maxCount+1 : maxCount+1);
                 }
                 functionMap.put(train.getName(), currentCount);
             }else {
-                Log.d(TAG, "Owner dạy ngu quá");
+                Log.d(TAG, "Owner dạy ngu quá không tìm được funct lúc train");
             }
         }
         return functionMap;

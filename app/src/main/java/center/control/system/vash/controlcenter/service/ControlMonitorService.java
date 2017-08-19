@@ -2,6 +2,7 @@ package center.control.system.vash.controlcenter.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
@@ -23,6 +24,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import center.control.system.vash.controlcenter.MainActivity;
 import center.control.system.vash.controlcenter.area.AreaEntity;
 import center.control.system.vash.controlcenter.command.CommandEntity;
 import center.control.system.vash.controlcenter.configuration.EventEntity;
@@ -34,10 +36,17 @@ import center.control.system.vash.controlcenter.panel.ControlPanel;
 
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
+import center.control.system.vash.controlcenter.server.CloudApi;
+import center.control.system.vash.controlcenter.server.HouseKeyDTO;
+import center.control.system.vash.controlcenter.server.LoginSmarthouseDTO;
+import center.control.system.vash.controlcenter.server.RetroFitSingleton;
 import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
+import center.control.system.vash.controlcenter.utils.MessageUtils;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import center.control.system.vash.controlcenter.server.VolleySingleton;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 /**
  * Created by Thuans on 5/26/2017.
@@ -59,6 +68,7 @@ public class ControlMonitorService extends Service {
     public static final String SCHEDULER = "scheduler trig";
     public static final String PERSON_UPDATE = "person update req";
     private static Timer repeatScheduler;
+    private static int count;
     private boolean areaChecked = false;
     public static String CHANGE_STATE = "state.change";
 
@@ -115,6 +125,12 @@ public class ControlMonitorService extends Service {
             public void run() {
                 SmartHouse smartHouse = SmartHouse.getInstance();
                 boolean checkConfig = false;
+
+                if(count == 65){
+                    checkActive();
+                    count= 0;
+                }
+                count++;
                 if (smartHouse.getContractId() == null){
                     sendResult(DEACTIVATE,-1);
                     return;
@@ -170,24 +186,6 @@ public class ControlMonitorService extends Service {
                     }
 
                 }else {
-//                    if (checkConfig){
-//                        Set<Integer> areaIds = new HashSet<Integer>();
-//                        for (EventEntity event : smartHouse.getCurrentState().getEvents()) {
-//                            if (SmartHouse.getAreaById(event.getAreaId())!= null) {
-//                                if (!areaIds.contains(event.getAreaId())) {
-//                                    areaIds.add(event.getAreaId());
-//                                    if (event.getSenName().equals(AreaEntity.attrivutesValues[3])) {
-//                                        checkCamera(SmartHouse.getAreaById(event.getAreaId()));
-//                                    } else {
-//                                        checkArea(SmartHouse.getAreaById(event.getAreaId()));
-//                                    }
-//                                }
-//                            } else {
-//                                Log.d(TAG," chưa đặt không gian cho cấu hình");
-//                            }
-//
-//                        }
-//                    } else {
                         for (AreaEntity area : smartHouse.getAreas()) {
 //                            Log.d(TAG, area.getName() + "   " + area.isHasCamera());
                             if (area.isHasCamera() && areaChecked) {
@@ -211,8 +209,33 @@ public class ControlMonitorService extends Service {
                         sendResult(SCHEDULER,-1);
                     }
                 }
+                //1 min
             }
         }, VolleySingleton.CHECK_CAMERA_TIMEOUT, ConstManager.SERVICE_PERIOD);
+    }
+
+    private void checkActive() {
+        final HouseKeyDTO key = new HouseKeyDTO();
+        key.setHouseId(ConstManager.HOUSE_ID);
+        final CloudApi loginApi = RetroFitSingleton.getInstance().getCloudApi();
+        loginApi.check(key).enqueue(new Callback<LoginSmarthouseDTO>() {
+            @Override
+            public void onResponse(Call<LoginSmarthouseDTO> call, retrofit2.Response<LoginSmarthouseDTO> response) {
+                Log.d(TAG,call.request().url().toString());
+                if (response.body() != null && response.body().getContractId() != null) {
+                    Log.d(TAG,"activate");
+                } else {
+                    Log.d(TAG,"deactivate"+" wrong");
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<LoginSmarthouseDTO> call, Throwable t) {
+                Log.d(TAG,call.request().url().toString());
+                Log.d(TAG,"deactivate");
+            }
+        });
     }
 
     private  void checkArea(final AreaEntity area){

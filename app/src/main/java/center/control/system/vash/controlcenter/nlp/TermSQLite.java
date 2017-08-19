@@ -209,6 +209,12 @@ public class TermSQLite {
         db.delete(TABLE_HUMAN_TERM,null,null);
         SQLiteManager.getInstance().closeDatabase();
     }
+
+    public static void clearTrain() {
+        SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
+        db.delete(TABLE_OWNER_TRAIN_TERM,null,null);
+        SQLiteManager.getInstance().closeDatabase();
+    }
     public void clearTargweAll( ) {
         SQLiteDatabase db = SQLiteManager.getInstance().openDatabase();
         db.delete(TABLE_TARGET_TERM,null,null);

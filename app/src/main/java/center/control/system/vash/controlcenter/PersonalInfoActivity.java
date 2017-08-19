@@ -379,21 +379,11 @@ public class PersonalInfoActivity extends AppCompatActivity {
             }
         }
         for (final ScriptEntity mode: house.getScripts()){
-            if (mode.getNickName().length()<2){
-                inputDialog.setTitle("Tên gọi khác cho chế độ "+mode.getName());
-                final EditText input = new EditText(PersonalInfoActivity.this);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                inputDialog.setView(input);
-                inputDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mode.setNickName(input.getText().toString());
-                        ScriptSQLite.upModeOnly(mode.getId(),mode);
-                        house.updateModeById(mode.getId(),mode);
-                        dialog.dismiss();
-                    }
-                });
-                inputDialog.show();
+            if (mode.getNickName() == null || mode.getNickName().length()<2){
+                mode.setNickName(mode.getName()+ mode.getName());
+                ScriptSQLite.upModeOnly(mode.getId(),mode);
+                house.updateModeById(mode.getId(),mode);
+
             }
         }
     }

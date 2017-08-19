@@ -81,10 +81,7 @@ public class TrainVAActivity extends AppCompatActivity {
                         MessageUtils.makeText(TrainVAActivity.this,"Vui lòng chọn mục đích câu nói").show();
                     } else {
                         train.setName(DetectIntentSQLite.findFunctionById(selectedRdo.getId()).getFunctionName());
-                        train.setWords(txtSenten.getText().toString()+" "+txtSenten.getText().toString()+" "+txtSenten.getText().toString()+" "
-                        +txtSenten.getText().toString()+" "+txtSenten.getText().toString()+" "+txtSenten.getText().toString()+" "+
-                                txtSenten.getText().toString()+" "+txtSenten.getText().toString()+" "+txtSenten.getText().toString()+" "
-                                +txtSenten.getText().toString()+" "+txtSenten.getText().toString()+" "+txtSenten.getText().toString()+" ");
+                        train.setWords(txtSenten.getText().toString());
                         train.setType("function");
                         Log.d(TAG, train.getName() + "   " + train.getWords());
                         TermSQLite.insertOrUpdateTrain(train);
