@@ -108,12 +108,12 @@ public class ControlMonitorService extends Service {
                     sendResult(CONTROL,FAIL);
                 }
             });
-            control.setRetryPolicy(new DefaultRetryPolicy(1500,0,1f));
+            control.setRetryPolicy(new DefaultRetryPolicy(4000,0,1f));
 
             VolleySingleton.getInstance(this).addToRequestQueue(control);
         } else {
             Log.d(TAG,deviceEntity.getName()+" đã được "+deviceEntity.getState());
-//            sendResult(CONTROL, SUCCESS);
+            sendResult(CONTROL, SUCCESS);
         }
     }
     @Override

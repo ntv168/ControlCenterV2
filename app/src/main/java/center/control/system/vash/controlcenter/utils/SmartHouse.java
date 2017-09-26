@@ -217,13 +217,13 @@ public class SmartHouse {
                 for (int i = 0; i< ele.length; i++){
                     if (ele[i].length()>1){
                         String[] val = ele[i].split(":");
-                         if (val[0].equals(AreaEntity.attrivutesValues[0])){
+                        if (val[0].equals(AreaEntity.attrivutesValues[0])){
                             area.setSafety(val[1]);
                         } else if (val[0].equals(AreaEntity.attrivutesValues[2])){
                             area.setTempAmout(Double.parseDouble(val[1]));
                         } else if (getDeviceByPort(val[0],areaId) != -1){
 //                             Log.d(TAG,val[0]+"   :  "+val[1]);
-                             devices.get(getDeviceByPort(val[0],areaId)).setState(val[1]);
+                            devices.get(getDeviceByPort(val[0],areaId)).setState(val[1]);
                         }
                     }
                 }
@@ -433,12 +433,12 @@ public class SmartHouse {
     }
 
     public void updateDeviceStateById(int id, String status) {
-       for (DeviceEntity dev : this.getDevices()){
-           if (dev.getId() == id){
-               dev.setState(status);
-               return;
-           }
-       }
+        for (DeviceEntity dev : this.getDevices()){
+            if (dev.getId() == id){
+                dev.setState(status);
+                return;
+            }
+        }
     }
 
     public void updatePictureArea(int id, Bitmap decodedByte) {
@@ -570,7 +570,7 @@ public class SmartHouse {
         List<ScriptEntity> res = new ArrayList<>();
         for (ScriptEntity mode: this.getScripts()){
             if (mode.getWeeksDay()!= null  &&
-            mode.getWeekDay().contains(day+"")){
+                    mode.getWeekDay().contains(day+"")){
                 mode.setEnabled(true);
                 res.add(mode);
             }
@@ -590,7 +590,7 @@ public class SmartHouse {
     public List<ScriptEntity> getRunToday() {
         if (runToday == null) return getTodayMode();
         else
-        return runToday;
+            return runToday;
     }
 
     public void setRunToday(List<ScriptEntity> todayScript) {
@@ -604,6 +604,16 @@ public class SmartHouse {
                 cmd.setDeviceState("off");
                 cmd.setDeviceId(dev.getId());
                 Log.d(TAG,dev.getName()+" off toan bo");
+                addCommand(cmd);
+            }
+        }
+    }
+    public void turnOnAll() {
+        for (DeviceEntity dev: getDevices()){
+            if (dev.getAreaId() != -1 && dev.getState().equals("off")) {
+                CommandEntity cmd = new CommandEntity();
+                cmd.setDeviceState("on");
+                cmd.setDeviceId(dev.getId());
                 addCommand(cmd);
             }
         }

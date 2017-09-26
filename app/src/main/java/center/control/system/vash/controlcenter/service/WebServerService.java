@@ -35,7 +35,7 @@ public class WebServerService extends Service {
         super.onCreate();
 
         Log.w(TAG, "starting server.....");
-        final int port = 8080;
+        final int port = 16895;
         server = new WebServer(port);
 
         (new Thread(server)).start();

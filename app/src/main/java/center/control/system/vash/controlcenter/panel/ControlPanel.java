@@ -152,9 +152,9 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 //            deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
             startService(new Intent(this, ControlMonitorService.class));
         } else {
-            MessageUtils.makeText(this,"Nhân viên chưa cấu hình thiết bị").show();
-            startActivity(new Intent(this,MainActivity.class));
-            finish();
+//            MessageUtils.makeText(this,"Nhân viên chưa cấu hình thiết bị").show();
+//            startActivity(new Intent(this,MainActivity.class));
+//            finish();
         }
         Bundle bun = getIntent().getBundleExtra("bundle");
         if (bun!= null) {
@@ -437,7 +437,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         for (EventEntity ev : SmartHouse.getInstance().getCurrentState().getEvents()){
             Log.d(TAG, ev.getAreaId()+" "+ev.getSenName()+" "+ev.getSenValue() );
             if (ev.getAreaId() == 0){
-                MessageUtils.makeText(this,"Cấu hình chưa được kích hoạt").show();
+//                MessageUtils.makeText(this,"Cấu hình chưa được kích hoạt").show();
             } else
             if (ev.getAreaId() == area.getId()){
                 if (ev.getSenName().equals(AreaEntity.attrivutesValues[0]) &&
@@ -681,8 +681,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
 //        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
 //        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
-        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
-        amanager.setStreamMute(AudioManager.STREAM_RING, true);
+//        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+//        amanager.setStreamMute(AudioManager.STREAM_RING, true);
 //        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
     }
 
@@ -1155,34 +1155,36 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     Bitmap bmImg = house.getBitmapByAreaId(cameraAreaId);
                     ImageView imgFace = (ImageView) cameraDialog.findViewById(R.id.imgFace);
 
-                    if (bmImg!=null){
-                        imgFace.setImageBitmap(bmImg);
-                        File myDir =  Environment.getExternalStoragePublicDirectory(
-                                Environment.DIRECTORY_PICTURES);
-                        myDir.mkdirs();
-                        String nameFile = "testSelf.jpg";
-                        File file = new File(myDir, nameFile);
-                        if (file.exists ()) file.delete();
-                        try {
-                            FileOutputStream out = new FileOutputStream(file);
-//                                Log.d(TAG,file.getAbsolutePath());
-                            bmImg.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                            out.close();
-                        } catch (IOException e){
-                            Log.d(TAG, e.getMessage());
-                        }
-
-                        Uri uri = Uri.fromFile(file);
-                        Bitmap mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
-                                uri, getContentResolver());
-
-                        stopService(new Intent(ControlPanel.this,ControlMonitorService.class));
-                        detect(mBitmap);
-                    } else {
-                        imgFace.setImageResource(R.drawable.close);
-                    }
+//                    if (bmImg!=null){
+//                        imgFace.setImageBitmap(bmImg);
+//                        File myDir =  Environment.getExternalStoragePublicDirectory(
+//                                Environment.DIRECTORY_PICTURES);
+//                        myDir.mkdirs();
+//                        String nameFile = "testSelf.jpg";
+//                        File file = new File(myDir, nameFile);
+//                        if (file.exists ()) file.delete();
+//                        try {
+//                            FileOutputStream out = new FileOutputStream(file);
+////                                Log.d(TAG,file.getAbsolutePath());
+//                            bmImg.compress(Bitmap.CompressFormat.JPEG, 100, out);
+//                            out.close();
+//                        } catch (IOException e){
+//                            Log.d(TAG, e.getMessage());
+//                        }
+//
+//                        Uri uri = Uri.fromFile(file);
+//                        Bitmap mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
+//                                uri, getContentResolver());
+//
+//                        stopService(new Intent(ControlPanel.this,ControlMonitorService.class));
+//                        detect(mBitmap);
+//                    } else {
+//                        imgFace.setImageResource(R.drawable.close);
+//                    }
                     ((TextView) cameraDialog.findViewById(R.id.txtFaceResult)).setText("Hình từ "+SmartHouse.getAreaById(cameraAreaId).getName());
                     cameraDialog.show();
+                    String message = AreaEntity.DETECT_STRANGE;
+                    setDetectMessage(message);
 
                 }
             }

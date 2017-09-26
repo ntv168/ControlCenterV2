@@ -70,7 +70,7 @@ public class BotUtils {
             Log.d(TAG, res.getFunctionName()+ " function founded "+maxTfidf);
             return res;
         } else
-                return null;
+            return null;
     }
     public static DetectSocialEntity findBestSocialDetected(List<TermEntity> foundTerm){
         Map<Integer,Double> sumTfidfIntent = new HashMap<>();
@@ -119,7 +119,7 @@ public class BotUtils {
             }
         }
         Log.d(TAG,"best device "+ bestDevice+ " founded");
-            return bestDevice ;
+        return bestDevice ;
 
     }
     public static double findBestDeviceTfidf(List<TargetTernEntity> termTargets) {
@@ -246,7 +246,7 @@ public class BotUtils {
                 }
             }
         }
-            return maxTfidf;
+        return maxTfidf;
     }
 
     public static ScriptEntity findBestScript(List<TargetTernEntity> termTargets) {
@@ -299,6 +299,7 @@ public class BotUtils {
         while (it.hasNext()){
             Map.Entry pair = (Map.Entry) it.next();
             String functionName = (String)pair.getKey();
+            Log.d(TAG, functionName);
             int functId = DetectIntentSQLite.findFunctionByName(functionName).getId();
             Map<String, Integer> wordCount = (Map<String, Integer>) pair.getValue();
 
@@ -394,7 +395,7 @@ public class BotUtils {
                 String term = (String) termPair.getKey();
                 double termTfidf =1.0;
 
-                    termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, areaId);
+                termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, areaId);
                 if (termTfidf ==0.0){
                     termTfidf = 1.0;
                 }
@@ -427,7 +428,7 @@ public class BotUtils {
                 String term = (String) termPair.getKey();
                 double termTfidf =1.0;
 
-                    termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, scriptId);
+                termTfidf = TFIDF.createTfIdf(cloneForCalculate, term, scriptId);
                 if (termTfidf ==0.0){
                     termTfidf = 1.0;
                 }
@@ -595,7 +596,7 @@ public class BotUtils {
             DetectSocialEntity notUnderReply = BotUtils.getSocialById(ConstManager.NOT_UNDERSTD);
             current.setDetectSocial(notUnderReply);
             return completeSentence(notUnderReply.getQuestionPattern(), "", "");
-        } 
+        }
     }
     public static String botReplyToSentence(String humanSay){
         humanSay = " "+humanSay+" ";
@@ -615,7 +616,7 @@ public class BotUtils {
             String resultVal = BotUtils.getAttributeByFunction(currentFunct.getId(),area);
             String replyComplete ="";
             if (resultVal == null){
-                replyComplete=completeSentence(currentFunct.getFailPattern(), resultVal, area.getName());
+                replyComplete=completeSentence(currentFunct.getFailPattern(), "", area.getName());
             } else {
                 replyComplete=completeSentence(currentFunct.getSuccessPattern(), resultVal, area.getName());
             }
@@ -627,10 +628,20 @@ public class BotUtils {
             DetectSocialEntity socialFound = BotUtils.findBestSocialDetected(terms);
             if (functFound != null && socialFound != null) {
                 double functionTfidf = functFound.getDetectScore();
-                if (functFound.getId() == ConstManager.FUNCTION_START_MODE)
+                if (functFound.getId() == ConstManager.FUNCTION_START_MODE || functFound.getId() == ConstManager.FUNCTION_STOP_MODE)
                     functionTfidf +=  BotUtils.findBestScriptTfidf(termTargets);
                 else
-                functionTfidf += BotUtils.findBestArreaTfidf(termTargets) + BotUtils.findBestDeviceTfidf(termTargets);
+                if (functFound.getId() == ConstManager.FUNCTION_TURN_ON_ALL) {
+                    SmartHouse.getInstance().turnOffAll();
+                    return "Xác nhận";
+                }
+                else
+                if (functFound.getId() == ConstManager.FUNCTION_TURN_ON_ALL) {
+                    SmartHouse.getInstance().turnOnAll();
+                    return "Xác nhận";
+                }
+                else
+                    functionTfidf += BotUtils.findBestArreaTfidf(termTargets) + BotUtils.findBestDeviceTfidf(termTargets);
                 Log.d(TAG, "funct point: " + functionTfidf + " soc point " + socialFound.getDetectScore());
                 if (functionTfidf > socialFound.getDetectScore()) {
                     return processFunction(termTargets, functFound, humanSay);
@@ -686,7 +697,7 @@ public class BotUtils {
                 current.setScript(mode);
                 current.setDevice(null);
                 BotUtils.implementCommand(functionIntent, null, mode);
-             }
+            }
             return "Xác nhận "+ConstManager.getVerbByIntent(functionIntent.getId(),false)+" chế độ "+mode.getName();
         } else {
             Log.d(TAG,"Khong thay mode ");
@@ -708,7 +719,7 @@ public class BotUtils {
             current.setArea(findArea);
             if (findArea !=null) {
                 return  processDeviceInArea(functionIntent, termTargets,sentence);
-            } 
+            }
             return processDeviceOnly(functionIntent,termTargets);
         } else if (functionIntent.getFunctionName().contains("check")){
             if (functionIntent.getId() == ConstManager.CHECK_DEV_STATE){
@@ -732,7 +743,7 @@ public class BotUtils {
                     Log.d(TAG, "Thay phong de check" + area.getName() + "  " + functionIntent.getId());
                     String resultVal = BotUtils.getAttributeByFunction(functionIntent.getId(), area);
                     if (resultVal == null) {
-                        return completeSentence(functionIntent.getFailPattern(), resultVal, area.getName());
+                        return completeSentence(functionIntent.getFailPattern(), "", area.getName());
                     } else {
                         return completeSentence(functionIntent.getSuccessPattern(), resultVal, area.getName());
                     }
@@ -813,11 +824,11 @@ public class BotUtils {
 //                Log.d(TAG," no body "+ house.getCurrentState().getName());
                 break;
             case ConstManager.SOCIAL_AGREE:
-                 if (SmartHouse.getInstance().getCurrentState().getId() == ConstManager.NO_BODY_HOME_STATE) {
-                     Log.d(TAG, "owner leave turn off foaulll");
-                     SmartHouse.getInstance().turnOffAll();
-                     break;
-                 } else
+                if (SmartHouse.getInstance().getCurrentState().getId() == ConstManager.NO_BODY_HOME_STATE) {
+                    Log.d(TAG, "owner leave turn off foaulll");
+                    SmartHouse.getInstance().turnOffAll();
+                    break;
+                } else
                 if (current.getDetectedFunction() != null ){
                     if (current.getDevice() != null) {
                         implementCommand(current.getDetectedFunction(), current.getDevice(), null);
@@ -839,7 +850,7 @@ public class BotUtils {
                 }
             case ConstManager.SOCIAL_DENY:
                 if (current.getDetectedFunction() != null ){
-                   current.renew();
+                    current.renew();
 
                 }
                 return completeSentence(socialIntent.getReplyPattern(),"","");

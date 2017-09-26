@@ -4,7 +4,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="endpoint">https://westcentralus.api.cognitive.microsoft.com/face/v1.0</string>
-    <string name="subscription_key">abd29e6e43b34acf9cf2b83a41ba185c</string>
+    <string name="subscription_key">71730003bad44fb58321b58577a5fc9f</string>
     <string name="area_name">phòng học FPT</string>
     <string name="area_second_name">phòng học</string>
     <string name="default_ip">1.1.1.1:80</string>

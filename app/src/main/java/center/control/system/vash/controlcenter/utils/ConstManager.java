@@ -46,6 +46,8 @@ public class ConstManager {
     public static final int NOT_LEARN_YET = 35;
     public static final int FUNCTION_TURN_ON = 1034;
     public static final int FUNCTION_TURN_OFF = 1036;
+    public static final int FUNCTION_TURN_OFF_ALL = 1039;
+    public static final int FUNCTION_TURN_ON_ALL = 1040;
     public static final int FUNCTION_INC_TEMP = 1032;
     public static final int FUNCTION_DEC_TEMP = 1035;
     public static final int FUNCTION_START_MODE = 1027;
