@@ -171,6 +171,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 }
             }
         }, 1000, 1000);
+        restartListeningService();
     }
     @Override
     protected void onNewIntent(Intent intent) {
@@ -573,7 +574,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     }
 
     public void clicktoVAPanel(View view) {
-        promptSpeechInput("");
+//        promptSpeechInput("");
     }
 
     @Override
@@ -1201,7 +1202,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         Log.d(TAG,"on start");
     }
 
-    private void promptSpeechInput(String message) {
+    private void  ptSpeechInput(String message) {
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,

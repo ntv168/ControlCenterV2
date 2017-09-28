@@ -629,7 +629,7 @@ public class BotUtils {
                 if (functFound.getId() == ConstManager.FUNCTION_START_MODE || functFound.getId() == ConstManager.FUNCTION_STOP_MODE)
                     functionTfidf +=  BotUtils.findBestScriptTfidf(termTargets);
                 else
-                if (functFound.getId() == ConstManager.FUNCTION_TURN_ON_ALL) {
+                if (functFound.getId() == ConstManager.FUNCTION_TURN_OFF_ALL) {
                     SmartHouse.getInstance().turnOffAll();
                     return "Xác nhận";
                 }
