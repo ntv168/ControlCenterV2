@@ -15,10 +15,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.speech.RecognizerIntent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
@@ -27,25 +25,17 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.microsoft.projectoxford.face.FaceServiceClient;
 import com.microsoft.projectoxford.face.contract.IdentifyResult;
 import com.microsoft.projectoxford.face.contract.Person;
 import com.microsoft.projectoxford.face.contract.TrainingStatus;
-import com.sonyericsson.extras.liveware.aef.control.Control;
-
-import org.w3c.dom.Text;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -56,13 +46,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import center.control.system.vash.controlcenter.App;
 import center.control.system.vash.controlcenter.MainActivity;
 import center.control.system.vash.controlcenter.PersonalInfoActivity;
 import center.control.system.vash.controlcenter.R;
-import center.control.system.vash.controlcenter.SettingPanel;
 import center.control.system.vash.controlcenter.area.AreaAdapter;
 import center.control.system.vash.controlcenter.area.AreaAttribute;
 import center.control.system.vash.controlcenter.area.AreaAttributeAdapter;
@@ -88,19 +79,15 @@ import center.control.system.vash.controlcenter.server.FunctionIntentDTO;
 import center.control.system.vash.controlcenter.server.RetroFitSingleton;
 import center.control.system.vash.controlcenter.server.SmartHouseRequestDTO;
 import center.control.system.vash.controlcenter.server.SocialIntentDTO;
-import center.control.system.vash.controlcenter.server.VolleySingleton;
-import center.control.system.vash.controlcenter.utils.MessageUtils;
-import center.control.system.vash.controlcenter.voice.VoiceUtils;
-import center.control.system.vash.controlcenter.recognition.Facedetect;
-import center.control.system.vash.controlcenter.recognition.ImageHelper;
-
 import center.control.system.vash.controlcenter.service.ControlMonitorService;
 import center.control.system.vash.controlcenter.service.WebServerService;
 import center.control.system.vash.controlcenter.utils.BotUtils;
 import center.control.system.vash.controlcenter.utils.ConstManager;
+import center.control.system.vash.controlcenter.utils.MessageUtils;
 import center.control.system.vash.controlcenter.utils.SmartHouse;
 import center.control.system.vash.controlcenter.voice.ListeningActivity;
 import center.control.system.vash.controlcenter.voice.VoiceRecognitionListener;
+import center.control.system.vash.controlcenter.voice.VoiceUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -128,17 +115,23 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     private boolean detecting;
     private String mPersonGroupId;
     private ProgressDialog waitDialog;
+
     private AlertDialog stateDialog;
     private AlertDialog lockDialog;
     private int cameraAreaId;
     private AlertDialog configUpdateDialog;
     private AlertDialog.Builder selectMode;
     private String sentenceReply;
+    private  boolean lissten;
+    private long listenTime= 0;
+    private Timer repeatScheduler;
+
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.d(TAG,"on resume");
+        lissten = false;
         if (DetectIntentSQLite.findSocialById(ConstManager.NOT_UNDERSTD) == null){
             startActivity(new Intent(this, PersonalInfoActivity.class));
         }
@@ -161,7 +154,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             Log.d(TAG, bun.getString("watch") + "");
             if (bun.getString("watch") != null &&
                     bun.getString("watch").equals("voice")) {
-                stopListening();
+//                stopListening();
                 CurrentContext.getInstance().waitOwner();
                 CurrentContext.getInstance().setDetectSocial(BotUtils.getSocialById(ConstManager.SOCIAL_APPEL));
 //            CurrentContext.getInstance().setDetectSocial(social);
@@ -169,6 +162,15 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 setIntent(new Intent());
             }
         }
+        repeatScheduler = new Timer();
+        repeatScheduler.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (lissten &&  (new Date()).getTime() - listenTime >10000){
+                    lissten = false;
+                }
+            }
+        }, 1000, 1000);
     }
     @Override
     protected void onNewIntent(Intent intent) {
@@ -675,7 +677,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     public void onFinish() {
         Log.d(TAG, CurrentContext.getInstance().isWaitingOwnerSpeak()+ "  ");
         if (CurrentContext.getInstance().isWaitingOwnerSpeak() && SmartHouse.getInstance().isDefaultState()) {
-            promptSpeechInput(sentenceReply);
+//            promptSpeechInput(sentenceReply);
         }
 
         AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
@@ -936,14 +938,15 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         if (sentenceReply.contains("ác nhậ")){
             CurrentContext.getInstance().stopWaitOwner();
             Log.d(TAG,"stop wait wait stop");
-            stopListening();
+//            stopListening();
+
         }else if (sentenceReply.contains("Hình từ")){
             SmartHouse house = SmartHouse.getInstance();
             Bitmap bmImg = house.getBitmapByAreaId(currentArea.getId());
             ImageView imgFace = (ImageView) cameraDialog.findViewById(R.id.imgFace);
 
             if (bmImg!=null){
-                stopListening();
+//                stopListening();
                 imgFace.setImageBitmap(bmImg);
                 cameraDialog.show();
                 sentenceReply = "";
@@ -955,15 +958,17 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 (CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SAY_BYE ||
                 CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.NOT_UNDERSTD||
                         CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_THANK)) {
-            restartListeningService();
+//            restartListeningService();
+            lissten= false;
             CurrentContext.getInstance().stopWaitOwner();
             Log.d(TAG,"stop wait wait stop");
         } else if (CurrentContext.getInstance().getDetectSocial()!= null &&(
                 CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_AGREE ||
                 CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_DENY ) &&
                 SmartHouse.getInstance().getCurrentState().getId() == ConstManager.NO_BODY_HOME_STATE) {
-            stopListening();
+//            stopListening();
             lockDialog.show();
+            lissten = false;
             CurrentContext.getInstance().stopWaitOwner();
             Log.d(TAG,"stop wait wait stop");
         }
@@ -1101,7 +1106,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     CurrentContext.getInstance().stopWaitOwner();
                     Log.d(TAG,"stop wait wait stop");
                     int result = intent.getIntExtra(AREA_ID, -1);
-                    restartListeningService();
+//                    restartListeningService();
 
                     CurrentContext current = CurrentContext.getInstance();
                     String target = current.getDevice()!=null?current.getDevice().getName():current.getScript().getName();
@@ -1220,9 +1225,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     String res = result.get(0).toLowerCase(new Locale("vi","VN"));
                     Log.d(TAG,res);
-                    showReply(BotUtils.botReplyToSentence(res));
                 } else {
-                    restartListeningService();
+//                    restartListeningService();
                 }
                 break;
             }
@@ -1243,9 +1247,11 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         if (social!=null) {
             Log.d(TAG, social.getName());
         }
-        Log.d(TAG, "processVoiceCommands: "+ voiceCommands[0].toString()+ "    "+(social!=null?social.getName():"null"));
+        Log.d(TAG, "processVoiceCommands: "+ voiceCommands[0].toString()+ "    "+(social!=null?social.getName():"null") + lissten);
         if (social != null && social.getId() == ConstManager.SOCIAL_APPEL) {
-            stopListening();
+//            stopListening();
+            lissten = true;
+            listenTime =  (new Date()).getTime();
             CurrentContext.getInstance().waitOwner();
             CurrentContext.getInstance().setDetectSocial(social);
             showReply(BotUtils.completeSentence(social.getReplyPattern(),"",""));
@@ -1255,11 +1261,11 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 configUpdateDialog.dismiss();
             }
             if (CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.UPDATE_BRAIN) {
-                stopListening();
+//                stopListening();
                 updateBot();
             }
             if (CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.UPDATE_CONFIG){
-                stopListening();
+//                stopListening();
                 updateConfig();
             }
         }
@@ -1284,10 +1290,14 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             house.setRequireUpdate(false);
             house.resetStateToDefault();
             CurrentContext.getInstance().renew();
-            restartListeningService();
-        } else {
-            restartListeningService();
+//            restartListeningService();
+        } else if (lissten){
+            listenTime =  (new Date()).getTime();
+            showReply(BotUtils.botReplyToSentence(voiceCommands[0]));
+//
         }
+
+        restartListeningService();
 //        Toast.makeText(this, voiceCommands[0], Toast.LENGTH_SHORT).show();
     }
 

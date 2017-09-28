@@ -5,8 +5,6 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
 
-import com.sonyericsson.extras.liveware.aef.control.Control;
-
 import java.util.HashMap;
 import java.util.Locale;
 

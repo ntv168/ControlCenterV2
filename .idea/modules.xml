@@ -4,8 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ControlCenter.iml" filepath="$PROJECT_DIR$/ControlCenter.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/SmartExtensionAPI/smartExtensionAPI.iml" filepath="$PROJECT_DIR$/SmartExtensionAPI/smartExtensionAPI.iml" />
-      <module fileurl="file://$PROJECT_DIR$/smartExtensionUtils/smartExtensionUtils.iml" filepath="$PROJECT_DIR$/smartExtensionUtils/smartExtensionUtils.iml" />
     </modules>
   </component>
 </project>

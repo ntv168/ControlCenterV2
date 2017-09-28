@@ -1,7 +1,5 @@
 package center.control.system.vash.controlcenter.utils;
 
-import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -26,7 +24,6 @@ import center.control.system.vash.controlcenter.nlp.OwnerTrainEntity;
 import center.control.system.vash.controlcenter.nlp.TargetTernEntity;
 import center.control.system.vash.controlcenter.nlp.TermEntity;
 import center.control.system.vash.controlcenter.nlp.TermSQLite;
-import center.control.system.vash.controlcenter.panel.ControlPanel;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 
@@ -604,6 +601,7 @@ public class BotUtils {
         List<TargetTernEntity> termTargets = TermSQLite.getTargetInSentence(humanSay);
         DetectSocialEntity currentSocial = CurrentContext.getInstance().getDetectSocial();
         DetectFunctionEntity currentFunct = CurrentContext.getInstance().getDetectedFunction();
+
         AreaEntity area = BotUtils.findBestArea(termTargets);
 
         if (currentSocial!= null && currentSocial.getId() == ConstManager.SOCIAL_ASK_DEVICEAREA){

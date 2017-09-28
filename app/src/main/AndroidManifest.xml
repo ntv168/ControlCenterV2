@@ -34,9 +34,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="landscape" >
-
-        </activity>
+            android:screenOrientation="landscape"></activity>
         <activity
             android:name=".panel.ControlPanel"
             android:screenOrientation="landscape">
@@ -72,9 +70,7 @@
             android:screenOrientation="landscape" />
         <activity
             android:name=".configuration.MapDeviceTriggerActivity"
-            android:screenOrientation="landscape" >
-
-        </activity>
+            android:screenOrientation="landscape"></activity>
         <activity android:name=".watch.SonyActivity">
             <intent-filter>
                 <action android:name="smart.house.watch.SONY_ACTIVITY" />
@@ -82,7 +78,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".configuration.ConfigurationActivity"></activity>
+        <activity android:name=".configuration.ConfigurationActivity" />
 
         <service android:name=".watch.WatchService" />
         <service android:name="com.sonyericsson.extras.liveware.extension.util.TunnelService">
@@ -123,7 +119,8 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".configuration.EventActivity"></activity>
+        <activity android:name=".configuration.EventActivity" />
+        <activity android:name=".dialog.SpeechDialogClass"></activity>
     </application>
 
 </manifest>
