@@ -15,8 +15,10 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.speech.RecognizerIntent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
@@ -36,6 +38,9 @@ import com.microsoft.projectoxford.face.contract.TrainingStatus;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -71,6 +76,7 @@ import center.control.system.vash.controlcenter.nlp.DetectSocialEntity;
 import center.control.system.vash.controlcenter.nlp.OwnerTrainEntity;
 import center.control.system.vash.controlcenter.nlp.TermEntity;
 import center.control.system.vash.controlcenter.nlp.TermSQLite;
+import center.control.system.vash.controlcenter.recognition.ImageHelper;
 import center.control.system.vash.controlcenter.script.ScriptEntity;
 import center.control.system.vash.controlcenter.script.ScriptSQLite;
 import center.control.system.vash.controlcenter.server.BotDataCentralDTO;
@@ -936,6 +942,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     }
     private void showReply(String sentenceReply){
         this.sentenceReply = sentenceReply;
+        if (sentenceReply == null) return;;
         if (sentenceReply.contains("ác nhậ")){
             CurrentContext.getInstance().stopWaitOwner();
             Log.d(TAG,"stop wait wait stop");
@@ -959,10 +966,10 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 (CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SAY_BYE ||
                 CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.NOT_UNDERSTD||
                         CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_THANK)) {
-//            restartListeningService();
+            restartListeningService();
             lissten= false;
-            CurrentContext.getInstance().stopWaitOwner();
-            Log.d(TAG,"stop wait wait stop");
+//            CurrentContext.getInstance().stopWaitOwner();
+//            Log.d(TAG,"stop wait wait stop");
         } else if (CurrentContext.getInstance().getDetectSocial()!= null &&(
                 CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_AGREE ||
                 CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_DENY ) &&
@@ -970,8 +977,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 //            stopListening();
             lockDialog.show();
             lissten = false;
-            CurrentContext.getInstance().stopWaitOwner();
-            Log.d(TAG,"stop wait wait stop");
+//            CurrentContext.getInstance().stopWaitOwner();
+//            Log.d(TAG,"stop wait wait stop");
         }
 
         AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
@@ -1161,32 +1168,32 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     Bitmap bmImg = house.getBitmapByAreaId(cameraAreaId);
                     ImageView imgFace = (ImageView) cameraDialog.findViewById(R.id.imgFace);
 
-//                    if (bmImg!=null){
-//                        imgFace.setImageBitmap(bmImg);
-//                        File myDir =  Environment.getExternalStoragePublicDirectory(
-//                                Environment.DIRECTORY_PICTURES);
-//                        myDir.mkdirs();
-//                        String nameFile = "testSelf.jpg";
-//                        File file = new File(myDir, nameFile);
-//                        if (file.exists ()) file.delete();
-//                        try {
-//                            FileOutputStream out = new FileOutputStream(file);
-////                                Log.d(TAG,file.getAbsolutePath());
-//                            bmImg.compress(Bitmap.CompressFormat.JPEG, 100, out);
-//                            out.close();
-//                        } catch (IOException e){
-//                            Log.d(TAG, e.getMessage());
-//                        }
-//
-//                        Uri uri = Uri.fromFile(file);
-//                        Bitmap mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
-//                                uri, getContentResolver());
-//
-//                        stopService(new Intent(ControlPanel.this,ControlMonitorService.class));
-//                        detect(mBitmap);
-//                    } else {
-//                        imgFace.setImageResource(R.drawable.close);
-//                    }
+                    if (bmImg!=null){
+                        imgFace.setImageBitmap(bmImg);
+                        File myDir =  Environment.getExternalStoragePublicDirectory(
+                                Environment.DIRECTORY_PICTURES);
+                        myDir.mkdirs();
+                        String nameFile = "testSelf.jpg";
+                        File file = new File(myDir, nameFile);
+                        if (file.exists ()) file.delete();
+                        try {
+                            FileOutputStream out = new FileOutputStream(file);
+//                                Log.d(TAG,file.getAbsolutePath());
+                            bmImg.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                            out.close();
+                        } catch (IOException e){
+                            Log.d(TAG, e.getMessage());
+                        }
+
+                        Uri uri = Uri.fromFile(file);
+                        Bitmap mBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(
+                                uri, getContentResolver());
+
+                        stopService(new Intent(ControlPanel.this,ControlMonitorService.class));
+                        detect(mBitmap);
+                    } else {
+                        imgFace.setImageResource(R.drawable.close);
+                    }
                     ((TextView) cameraDialog.findViewById(R.id.txtFaceResult)).setText("Hình từ "+SmartHouse.getAreaById(cameraAreaId).getName());
                     cameraDialog.show();
                     String message = AreaEntity.DETECT_STRANGE;
@@ -1257,7 +1264,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             CurrentContext.getInstance().setDetectSocial(social);
             showReply(BotUtils.completeSentence(social.getReplyPattern(),"",""));
         }else if (social!= null && social.getId() == ConstManager.SOCIAL_AGREE &&
-                CurrentContext.getInstance().getDetectSocial() !=null) {
+                configUpdateDialog.isShowing()) {
             if (configUpdateDialog.isShowing()){
                 configUpdateDialog.dismiss();
             }
@@ -1293,6 +1300,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             CurrentContext.getInstance().renew();
 //            restartListeningService();
         } else if (lissten){
+            Log.d(TAG,"listeen true ");
             listenTime =  (new Date()).getTime();
             showReply(BotUtils.botReplyToSentence(voiceCommands[0]));
 //

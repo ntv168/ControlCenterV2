@@ -596,6 +596,7 @@ public class BotUtils {
         }
     }
     public static String botReplyToSentence(String humanSay){
+        humanSay  = humanSay.toLowerCase();
         humanSay = " "+humanSay+" ";
         TermSQLite termSQLite = new TermSQLite();
         List<TargetTernEntity> termTargets = TermSQLite.getTargetInSentence(humanSay);
@@ -631,11 +632,14 @@ public class BotUtils {
                 else
                 if (functFound.getId() == ConstManager.FUNCTION_TURN_OFF_ALL) {
                     SmartHouse.getInstance().turnOffAll();
+                    Log.d(TAG,"OFF ALL");
                     return "Xác nhận";
                 }
                 else
                 if (functFound.getId() == ConstManager.FUNCTION_TURN_ON_ALL) {
                     SmartHouse.getInstance().turnOnAll();
+                    Log.d(TAG,"ON" +
+                            " ALL");
                     return "Xác nhận";
                 }
                 else
@@ -708,8 +712,19 @@ public class BotUtils {
         CurrentContext current = CurrentContext.getInstance();
         current.setDetectedFunction(functionIntent);
         current.setDetectSocial(null);
-
-
+        Log.d(TAG," process function");
+        if (functionIntent.getId() == ConstManager.FUNCTION_TURN_OFF_ALL) {
+            SmartHouse.getInstance().turnOffAll();
+            Log.d(TAG,"OFF ALL");
+            return "Xác nhận";
+        }
+        else
+        if (functionIntent.getId() == ConstManager.FUNCTION_TURN_ON_ALL) {
+            SmartHouse.getInstance().turnOnAll();
+            Log.d(TAG,"ON" +
+                    " ALL");
+            return "Xác nhận";
+        } else
         if (ConstManager.FUNCTION_FOR_SCRIPT.contains(functionIntent.getFunctionName())){
             return processMode(functionIntent,termTargets,sentence);
         } else if (ConstManager.FUNCTION_FOR_DEVICE.contains(functionIntent.getFunctionName())){
