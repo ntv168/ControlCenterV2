@@ -184,6 +184,13 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 //        showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(),"",""));
 
         startListening(); // starts listening
+
+        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+//        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+//        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
+        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+        amanager.setStreamMute(AudioManager.STREAM_RING, true);
+        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -683,12 +690,12 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 //            promptSpeechInput(sentenceReply);
 //        }
 
-//        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
 //        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
 //        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
-//        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
-//        amanager.setStreamMute(AudioManager.STREAM_RING, true);
-//        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+        amanager.setStreamMute(AudioManager.STREAM_RING, true);
+        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
     }
 
     private class DetectionTask extends AsyncTask<InputStream, String, com.microsoft.projectoxford.face.contract.Face[]> {
@@ -973,11 +980,12 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             Log.d(TAG,"stop wait wait stop");
         }
 
-//        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
 //        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
 //        amanager.setStreamMute(AudioManager.STREAM_ALARM, false);
-//        amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-//        amanager.setStreamMute(AudioManager.STREAM_RING, false);
+        amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+        amanager.setStreamMute(AudioManager.STREAM_RING, false);
+        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
 //        stopListening();
         lissten = false;
         VoiceUtils.speak(sentenceReply);
