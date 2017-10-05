@@ -438,7 +438,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         int maxPrio = -2;
         String result = "";
         for (EventEntity ev : SmartHouse.getInstance().getCurrentState().getEvents()){
-            Log.d(TAG, ev.getAreaId()+" "+ev.getSenName()+" "+ev.getSenValue() );
+//            Log.d(TAG, ev.getAreaId()+" "+ev.getSenName()+" "+ev.getSenValue() );
             if (ev.getAreaId() == 0){
 //                MessageUtils.makeText(this,"Cấu hình chưa được kích hoạt").show();
             } else
@@ -676,12 +676,14 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
     @Override
     public void onFinish() {
-        Log.d(TAG, CurrentContext.getInstance().isWaitingOwnerSpeak()+ "  ");
-        if (CurrentContext.getInstance().isWaitingOwnerSpeak() && SmartHouse.getInstance().isDefaultState()) {
+        lissten = true;
+//        restartListeningService();
+//        Log.d(TAG, CurrentContext.getInstance().isWaitingOwnerSpeak()+ "  ");
+//        if (CurrentContext.getInstance().isWaitingOwnerSpeak() && SmartHouse.getInstance().isDefaultState()) {
 //            promptSpeechInput(sentenceReply);
-        }
+//        }
 
-        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+//        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
 //        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
 //        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
 //        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
@@ -939,7 +941,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         if (sentenceReply.contains("ác nhậ")){
             CurrentContext.getInstance().stopWaitOwner();
             Log.d(TAG,"stop wait wait stop");
-//            stopListening();
 
         }else if (sentenceReply.contains("Hình từ")){
             SmartHouse house = SmartHouse.getInstance();
@@ -947,7 +948,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             ImageView imgFace = (ImageView) cameraDialog.findViewById(R.id.imgFace);
 
             if (bmImg!=null){
-//                stopListening();
                 imgFace.setImageBitmap(bmImg);
                 cameraDialog.show();
                 sentenceReply = "";
@@ -967,18 +967,19 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_AGREE ||
                 CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.SOCIAL_DENY ) &&
                 SmartHouse.getInstance().getCurrentState().getId() == ConstManager.NO_BODY_HOME_STATE) {
-//            stopListening();
             lockDialog.show();
             lissten = false;
             CurrentContext.getInstance().stopWaitOwner();
             Log.d(TAG,"stop wait wait stop");
         }
 
-        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+//        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
 //        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
 //        amanager.setStreamMute(AudioManager.STREAM_ALARM, false);
-        amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-        amanager.setStreamMute(AudioManager.STREAM_RING, false);
+//        amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+//        amanager.setStreamMute(AudioManager.STREAM_RING, false);
+//        stopListening();
+        lissten = false;
         VoiceUtils.speak(sentenceReply);
 //        Log.d(TAG, sentenceReply + "  " +CurrentContext.getInstance().isWaitingOwnerSpeak());
     }
@@ -1248,8 +1249,9 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         if (social!=null) {
             Log.d(TAG, social.getName());
         }
-        Log.d(TAG, "processVoiceCommands: "+ voiceCommands[0].toString()+ "    "+(social!=null?social.getName():"null") + lissten);
+        Log.d(TAG, "processVoiceCommands: "+ voiceCommands[0].toString()+ "    " + lissten);
         if (social != null && social.getId() == ConstManager.SOCIAL_APPEL) {
+            Log.d(TAG,"1");
 //            stopListening();
             lissten = true;
             listenTime =  (new Date()).getTime();
@@ -1258,6 +1260,7 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             showReply(BotUtils.completeSentence(social.getReplyPattern(),"",""));
         }else if (social!= null && social.getId() == ConstManager.SOCIAL_AGREE &&
                 CurrentContext.getInstance().getDetectSocial() !=null) {
+            Log.d(TAG,"2");
             if (configUpdateDialog.isShowing()){
                 configUpdateDialog.dismiss();
             }
@@ -1281,6 +1284,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 stateDialog.dismiss();
             }
         } else if (social!= null && social.getId() == ConstManager.SOCIAL_DENY) {
+            Log.d(TAG,"3");
+
             if (configUpdateDialog != null &&configUpdateDialog.isShowing()){
                 configUpdateDialog.dismiss();
             }
@@ -1293,6 +1298,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             CurrentContext.getInstance().renew();
 //            restartListeningService();
         } else if (lissten){
+            Log.d(TAG,"4");
+
             listenTime =  (new Date()).getTime();
             showReply(BotUtils.botReplyToSentence(voiceCommands[0]));
 //

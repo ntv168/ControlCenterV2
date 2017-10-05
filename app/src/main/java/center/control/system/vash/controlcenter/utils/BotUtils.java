@@ -222,7 +222,6 @@ public class BotUtils {
                 }
             }
         }
-        Log.d(TAG,"best area "+ bestAreaId+ " founded");
         if (bestAreaId != -1) {
             return AreaSQLite.findById(bestAreaId);
         } else
@@ -603,14 +602,19 @@ public class BotUtils {
         DetectFunctionEntity currentFunct = CurrentContext.getInstance().getDetectedFunction();
 
         AreaEntity area = BotUtils.findBestArea(termTargets);
-
+        if (currentFunct!=null) Log.d(TAG,"   "+currentFunct.getFunctionName());
+        if (currentSocial!=null)  Log.d(TAG,currentSocial!=null?currentSocial.getName():"");
         if (currentSocial!= null && currentSocial.getId() == ConstManager.SOCIAL_ASK_DEVICEAREA){
+            Log.d(TAG," 1");
             return processDeviceInArea(CurrentContext.getInstance().getDetectedFunction(),termTargets,humanSay);
         } else if (currentSocial!= null && currentSocial.getId() == ConstManager.SOCIAL_ASK_DEVICEONLY){
+            Log.d(TAG," 2");
             return processDeviceOnly(CurrentContext.getInstance().getDetectedFunction(),termTargets);
         } else if (currentSocial!= null && currentSocial.getId() == ConstManager.SOCIAL_ASK_MODE){
+            Log.d(TAG," 3");
             return processMode(CurrentContext.getInstance().getDetectedFunction(),termTargets,humanSay);
         } else if (currentFunct!= null && currentFunct.getFunctionName().contains("check") && area!=null){
+            Log.d(TAG," 4");
             String resultVal = BotUtils.getAttributeByFunction(currentFunct.getId(),area);
             String replyComplete ="";
             if (resultVal == null){
@@ -620,24 +624,28 @@ public class BotUtils {
             }
             return replyComplete;
         }  else {
+            Log.d(TAG," 5");
             List<TermEntity> terms = termSQLite.getHumanIntentInSentence(humanSay);
-//        Log.d(TAG,termSQLite.getAllTerms().size()+" s");
             DetectFunctionEntity functFound = BotUtils.findBestFunctDetected(terms);
             DetectSocialEntity socialFound = BotUtils.findBestSocialDetected(terms);
+//            Log.d(TAG,functFound!=null?functFound.getFunctionName():"null "+
+//                    socialFound!=null?socialFound.getName():"null ");
+
+            if (functFound!= null && functFound.getId() == ConstManager.FUNCTION_TURN_OFF_ALL) {
+                SmartHouse.getInstance().turnOffAll();
+                return "Xác nhận";
+            }
+            else
+            if (functFound!= null && functFound.getId() == ConstManager.FUNCTION_TURN_ON_ALL) {
+                SmartHouse.getInstance().turnOnAll();
+                return "Xác nhận";
+            } else
             if (functFound != null && socialFound != null) {
+                Log.d(TAG,"func not null");
                 double functionTfidf = functFound.getDetectScore();
                 if (functFound.getId() == ConstManager.FUNCTION_START_MODE || functFound.getId() == ConstManager.FUNCTION_STOP_MODE)
                     functionTfidf +=  BotUtils.findBestScriptTfidf(termTargets);
-                else
-                if (functFound.getId() == ConstManager.FUNCTION_TURN_OFF_ALL) {
-                    SmartHouse.getInstance().turnOffAll();
-                    return "Xác nhận";
-                }
-                else
-                if (functFound.getId() == ConstManager.FUNCTION_TURN_ON_ALL) {
-                    SmartHouse.getInstance().turnOnAll();
-                    return "Xác nhận";
-                }
+
                 else
                     functionTfidf += BotUtils.findBestArreaTfidf(termTargets) + BotUtils.findBestDeviceTfidf(termTargets);
                 Log.d(TAG, "funct point: " + functionTfidf + " soc point " + socialFound.getDetectScore());
@@ -647,10 +655,13 @@ public class BotUtils {
                     return processSocial(socialFound);
                 }
             } else if (functFound == null && socialFound != null) {
+                Log.d(TAG,"6");
                 return processSocial(socialFound);
             } else if (functFound != null && socialFound == null) {
+                Log.d(TAG,"7");
                 return processFunction(termTargets, functFound,humanSay);
             } else {
+                Log.d(TAG,"8");
                 DetectSocialEntity notUnderReply = BotUtils.getSocialById(ConstManager.NOT_UNDERSTD);
                 CurrentContext.getInstance().setDetectSocial(notUnderReply);
                 return completeSentence(notUnderReply.getReplyPattern(), "", "");
