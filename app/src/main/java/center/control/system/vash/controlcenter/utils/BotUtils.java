@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import center.control.system.vash.controlcenter.area.AreaEntity;
@@ -450,7 +451,16 @@ public class BotUtils {
                 cmd.setDeviceId(device.getId());
                 cmd.setDeviceState("on");
                 break;
+
+            case ConstManager.FUNCTION_TURN_MUSIC_ON:
+                cmd.setDeviceId(device.getId());
+                cmd.setDeviceState("on");
+                break;
             case ConstManager.FUNCTION_TURN_OFF:
+                cmd.setDeviceId(device.getId());
+                cmd.setDeviceState("off");
+                break;
+            case ConstManager.FUNCTION_TURN_MUSIC_OFF:
                 cmd.setDeviceId(device.getId());
                 cmd.setDeviceState("off");
                 break;
@@ -585,7 +595,7 @@ public class BotUtils {
                     current.setDevice(device);
                     BotUtils.implementCommand(functionIntent, device, null);
                     return "Xác nhận " + ConstManager.getVerbByIntent(current.getDetectedFunction().getId(), device.isDoor()) +
-                            " " + current.getDevice().getName() + " trong " + current.getArea().getName();
+                            " " + current.getDevice().getName();
                 }
             }
         } else {
@@ -595,6 +605,7 @@ public class BotUtils {
         }
     }
     public static String botReplyToSentence(String humanSay){
+        humanSay = humanSay.toLowerCase(new Locale("vi","VN"));
         humanSay = " "+humanSay+" ";
         TermSQLite termSQLite = new TermSQLite();
         List<TargetTernEntity> termTargets = TermSQLite.getTargetInSentence(humanSay);
@@ -630,7 +641,18 @@ public class BotUtils {
             DetectSocialEntity socialFound = BotUtils.findBestSocialDetected(terms);
 //            Log.d(TAG,functFound!=null?functFound.getFunctionName():"null "+
 //                    socialFound!=null?socialFound.getName():"null ");
-
+            if (functFound!= null && functFound.getId() == ConstManager.FUNCTION_TURN_MUSIC_ON){
+                Log.d(TAG,"music 1");
+                DeviceEntity device = SmartHouse.getInstance().getMusicDevice(0);
+                BotUtils.implementCommand(functFound, device, null);
+                return "Xác nhận bật nhạc";
+            } else
+            if (functFound!= null && functFound.getId() == ConstManager.FUNCTION_TURN_MUSIC_OFF){
+                Log.d(TAG,"music 2");
+                DeviceEntity device = SmartHouse.getInstance().getMusicDevice(0);
+                BotUtils.implementCommand(functFound, device, null);
+                return "Xác nhận tắt nhạc";
+            } else
             if (functFound!= null && functFound.getId() == ConstManager.FUNCTION_TURN_OFF_ALL) {
                 SmartHouse.getInstance().turnOffAll();
                 return "Xác nhận";

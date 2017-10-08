@@ -409,7 +409,14 @@ public class SmartHouse {
         }
         return null;
     }
-
+    public DeviceEntity getMusicDevice(int areaId) {
+        for (DeviceEntity device: this.getDevices()){
+            if (device.getPort().contains("mus")){
+                return  device;
+            }
+        }
+        return null;
+    }
 
     public ScriptEntity getModeById(int id) {
         for (ScriptEntity mode: this.getScripts()){

@@ -48,6 +48,8 @@ public class ConstManager {
     public static final int FUNCTION_TURN_OFF = 1036;
     public static final int FUNCTION_TURN_OFF_ALL = 1039;
     public static final int FUNCTION_TURN_ON_ALL = 1040;
+    public static final int FUNCTION_TURN_MUSIC_ON = 1041;
+    public static final int FUNCTION_TURN_MUSIC_OFF = 1042;
     public static final int FUNCTION_INC_TEMP = 1032;
     public static final int FUNCTION_DEC_TEMP = 1035;
     public static final int FUNCTION_START_MODE = 1027;
