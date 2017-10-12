@@ -15,8 +15,10 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.RecognizerIntent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
@@ -28,6 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.microsoft.projectoxford.face.FaceServiceClient;
 import com.microsoft.projectoxford.face.contract.IdentifyResult;
@@ -125,6 +128,8 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     private  boolean lissten;
     private long listenTime= 0;
     private Timer repeatScheduler;
+    private AudioManager am;
+    private MediaPlayer mMediaPlayer;
 
 
     @Override
@@ -140,24 +145,19 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
         SmartHouse house = SmartHouse.getInstance();
         if (house.getAreas().size()>0) {
-//            currentArea = house.getAreas().get(0);
-//            areaAttributeAdapter.updateAttribute(currentArea.generateValueArr());
-//            deviceAdapter.updateHouseDevice(house.getDevicesByAreaId(currentArea.getId()));
             startService(new Intent(this, ControlMonitorService.class));
         } else {
-//            MessageUtils.makeText(this,"Nhân viên chưa cấu hình thiết bị").show();
-//            startActivity(new Intent(this,MainActivity.class));
-//            finish();
+            MessageUtils.makeText(this,"Nhân viên chưa cấu hình thiết bị").show();
+            startActivity(new Intent(this,MainActivity.class));
+            finish();
         }
         Bundle bun = getIntent().getBundleExtra("bundle");
         if (bun!= null) {
             Log.d(TAG, bun.getString("watch") + "");
             if (bun.getString("watch") != null &&
                     bun.getString("watch").equals("voice")) {
-//                stopListening();
                 CurrentContext.getInstance().waitOwner();
                 CurrentContext.getInstance().setDetectSocial(BotUtils.getSocialById(ConstManager.SOCIAL_APPEL));
-//            CurrentContext.getInstance().setDetectSocial(social);
                 showReply(BotUtils.completeSentence(CurrentContext.getInstance().getDetectSocial().getReplyPattern(), "", ""));
                 setIntent(new Intent());
             }
@@ -185,12 +185,9 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
         startListening(); // starts listening
 
-        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-//        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
-//        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
-        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
-        amanager.setStreamMute(AudioManager.STREAM_RING, true);
-        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+//        am.setStreamMute(AudioManager.STREAM_MUSIC, true);
+//        am.setStreamMute(AudioManager.STREAM_RING, true);
+//        am.setStreamMute(AudioManager.STREAM_SYSTEM, true);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,6 +199,12 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         String botName = sharedPreferences.getString(ConstManager.BOT_NAME,"");
         String ownerName = sharedPreferences.getString(ConstManager.OWNER_NAME,"");
         String ownerRole = sharedPreferences.getString(ConstManager.OWNER_ROLE,"");
+
+        am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        am.setMode(AudioManager.STREAM_MUSIC);
+        Register();
+        am.setSpeakerphoneOn(true);
+
         Log.d(TAG,botRole+"  "+botName+"  "+ownerName+"  "+ownerRole);
         SmartHouse.getInstance().setBotOwnerNameRole(botName,botRole,ownerName,ownerRole);
         ((TextView) findViewById(R.id.txtOwnerName)).setText(ownerName);
@@ -445,7 +448,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         int maxPrio = -2;
         String result = "";
         for (EventEntity ev : SmartHouse.getInstance().getCurrentState().getEvents()){
-//            Log.d(TAG, ev.getAreaId()+" "+ev.getSenName()+" "+ev.getSenValue() );
             if (ev.getAreaId() == 0){
 //                MessageUtils.makeText(this,"Cấu hình chưa được kích hoạt").show();
             } else
@@ -461,7 +463,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 } else if (ev.getSenName().equals(AreaEntity.attrivutesValues[1]) &&
                         ev.getSenValue().equals(area.getBright())){
                     if (ev.getPriority() >maxPrio){
-//                        Log.d(TAG, ev.getNextStateId()+" " );
                         maxPrio = ev.getPriority();
                         result = area.getName();
                         nextEv = ev;
@@ -469,7 +470,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 }else if (ev.getSenName().equals(AreaEntity.attrivutesValues[2]) &&
                         ev.getSenValue().equals(area.getTemperature())){
                     if (ev.getPriority() >maxPrio){
-//                        Log.d(TAG, ev.getNextStateId()+" " );
                         maxPrio = ev.getPriority();
                         result = area.getName();
                         nextEv = ev;
@@ -684,18 +684,10 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     @Override
     public void onFinish() {
         lissten = true;
-//        restartListeningService();
-//        Log.d(TAG, CurrentContext.getInstance().isWaitingOwnerSpeak()+ "  ");
-//        if (CurrentContext.getInstance().isWaitingOwnerSpeak() && SmartHouse.getInstance().isDefaultState()) {
-//            promptSpeechInput(sentenceReply);
-//        }
 
-        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-//        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
-//        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
-        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
-        amanager.setStreamMute(AudioManager.STREAM_RING, true);
-        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+        Register();
+
+        am.setSpeakerphoneOn(true);
     }
 
     private class DetectionTask extends AsyncTask<InputStream, String, com.microsoft.projectoxford.face.contract.Face[]> {
@@ -735,8 +727,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
 
         @Override
         protected void onPostExecute(com.microsoft.projectoxford.face.contract.Face[] result) {
-//            long enddetect= System.currentTimeMillis();
-//            Log.d("--------------", "time detect --------------- " + result.length);
 
             if (result != null) {
                 // Set the adapter of the ListView which contains the details of detectingfaces.
@@ -875,8 +865,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
     private void setDetectMessage(String info) {
         startService(new Intent(this,ControlMonitorService.class));
         AreaEntity camArea = SmartHouse.getAreaById(cameraAreaId);
-//        String[] item = info.split("-");
-//        Log.d(TAG,"  "+info+"  detect nguoi "+ item[1]);
 
         camArea.setDetect(info);
         camArea.setUpdatePerson((new Date()).getTime());
@@ -980,15 +968,24 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             Log.d(TAG,"stop wait wait stop");
         }
 
-        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-//        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-//        amanager.setStreamMute(AudioManager.STREAM_ALARM, false);
-        amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-        amanager.setStreamMute(AudioManager.STREAM_RING, false);
-        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
+//        am.setStreamMute(AudioManager.STREAM_MUSIC, false);
+//        am.setStreamMute(AudioManager.STREAM_RING, false);
+//        am.setStreamMute(AudioManager.STREAM_SYSTEM, false);
 //        stopListening();
         lissten = false;
-        VoiceUtils.speak(sentenceReply);
+
+        am.stopBluetoothSco();
+        am.setSpeakerphoneOn(true);
+        final Handler handler = new Handler();
+        final String finalSentenceReply = sentenceReply;
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                VoiceUtils.speak(finalSentenceReply);
+            }
+        }, 200);
 //        Log.d(TAG, sentenceReply + "  " +CurrentContext.getInstance().isWaitingOwnerSpeak());
     }
     @Override
@@ -1095,15 +1092,10 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 } else if (resultType.equals(ControlMonitorService.WAIT)){
                     Log.d(TAG,waitDialog.isShowing()+" stae diaalog");
                     if (!waitDialog.isShowing()) {
-//                        waitDialog = new ProgressDialog(ControlPanel.this);
-//                        waitDialog.setTitle("Vui lòng đợi");
-//                        waitDialog.setIndeterminate(true);
-//                        waitDialog.setCancelable(true);
                         waitDialog.show();
                     }
                 } else if (resultType.equals(ControlMonitorService.CHANGE_STATE)){
                     SmartHouse house =SmartHouse.getInstance();
-//                    CurrentContext.getInstance().stopWaitOwner();
                     if (!house.isDefaultState()) {
                         showAlertState(house.getCurrentState(), "");
                         showReply(BotUtils.completeSentence(SmartHouse.getInstance().getCurrentState().getNoticePattern(), "", ""));
@@ -1155,7 +1147,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                     }
                 } else if (resultType.equals(ControlMonitorService.MONITOR)) {
                     int areaId = intent.getIntExtra(AREA_ID, -1);
-//                    Log.d(TAG,currentArea.getId()+" , "+areaId);
                     if ( currentArea!=null && areaId == currentArea.getId()) {
                         areaAttributeAdapter.updateAttribute(currentArea.generateValueArr());
                         SmartHouse house = SmartHouse.getInstance();
@@ -1260,7 +1251,6 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
         Log.d(TAG, "processVoiceCommands: "+ voiceCommands[0].toString()+ "    " + lissten);
         if (social != null && social.getId() == ConstManager.SOCIAL_APPEL) {
             Log.d(TAG,"1");
-//            stopListening();
             lissten = true;
             listenTime =  (new Date()).getTime();
             CurrentContext.getInstance().waitOwner();
@@ -1273,11 +1263,9 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
                 configUpdateDialog.dismiss();
             }
             if (CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.UPDATE_BRAIN) {
-//                stopListening();
                 updateBot();
             }
             if (CurrentContext.getInstance().getDetectSocial().getId() == ConstManager.UPDATE_CONFIG){
-//                stopListening();
                 updateConfig();
             }
         }
@@ -1304,17 +1292,43 @@ public class ControlPanel extends ListeningActivity implements AreaAttributeAdap
             house.setRequireUpdate(false);
             house.resetStateToDefault();
             CurrentContext.getInstance().renew();
-//            restartListeningService();
         } else if (lissten){
             Log.d(TAG,"4");
 
             listenTime =  (new Date()).getTime();
             showReply(BotUtils.botReplyToSentence(voiceCommands[0]));
-//
         }
 
         restartListeningService();
-//        Toast.makeText(this, voiceCommands[0], Toast.LENGTH_SHORT).show();
     }
+    protected void Register() {
+        // TODO Auto-generated method stub
+        am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        registerReceiver(new BroadcastReceiver() {
 
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "Inside rcv ");
+
+
+                int state = intent.getIntExtra(
+                        AudioManager.EXTRA_SCO_AUDIO_STATE, -1);
+
+                Log.d(TAG, "Audio SCO state: " + state);
+                if (AudioManager.SCO_AUDIO_STATE_CONNECTED == state) {
+                    Toast.makeText(ControlPanel.this,"mic on",Toast.LENGTH_SHORT).show();
+                    unregisterReceiver(this);
+//                    am.stopBluetoothSco();
+                }
+
+            }
+        }, new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED));
+
+        Log.d("Start Bluetooth", "starting bluetooth");
+        try {
+            am.startBluetoothSco();
+        } catch (Exception e){
+            
+        }
+    }
 }

@@ -67,7 +67,6 @@ public class VoiceUtils {
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"1");
         singleton.tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, map);
-//         singleton.tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, null);
     }
     public String getContent() {
         return content;
